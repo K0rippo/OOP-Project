@@ -1,0 +1,4 @@
+bucket.jpg
+droplet.jpg
+droplet.png
+libgdx.png
