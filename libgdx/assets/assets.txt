@@ -1,3 +1,0 @@
-bucket.jpg
-droplet.png
-libgdx.png
