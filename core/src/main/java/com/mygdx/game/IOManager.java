@@ -12,12 +12,8 @@ import java.util.Map;
 
 public class IOManager implements InputProcessor {
 
-    // Maps a high-level action (E.g. JUMP)
     private EnumMap<InputAction, Runnable> actionHandlers;
-    
-    // Maps a keyboard key to an action
     private HashMap<Integer, InputAction> keyBindings;
-    
     private Vector2 mousePos;
     private Camera gameCamera; 
     private int scrollAmount = 0;
@@ -52,8 +48,20 @@ public class IOManager implements InputProcessor {
 
     public void handleInput() {
         for (Map.Entry<Integer, InputAction> entry : keyBindings.entrySet()) {
-            if (Gdx.input.isKeyPressed(entry.getKey())) {
-                invokeAction(entry.getValue());
+            int key = entry.getKey();
+            InputAction action = entry.getValue();
+            
+            boolean triggered = false;
+
+            // Simple "Just Pressed" vs "Held" logic
+            if (action.toString().startsWith("MOVE")) {
+                if (Gdx.input.isKeyPressed(key)) triggered = true;
+            } else {
+                if (Gdx.input.isKeyJustPressed(key)) triggered = true;
+            }
+
+            if (triggered) {
+                invokeAction(action);
             }
         }
     }
@@ -82,6 +90,12 @@ public class IOManager implements InputProcessor {
         keyBindings.clear();
         Gdx.input.setInputProcessor(null);
     }
+    
+    public int getScrollAmount() { 
+        int i = scrollAmount; 
+        scrollAmount = 0; 
+        return i; 
+    }
 
     // Required InputProcessor methods
     @Override public boolean scrolled(float amountX, float amountY) { this.scrollAmount = (int)amountY; return true; }
@@ -93,10 +107,4 @@ public class IOManager implements InputProcessor {
     @Override public boolean touchCancelled(int screenX, int screenY, int pointer, int button) { return false; }
     @Override public boolean touchDragged(int screenX, int screenY, int pointer) { return false; }
     @Override public boolean mouseMoved(int screenX, int screenY) { return false; }
-    
-    // Placeholder audio methods from UML
-    public void playSound(String key) { System.out.println("Sound: " + key); }
-    public void playMusic(String key) { System.out.println("Music: " + key); }
-    public void setVolume(float vol) { }
-    public int getScrollAmount() { int i = scrollAmount; scrollAmount=0; return i; }
 }
