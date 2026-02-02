@@ -28,7 +28,7 @@ public class EntityManager {
         return entities;
     }
 
-    public void update(float deltaTime)
+    public void updateAll(float deltaTime)
     {
         for (Entity e : entities)
         {
@@ -39,7 +39,7 @@ public class EntityManager {
         }
     }
 
-    public void render(SpriteBatch batch)
+    public void renderAll(SpriteBatch batch)
     {
         for (Entity e : entities)
         {

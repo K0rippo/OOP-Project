@@ -38,8 +38,8 @@ public class GameMaster extends ApplicationAdapter {
         
         if (isRunning) 
         {
-            entityManager.update(1/60f); // assume ~60 FPS for now
-            entityManager.render(batch);
+            entityManager.updateAll(1/60f); // assume ~60 FPS for now
+            entityManager.renderAll(batch);
         }
         
         batch.end();
