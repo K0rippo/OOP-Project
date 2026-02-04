@@ -10,6 +10,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 
 //Elvan's test commit
 //Test commit 2
+//kendrickk tessstingg 31/1/26
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class GameMaster extends ApplicationAdapter {
 	
