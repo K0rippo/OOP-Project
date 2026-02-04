@@ -19,6 +19,7 @@ public class GameMaster extends ApplicationAdapter {
     // Components
     private SpriteBatch batch;
     private SceneManager sceneManager;
+    private IOManager ioManager;
     
     EntityManager entityManager = new EntityManager();
     
@@ -65,6 +66,7 @@ public class GameMaster extends ApplicationAdapter {
     {
         batch = new SpriteBatch();
         isRunning = true;
+        private IOManager ioManager;
         
         Circle circle = new Circle(1, new Vector2(100, 300), 30f);
         circle.setVelocity(new Vector2(0, -50)); // falling down
@@ -92,8 +94,13 @@ public class GameMaster extends ApplicationAdapter {
     @Override
     public void pause() {
         isRunning = false;
+        ScreenUtils.clear(0, 0, 0, 1);
+        
+        if (ioManager != null) {
+            ioManager.handleInput();
+        }
     }
-
+    
     @Override
     public void resume() {
         isRunning = true;
@@ -115,5 +122,9 @@ public class GameMaster extends ApplicationAdapter {
     // If you need to access other managers globally
     public SpriteBatch getBatch() {
         return batch;
+    public void dispose() {
+        if (ioManager != null) {
+            ioManager.dispose();
+        }
     }
 }
