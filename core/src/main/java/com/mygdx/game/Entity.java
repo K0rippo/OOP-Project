@@ -3,20 +3,25 @@ package com.mygdx.game;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 
-public abstract class Entity {
+public abstract class Entity implements Movable{
 	
     private int id;
     private Vector2 position;
     private Vector2 velocity;
     private String state;
     private boolean isActive;
+    private String name;
+    private final Transform transform;
+
 
     //Constructor 
-    public Entity(int id, Vector2 position)
+    public Entity(int id, String name, Vector2 position)
     {
         this.id = id;
+        this.name = name;
         this.position = position;
         this.velocity = new Vector2(0, 0);
+        this.transform = new Transform();
         this.state = "default";
         this.isActive = true;
     }
@@ -26,11 +31,23 @@ public abstract class Entity {
         //Basic movement logic
         position.add(velocity.x * deltaTime, velocity.y * deltaTime);
     }
+    
+    
+    
+    // Overriding toString makes debugging collisions much easier
+    @Override
+    public String toString() {
+        return "Entity{name='" + name + "'}";
+    }
 
     public abstract void render(SpriteBatch batch);
 
     //Gett setters
     public int getId() { return id; }
+    
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+
     
     public Vector2 getPosition() { return position; }
     public void setPosition(Vector2 position) { this.position = position; }
@@ -43,5 +60,37 @@ public abstract class Entity {
     
     public boolean isActive() { return isActive; }
     public void setActive(boolean active) { this.isActive = active; }
-}
+    
+    @Override
+    public Transform getTransform() {
+        return transform;
+    }
+    
+    @Override
+    public void applyMovement(float deltaTime) {
+        Vector2 delta = velocity.cpy().scl(deltaTime);
+        transform.getPosition().add(delta);
+    }
 
+    public void rotate(float angleDegrees) {
+        transform.setRotationDegrees(
+            transform.getRotationDegrees() + angleDegrees
+        );
+    }
+
+    public void lookAt(Vector2 target) {
+        Vector2 dir = target.cpy().sub(transform.getPosition());
+        float angle = (float) Math.toDegrees(Math.atan2(dir.y, dir.x));
+        transform.setRotationDegrees(angle);
+    }
+
+    public void moveTowards(Vector2 target) {
+        Vector2 dir = target.cpy()
+                            .sub(transform.getPosition())
+                            .nor();
+
+        float speed = velocity.len();
+        velocity = dir.scl(speed);
+    }
+    
+}
