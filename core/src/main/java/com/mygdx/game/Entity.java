@@ -44,3 +44,4 @@ public abstract class Entity {
     public boolean isActive() { return isActive; }
     public void setActive(boolean active) { this.isActive = active; }
 }
+
