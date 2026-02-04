@@ -53,5 +53,30 @@ public class EntityManager {
     public void clear()
     {
         entities.clear();
+
+        //addison
+        private List<Entity> entityList = new ArrayList<>(); 
+        public void addEntity(Entity e) {
+            entityList.add(e); 
+        }
+
+        public void movement() {
+            for (Entity e : entityList) {
+                e.movement(); 
+            }
+        }
+
+        public void draw(SpriteBatch batch, ShapeRenderer shape) {
+            for (Entity e : entityList) {
+                e.draw(batch); 
+                e.draw(shape);
+            }
+        }
+
+        public void update() {
+            for (Entity e : entityList) {
+                e.update();
+            }
+        }
     }
 }

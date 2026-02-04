@@ -20,6 +20,7 @@ public class GameMaster extends ApplicationAdapter {
     private SpriteBatch batch;
     private SceneManager sceneManager;
     private IOManager ioManager;
+    private EntityManager em;
     
     EntityManager entityManager = new EntityManager();
     
@@ -72,6 +73,13 @@ public class GameMaster extends ApplicationAdapter {
         circle.setVelocity(new Vector2(0, -50)); // falling down
         entityManager.addEntity(circle);
 
+        //addison
+        em = new EntityManager();
+        // Create your objects and add them to the manager
+        em.addEntity(new Circle(100, 100, 50, Color.RED, 200));
+        em.addEntity(new TextureObject(bucketTex, 300, 20, 300, false));
+        // Add raindrops, triangles, etc.
+
         
     }
 
@@ -87,6 +95,19 @@ public class GameMaster extends ApplicationAdapter {
             entityManager.renderAll(batch);
         }
         
+        //addison
+        // 1. Update state
+        em.movement(); 
+        em.update(); // Prints info to console [cite: 34]
+
+        // 2. Draw state
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        batch.begin();
+        shape.begin(ShapeType.Filled);
+        
+        em.draw(batch, shape); // Manager handles all drawing [cite: 49, 50]
+        
+        shape.end();
         batch.end();
 
     }
@@ -126,5 +147,6 @@ public class GameMaster extends ApplicationAdapter {
         if (ioManager != null) {
             ioManager.dispose();
         }
+    }
     }
 }

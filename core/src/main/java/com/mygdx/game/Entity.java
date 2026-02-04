@@ -3,6 +3,7 @@ package com.mygdx.game;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 
+//elvan
 public abstract class Entity {
 	
     private int id;
@@ -45,6 +46,7 @@ public abstract class Entity {
     public void setActive(boolean active) { this.isActive = active; }
 }
 
+//kendrick
 public class Entity implements Movable {
 
     private final Transform transform;
@@ -98,3 +100,21 @@ public class Entity implements Movable {
     }
 }
 
+//addison
+public class Entity {
+    private String name;
+
+    public Entity(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    // Overriding toString makes debugging collisions much easier
+    @Override
+    public String toString() {
+        return "Entity{name='" + name + "'}";
+    }
+}
