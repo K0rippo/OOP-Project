@@ -9,9 +9,9 @@ public class Circle extends Entity {
     private float radius;
     private ShapeRenderer shapeRenderer;
 
-    public Circle(int id, Vector2 position, float radius)
+    public Circle(int id, String name, Vector2 position, float radius)
     {
-        super(id, position);
+        super(id, name, position);
         this.radius = radius;
         this.shapeRenderer = new ShapeRenderer();
     }
