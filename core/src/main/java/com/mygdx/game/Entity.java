@@ -1,26 +1,19 @@
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+package groupProject;
 
-public abstract class Entity implements iMovable {
-    protected float x, y, speed; // Common attributes 
-    protected Color color;
+public class Entity {
+    private String name;
 
-    public Entity(float x, float y, Color color, float speed) {
-        this.x = x;
-        this.y = y;
-        this.color = color;
-        this.speed = speed;
+    public Entity(String name) {
+        this.name = name;
     }
 
-    // Standard getters and setters 
-    public float getX() { return x; }
-    public float getY() { return y; }
+    public String getName() {
+        return name;
+    }
 
-    // Abstract method: Must be implemented by subclasses to display console info 
-    public abstract void update();
-
-    // These will be overridden by subclasses depending on if they use textures or shapes [cite: 114]
-    public void draw(ShapeRenderer shape) {}
-    public void draw(SpriteBatch batch) {}
+    // Overriding toString makes debugging collisions much easier
+    @Override
+    public String toString() {
+        return "Entity{name='" + name + "'}";
+    }
 }
