@@ -1,11 +1,31 @@
-package com.mygdx.game;
+import java.util.ArrayList;
+import java.util.List;
 
-import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.utils.ScreenUtils;
+public class EntityManager {
+    private List<Entity> entityList = new ArrayList<>(); 
+    public void addEntity(Entity e) {
+        entityList.add(e); 
+    }
 
+    public void movement() {
+        for (Entity e : entityList) {
+            e.movement(); 
+        }
+    }
+
+    public void draw(SpriteBatch batch, ShapeRenderer shape) {
+        for (Entity e : entityList) {
+            e.draw(batch); 
+            e.draw(shape);
+        }
+    }
+
+    public void update() {
+        for (Entity e : entityList) {
+            e.update();
+        }
+    }
+}
 public class GameMaster extends ApplicationAdapter {
     private EntityManager em;
 
@@ -22,14 +42,14 @@ public class GameMaster extends ApplicationAdapter {
     public void render() {
         // 1. Update state
         em.movement(); 
-        em.update(); // Prints info to console [cite: 34]
+        em.update();
 
         // 2. Draw state
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         batch.begin();
         shape.begin(ShapeType.Filled);
         
-        em.draw(batch, shape); // Manager handles all drawing [cite: 49, 50]
+        em.draw(batch, shape);
         
         shape.end();
         batch.end();
