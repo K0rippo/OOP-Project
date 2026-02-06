@@ -33,8 +33,13 @@ public class Scene {
     }
 
     public void render(SpriteBatch batch) {
-        if (!isActive) return;
-        // rendered entities would go here
+        for (Entity e : sceneEntities)
+        {
+            if (e.isActive())
+            {
+                e.render(batch);
+            }
+        }
     }
 
     public void setActive(boolean active) {

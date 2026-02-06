@@ -1,5 +1,6 @@
 package com.mygdx.game;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
@@ -7,13 +8,15 @@ import com.badlogic.gdx.math.Vector2;
 public class Circle extends Entity {
 	
     private float radius;
+    private Color color;
     private ShapeRenderer shapeRenderer;
 
-    public Circle(int id, String name, Vector2 position, float radius)
+    public Circle(int id, String name, Vector2 position, float radius, Color color)
     {
         super(id, name, position);
         this.radius = radius;
         this.shapeRenderer = new ShapeRenderer();
+        this.color = color;
     }
 
     @Override
@@ -24,6 +27,7 @@ public class Circle extends Entity {
 
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.circle(getPosition().x, getPosition().y, radius);
+        shapeRenderer.setColor(color);
         shapeRenderer.end();
 
         // Resume the batch for other entities
