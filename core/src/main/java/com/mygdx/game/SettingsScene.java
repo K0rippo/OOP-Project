@@ -20,14 +20,17 @@ public class SettingsScene extends Scene {
 
     private Stage stage;
     private SceneManager sceneManager;
-    private TextButton btnMute; // Class level so we can update text
+    private TextButton btnMute;
+    
+    // default to MENU, but can be changed to GAME
+    private String previousSceneId = "MENU"; 
 
     public SettingsScene(String id, final SceneManager sceneManager) {
         super(id);
         this.sceneManager = sceneManager;
         stage = new Stage(new ScreenViewport());
 
-        // Style Setup (Same generic white style)
+        // styling
         BitmapFont font = new BitmapFont();
         Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
         pixmap.setColor(Color.WHITE);
@@ -39,27 +42,22 @@ public class SettingsScene extends Scene {
         style.font = font;
         style.up = new TextureRegionDrawable(new TextureRegion(texture));
         style.fontColor = Color.WHITE;
-
         Label.LabelStyle labelStyle = new Label.LabelStyle(font, Color.WHITE);
 
-        // Layout
+        // layout
         Table mainTable = new Table();
         mainTable.setFillParent(true);
         stage.addActor(mainTable);
 
-        // Title
         Label title = new Label("SETTINGS", labelStyle);
         title.setFontScale(1.5f);
 
-        // Mute Button
         btnMute = new TextButton("SOUND: UNMUTED", style);
         btnMute.setColor(Color.DARK_GRAY);
 
-        // Back Button
         TextButton btnBack = new TextButton("BACK", style);
         btnBack.setColor(Color.GRAY);
 
-        // Add to Table
         mainTable.top().padTop(50);
         mainTable.add(title).padBottom(50);
         mainTable.row();
@@ -67,7 +65,7 @@ public class SettingsScene extends Scene {
         mainTable.row();
         mainTable.add(btnBack).size(200, 50);
 
-        // Listeners
+        // listeners
         btnMute.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -78,9 +76,14 @@ public class SettingsScene extends Scene {
         btnBack.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                sceneManager.setActiveScene("MENU");
+                // Go back to wherever we came from (Menu or Game)
+                sceneManager.setActiveScene(previousSceneId);
             }
         });
+    }
+
+    public void setPreviousScene(String id) {
+        this.previousSceneId = id;
     }
 
     private void toggleMute() {
@@ -91,7 +94,7 @@ public class SettingsScene extends Scene {
     private void updateButtonText() {
         if (GameMaster.isMuted) {
             btnMute.setText("SOUND: MUTED");
-            btnMute.setColor(Color.RED); // Visual feedback
+            btnMute.setColor(Color.RED);
         } else {
             btnMute.setText("SOUND: UNMUTED");
             btnMute.setColor(Color.DARK_GRAY);
@@ -101,7 +104,6 @@ public class SettingsScene extends Scene {
     @Override
     public void show() {
         Gdx.input.setInputProcessor(stage);
-        // Ensure button text matches current global state when we enter the screen
         updateButtonText();
     }
 

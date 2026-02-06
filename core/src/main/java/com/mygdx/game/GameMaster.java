@@ -10,7 +10,7 @@ public class GameMaster extends ApplicationAdapter {
     private SpriteBatch batch;
     private SceneManager sceneManager;
     
-    // Global settings state
+    // global settings state
     public static boolean isMuted = false;
 
     @Override
@@ -18,17 +18,17 @@ public class GameMaster extends ApplicationAdapter {
         batch = new SpriteBatch();
         sceneManager = new SceneManager();
 
-        // 1. Create Scenes
+        // create scenes
         MenuScene menuScene = new MenuScene("MENU", sceneManager);
-        GameScene gameScene = new GameScene("GAME");
+        GameScene gameScene = new GameScene("GAME", sceneManager);
         SettingsScene settingsScene = new SettingsScene("SETTINGS", sceneManager);
 
-        // 2. Add to Manager
+        // add to Manager
         sceneManager.addScene(menuScene.getId(), menuScene);
         sceneManager.addScene(gameScene.getId(), gameScene);
         sceneManager.addScene(settingsScene.getId(), settingsScene);
 
-        // 3. Start at Menu
+        // start at Menu
         sceneManager.setActiveScene("MENU");
     }
 
