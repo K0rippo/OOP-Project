@@ -14,36 +14,32 @@ public class SceneManager {
 
     public void addScene(String id, Scene scene) {
         scenes.put(id, scene);
-        if (activeScene == null) {
-            activeScene = scene;
-        }
-    }
-
-    public void removeScene(String id) {
-        scenes.remove(id);
     }
 
     public void setActiveScene(String id) {
         if (scenes.containsKey(id)) {
+            // 1. If there is an old scene, hide it
+            if (activeScene != null) {
+                activeScene.hide();
+            }
+            
+            // 2. Switch to new scene
             activeScene = scenes.get(id);
+            
+            // 3. Show the new scene (This will turn on the buttons!)
+            activeScene.show(); 
+            
         } else {
             System.out.println("Scene " + id + " does not exist.");
         }
     }
 
-    public Scene getActiveScene() {
-        return activeScene;
-    }
-
+    // ... rest of your code (updateActiveScene, renderActiveScene, etc) ...
     public void updateActiveScene(float deltaTime) {
-        if (activeScene != null) {
-            activeScene.update(deltaTime);
-        }
+        if (activeScene != null) activeScene.update(deltaTime);
     }
 
     public void renderActiveScene(SpriteBatch batch) {
-        if (activeScene != null) {
-            activeScene.render(batch);
-        }
+        if (activeScene != null) activeScene.render(batch);
     }
 }
