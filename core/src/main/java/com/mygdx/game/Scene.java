@@ -14,6 +14,14 @@ public class Scene {
         this.sceneEntities = new ArrayList<>();
         this.isActive = true;
     }
+    
+    public void show() {
+        // This method is called when the scene becomes active
+    }
+    
+    public void hide() {
+        // This method is called when the scene is removed/switched away
+    }
 
     public void addEntity(Entity e) {
         sceneEntities.add(e);

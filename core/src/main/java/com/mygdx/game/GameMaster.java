@@ -1,12 +1,11 @@
 package com.mygdx.game;
 
 import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.utils.ScreenUtils;
-import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import java.util.ArrayList;
-import java.util.List;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.ScreenUtils;
 
 public class GameMaster extends ApplicationAdapter {
 
@@ -14,16 +13,26 @@ public class GameMaster extends ApplicationAdapter {
     private SceneManager sceneManager;
     private EntityManager entityManager;
 
+    // global settings state
+    public static boolean isMuted = false;
+
+
     @Override
     public void create() {
         batch = new SpriteBatch();
         sceneManager = new SceneManager();
         entityManager = new EntityManager();
 
-        // Create scenes
-        Scene sandbox = new Scene("sandbox");
-        sceneManager.addScene("sandbox", sandbox);
-        sceneManager.setActiveScene("sandbox");
+
+        // create scenes
+        MenuScene menuScene = new MenuScene("MENU", sceneManager);
+        GameScene gameScene = new GameScene("GAME", sceneManager);
+        SettingsScene settingsScene = new SettingsScene("SETTINGS", sceneManager);
+
+        // add to Manager
+        sceneManager.addScene(menuScene.getId(), menuScene);
+        sceneManager.addScene(gameScene.getId(), gameScene);
+        sceneManager.addScene(settingsScene.getId(), settingsScene);
 
         // Create entities
         Entity ball = new Circle(
@@ -69,11 +78,20 @@ public class GameMaster extends ApplicationAdapter {
         entityManager.addEntity(ball);
         entityManager.addEntity(trampoline);
         entityManager.addEntity(wall);
+
+        // start at Menu
+        sceneManager.setActiveScene("MENU");
+
     }
 
     @Override
     public void render() {
-        ScreenUtils.clear(0.5f, 0.5f, 0.5f, 1f);
+
+        ScreenUtils.clear(0.1f, 0.1f, 0.2f, 1f);
+
+        float deltaTime = Gdx.graphics.getDeltaTime();
+        sceneManager.updateActiveScene(deltaTime);
+
 
         batch.begin();
         sceneManager.renderActiveScene(batch, entityManager);

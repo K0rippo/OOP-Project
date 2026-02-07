@@ -14,36 +14,30 @@ public class SceneManager {
 
     public void addScene(String id, Scene scene) {
         scenes.put(id, scene);
-        if (activeScene == null) {
-            activeScene = scene;
-        }
     }
 
-    public void removeScene(String id) {
-        scenes.remove(id);
+    public Scene getScene(String id) {
+        return scenes.get(id);
     }
 
     public void setActiveScene(String id) {
         if (scenes.containsKey(id)) {
+            if (activeScene != null) activeScene.hide();
             activeScene = scenes.get(id);
+            activeScene.show();
         } else {
             System.out.println("Scene " + id + " does not exist.");
         }
     }
 
-    public Scene getActiveScene() {
-        return activeScene;
-    }
-
     public void updateActiveScene(float deltaTime) {
-        if (activeScene != null) {
-            activeScene.update(deltaTime);
-        }
+        if (activeScene != null) activeScene.update(deltaTime);
     }
 
     public void renderActiveScene(SpriteBatch batch, EntityManager entityManager) {
         if (activeScene != null) {
             activeScene.render(batch, entityManager);
         }
+
     }
 }
