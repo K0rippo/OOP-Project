@@ -28,10 +28,16 @@ public class IOManager implements InputProcessor {
     }
     
     private void initializeDefaultBindings() {
+        // Ball Controls (WASD)
         bindKey(Input.Keys.W, InputAction.MOVE_UP);
         bindKey(Input.Keys.S, InputAction.MOVE_DOWN);
         bindKey(Input.Keys.A, InputAction.MOVE_LEFT);
         bindKey(Input.Keys.D, InputAction.MOVE_RIGHT);
+        
+        // NEW: Trampoline Controls (Arrow Keys)
+        bindKey(Input.Keys.LEFT, InputAction.TRAMPOLINE_LEFT);
+        bindKey(Input.Keys.RIGHT, InputAction.TRAMPOLINE_RIGHT);
+        
         bindKey(Input.Keys.SPACE, InputAction.JUMP);
         bindKey(Input.Keys.ESCAPE, InputAction.PAUSE_GAME);
     }
@@ -53,8 +59,9 @@ public class IOManager implements InputProcessor {
             
             boolean triggered = false;
 
-            // Simple "Just Pressed" vs "Held" logic
-            if (action.toString().startsWith("MOVE")) {
+            // Check if key is pressed
+            // "MOVE" and "TRAMPOLINE" actions should work while holding the key
+            if (action.toString().startsWith("MOVE") || action.toString().startsWith("TRAMPOLINE")) {
                 if (Gdx.input.isKeyPressed(key)) triggered = true;
             } else {
                 if (Gdx.input.isKeyJustPressed(key)) triggered = true;

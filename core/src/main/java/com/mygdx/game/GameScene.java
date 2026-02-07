@@ -1,6 +1,7 @@
 package com.mygdx.game;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
@@ -21,24 +22,75 @@ public class GameScene extends Scene {
 
     private Stage stage;
     private SceneManager sceneManager;
+    private IOManager ioManager; // Added reference
+    
+    // Class-level references so we can control them in update()
+    private Entity ball; 
+    private Entity trampoline;
+    
     private boolean isPaused = false;
     
     // ui elements
     private Table pauseMenuTable;
     private Image dimOverlay;
-    private Table topTable; // to hold the pause button
+    private Table topTable; 
 
-    public GameScene(String id, final SceneManager sceneManager) {
+    // Constructor updated to accept IOManager
+    public GameScene(String id, final SceneManager sceneManager, IOManager ioManager) {
         super(id);
         this.sceneManager = sceneManager;
+        this.ioManager = ioManager;
+        
         initializeEntities();
         initializeUI();
+        setupInputLogic(); // Bind keys to actions
     }
 
+    private void setupInputLogic() {
+        if (ball == null || trampoline == null) return;
+        
+        float ballSpeed = 200f;
+        float trampolineSpeed = 250f;
+
+        // --- BALL CONTROLS (WASD) ---
+        ioManager.registerAction(InputAction.MOVE_UP, () -> ball.getVelocity().y = ballSpeed);
+        ioManager.registerAction(InputAction.MOVE_DOWN, () -> ball.getVelocity().y = -ballSpeed);
+        ioManager.registerAction(InputAction.MOVE_LEFT, () -> ball.getVelocity().x = -ballSpeed);
+        ioManager.registerAction(InputAction.MOVE_RIGHT, () -> ball.getVelocity().x = ballSpeed);
+        
+        // --- TRAMPOLINE CONTROLS (ARROWS) ---
+        ioManager.registerAction(InputAction.TRAMPOLINE_LEFT, () -> trampoline.getVelocity().x = -trampolineSpeed);
+        ioManager.registerAction(InputAction.TRAMPOLINE_RIGHT, () -> trampoline.getVelocity().x = trampolineSpeed);
+        
+        // --- PAUSE ---
+        ioManager.registerAction(InputAction.PAUSE_GAME, () -> {
+            if (!isPaused) togglePause(true);
+            else togglePause(false);
+        });
+    }
+
+    private void initializeEntities() {
+        // 1. Create Ball and save to class variable
+        ball = new Circle(1, "Ball", new Vector2(200, 200), 15, Color.BROWN);
+        addEntity(ball); 
+
+        // 2. Create Trampoline and save to class variable
+        trampoline = new RectangleEntity(2, "Trampoline", new Vector2(50, 50), 150, 20, Color.GREEN);
+        addEntity(trampoline);
+
+        // 3. Create Walls/Coins
+        Entity wall = new RectangleEntity(3, "Wall", new Vector2(600, 50), 40, 200, Color.BLACK);
+        addEntity(wall);
+        
+        for(int i=0; i<2; i++) {
+             Entity coin = new Circle(100 + i, "Coin" + i, new Vector2(300 + i * 40, 250), 5, Color.GOLD);
+             addEntity(coin);
+        }
+    }
+    
     private void initializeUI() {
         stage = new Stage(new ScreenViewport());
 
-        // styling
         BitmapFont font = new BitmapFont();
         Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
         pixmap.setColor(Color.WHITE);
@@ -51,16 +103,14 @@ public class GameScene extends Scene {
         style.up = new TextureRegionDrawable(new TextureRegion(whiteTexture));
         style.fontColor = Color.BLACK;
 
-        // create transparent black background
         Pixmap dimPixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
         dimPixmap.setColor(0, 0, 0, 0.7f);
         dimPixmap.fill();
         dimOverlay = new Image(new Texture(dimPixmap));
         dimOverlay.setFillParent(true);
-        dimOverlay.setVisible(false); // hidden by default
+        dimOverlay.setVisible(false);
         dimPixmap.dispose();
 
-        // create top-right pause button
         TextButton btnPause = new TextButton("||", style); 
         btnPause.setColor(Color.ORANGE);
         
@@ -69,18 +119,15 @@ public class GameScene extends Scene {
         topTable.top().right();
         topTable.add(btnPause).size(50, 50).pad(10);
 
-        // create pause menu
         pauseMenuTable = new Table();
         pauseMenuTable.setFillParent(true);
         pauseMenuTable.center();
-        pauseMenuTable.setVisible(false); // hidden by default
+        pauseMenuTable.setVisible(false);
 
         TextButton btnContinue = new TextButton("CONTINUE", style);
         btnContinue.setColor(Color.GRAY);
-        
         TextButton btnSettings = new TextButton("SETTINGS", style);
         btnSettings.setColor(Color.GRAY);
-        
         TextButton btnLeave = new TextButton("LEAVE", style);
         btnLeave.setColor(Color.RED);
 
@@ -90,24 +137,17 @@ public class GameScene extends Scene {
         pauseMenuTable.row();
         pauseMenuTable.add(btnLeave).size(200, 50);
 
-        // add everything to stage
-        stage.addActor(dimOverlay); // background first
-        stage.addActor(topTable);   // top right button
-        stage.addActor(pauseMenuTable); // pause menu on top
+        stage.addActor(dimOverlay);
+        stage.addActor(topTable);
+        stage.addActor(pauseMenuTable);
 
-        // listeners
-        
-        // pause button logic
         btnPause.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                if (!isPaused) {
-                    togglePause(true);
-                }
+                if (!isPaused) togglePause(true);
             }
         });
 
-        // continue button logic
         btnContinue.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -115,25 +155,21 @@ public class GameScene extends Scene {
             }
         });
 
-        // settings button logic
         btnSettings.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                // find settings scene
                 SettingsScene settings = (SettingsScene) sceneManager.getScene("SETTINGS");
                 if (settings != null) {
-                    // come back to game scene, not to main menu
                     settings.setPreviousScene("GAME");
                     sceneManager.setActiveScene("SETTINGS");
                 }
             }
         });
 
-        // leave button logic
         btnLeave.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                togglePause(false); // reset pause state
+                togglePause(false);
                 sceneManager.setActiveScene("MENU");
             }
         });
@@ -143,28 +179,16 @@ public class GameScene extends Scene {
         isPaused = paused;
         pauseMenuTable.setVisible(paused);
         dimOverlay.setVisible(paused);
-        topTable.setVisible(!paused); // hide the top pause button when menu is open
-    }
-
-    private void initializeEntities() {
-        Entity ball = new Circle(1, "Ball", new Vector2(200, 200), 15, Color.BROWN);
-        addEntity(ball);
-
-        Entity trampoline = new RectangleEntity(2, "Trampoline", new Vector2(50, 50), 150, 20, Color.GREEN);
-        addEntity(trampoline);
-
-        Entity wall = new RectangleEntity(3, "Wall", new Vector2(600, 50), 40, 200, Color.BLACK);
-        addEntity(wall);
-        
-        for(int i=0; i<2; i++) {
-             Entity coin = new Circle(100 + i, "Coin" + i, new Vector2(300 + i * 40, 250), 5, Color.GOLD);
-             addEntity(coin);
-        }
+        topTable.setVisible(!paused);
     }
 
     @Override
     public void show() {
-        Gdx.input.setInputProcessor(stage);
+        // MULTIPLEXER: This is critical. It lets us click buttons AND press keys.
+        InputMultiplexer multiplexer = new InputMultiplexer();
+        multiplexer.addProcessor(stage);      // UI
+        multiplexer.addProcessor(ioManager);  // Game
+        Gdx.input.setInputProcessor(multiplexer);
     }
 
     @Override
@@ -174,21 +198,22 @@ public class GameScene extends Scene {
 
     @Override
     public void update(float deltaTime) {
-        // update only game entities if not paused
         if (!isPaused) {
-            super.update(deltaTime);
+            // STOP ON RELEASE: Reset velocity every frame. 
+            // If a key is still held, IOManager will set it back to speed immediately after this.
+            if (ball != null) ball.setVelocity(new Vector2(0,0));
+            if (trampoline != null) trampoline.setVelocity(new Vector2(0,0));
+            
+            ioManager.handleInput(); 
+            super.update(deltaTime); 
         }
         
-        // update the ui
         stage.act(deltaTime);
     }
 
     @Override
     public void render(SpriteBatch batch, EntityManager entityManager) {
-        // render game entities (background)
         super.render(batch, entityManager);
-
-        // render ui (pause menu + overlay)
         if (batch.isDrawing()) batch.end();
         stage.draw();
         if (!batch.isDrawing()) batch.begin();

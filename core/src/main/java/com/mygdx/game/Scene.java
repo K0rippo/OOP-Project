@@ -6,7 +6,7 @@ import java.util.List;
 
 public class Scene {
     private String id;
-    private List<Entity> sceneEntities;
+    private List<Entity> sceneEntities; // Local list
     private boolean isActive;
 
     public Scene(String id) {
@@ -15,13 +15,8 @@ public class Scene {
         this.isActive = true;
     }
     
-    public void show() {
-        // This method is called when the scene becomes active
-    }
-    
-    public void hide() {
-        // This method is called when the scene is removed/switched away
-    }
+    public void show() {}
+    public void hide() {}
 
     public void addEntity(Entity e) {
         sceneEntities.add(e);
@@ -37,11 +32,16 @@ public class Scene {
 
     public void update(float deltaTime) {
         if (!isActive) return;
-        // updated entities would go here
+        
+        // <--- NEW: Update ONLY local entities
+        for (Entity e : sceneEntities) {
+            if (e.isActive()) e.update(deltaTime);
+        }
     }
 
     public void render(SpriteBatch batch, EntityManager entityManager) {
-        for (Entity e : entityManager.getEntities()) {
+        // <--- NEW: Render ONLY local entities (Fixes invisible player bug)
+        for (Entity e : sceneEntities) {
             e.render(batch, entityManager);
         }
     }
