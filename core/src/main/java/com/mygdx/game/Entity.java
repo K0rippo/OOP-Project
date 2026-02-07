@@ -40,7 +40,7 @@ public abstract class Entity implements Movable{
         return "Entity{name='" + name + "'}";
     }
 
-    public abstract void render(SpriteBatch batch);
+    public abstract void render(SpriteBatch batch, EntityManager entityManager);
 
     //Gett setters
     public int getId() { return id; }

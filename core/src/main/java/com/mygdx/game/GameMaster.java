@@ -12,29 +12,21 @@ public class GameMaster extends ApplicationAdapter {
 
     private SpriteBatch batch;
     private SceneManager sceneManager;
-
-    private Entity ball;
-    private Entity trampoline;
-    private Entity wall;
-    private List<Entity> coins;
-
-    private Scene sandbox;
+    private EntityManager entityManager;
 
     @Override
     public void create() {
         batch = new SpriteBatch();
         sceneManager = new SceneManager();
+        entityManager = new EntityManager();
 
-        // coin list
-        coins = new ArrayList<>();
-
-        // Create sandbox scene
-        sandbox = new Scene("sandbox");
+        // Create scenes
+        Scene sandbox = new Scene("sandbox");
         sceneManager.addScene("sandbox", sandbox);
         sceneManager.setActiveScene("sandbox");
 
-        // 1. Ball (Circle)
-        ball = new Circle(
+        // Create entities
+        Entity ball = new Circle(
                 1,
                 "Ball",
                 new Vector2(200, 200),
@@ -42,9 +34,9 @@ public class GameMaster extends ApplicationAdapter {
                 Color.BROWN
         );
 
-        // 2. Trampoline (RectangleEntity)
-        trampoline = new RectangleEntity(
-                2,
+
+        Entity trampoline = new RectangleEntity(
+        		2,
                 "Trampoline",
                 new Vector2(50, 50),
                 150,
@@ -52,9 +44,8 @@ public class GameMaster extends ApplicationAdapter {
                 Color.GREEN
         );
 
-        // 3. Wall (RectangleEntity)
-        wall = new RectangleEntity(
-                3,
+        Entity wall = new RectangleEntity(
+        		3,
                 "Wall",
                 new Vector2(600, 50),
                 40,
@@ -62,31 +53,30 @@ public class GameMaster extends ApplicationAdapter {
                 Color.BLACK
         );
 
-        // 4. Coins
+        // Coins
         for (int i = 0; i < 2; i++) {
             Entity coin = new Circle(
-                    100 + i,
+            		100 + i,
                     "Coin" + i,
                     new Vector2(300 + i * 40, 250),
                     5,
                     Color.GOLD
             );
-
-            coins.add(coin);
-            sandbox.addEntity(coin);
+            entityManager.addEntity(coin);
         }
 
-        // Add main entities to the scene
-        sandbox.addEntity(ball);
-        sandbox.addEntity(trampoline);
-        sandbox.addEntity(wall);
+        // Register main entities
+        entityManager.addEntity(ball);
+        entityManager.addEntity(trampoline);
+        entityManager.addEntity(wall);
     }
 
     @Override
     public void render() {
-    	ScreenUtils.clear(0.5f, 0.5f, 0.5f, 1f);
+        ScreenUtils.clear(0.5f, 0.5f, 0.5f, 1f);
+
         batch.begin();
-        sceneManager.renderActiveScene(batch);
+        sceneManager.renderActiveScene(batch, entityManager);
         batch.end();
     }
 

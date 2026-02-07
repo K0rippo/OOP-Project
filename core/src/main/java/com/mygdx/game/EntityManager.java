@@ -39,13 +39,13 @@ public class EntityManager {
         }
     }
 
-    public void renderAll(SpriteBatch batch)
+    public void renderAll(SpriteBatch batch, EntityManager entityManager)
     {
         for (Entity e : entities)
         {
             if (e.isActive())
             {
-                e.render(batch);
+                e.render(batch, entityManager);
             }
         }
     }

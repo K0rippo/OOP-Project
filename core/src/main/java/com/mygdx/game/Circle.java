@@ -20,7 +20,7 @@ public class Circle extends Entity {
     }
 
     @Override
-    public void render(SpriteBatch batch)
+    public void render(SpriteBatch batch, EntityManager entityManager)
     {
         // End the batch before using ShapeRenderer
         batch.end();

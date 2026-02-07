@@ -32,13 +32,9 @@ public class Scene {
         // updated entities would go here
     }
 
-    public void render(SpriteBatch batch) {
-        for (Entity e : sceneEntities)
-        {
-            if (e.isActive())
-            {
-                e.render(batch);
-            }
+    public void render(SpriteBatch batch, EntityManager entityManager) {
+        for (Entity e : entityManager.getEntities()) {
+            e.render(batch, entityManager);
         }
     }
 

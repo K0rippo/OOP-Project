@@ -41,9 +41,9 @@ public class SceneManager {
         }
     }
 
-    public void renderActiveScene(SpriteBatch batch) {
+    public void renderActiveScene(SpriteBatch batch, EntityManager entityManager) {
         if (activeScene != null) {
-            activeScene.render(batch);
+            activeScene.render(batch, entityManager);
         }
     }
 }
