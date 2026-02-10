@@ -8,7 +8,6 @@ public abstract class Entity implements Movable{
     private int id;
     private Vector2 position;
     private Vector2 velocity;
-    private String state;
     private boolean isActive;
     private String name;
     private final Transform transform;
@@ -22,7 +21,6 @@ public abstract class Entity implements Movable{
         this.position = position;
         this.velocity = new Vector2(0, 0);
         this.transform = new Transform();
-        this.state = "default";
         this.isActive = true;
     }
 
@@ -54,9 +52,6 @@ public abstract class Entity implements Movable{
     
     public Vector2 getVelocity() { return velocity; }
     public void setVelocity(Vector2 velocity) { this.velocity = velocity; }
-    
-    public String getState() { return state; }
-    public void setState(String state) { this.state = state; }
     
     public boolean isActive() { return isActive; }
     public void setActive(boolean active) { this.isActive = active; }
