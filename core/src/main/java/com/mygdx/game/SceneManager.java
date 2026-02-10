@@ -34,9 +34,9 @@ public class SceneManager {
         if (activeScene != null) activeScene.update(deltaTime);
     }
 
-    public void renderActiveScene(SpriteBatch batch, EntityManager entityManager) {
+    public void renderActiveScene(SpriteBatch batch) {
         if (activeScene != null) {
-            activeScene.render(batch, entityManager);
+            activeScene.render(batch);
         }
 
     }

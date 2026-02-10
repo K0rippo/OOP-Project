@@ -2,15 +2,16 @@ package com.mygdx.game;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import java.util.ArrayList;
+import java.util.Collections; // Added for safety
 import java.util.List;
 
 public class EntityManager {
-	
-    private List<Entity> entities;
+    
+    private final List<Entity> entities;
 
     public EntityManager()
     {
-        entities = new ArrayList<>();
+        this.entities = new ArrayList<>();
     }
 
     public void addEntity(Entity e)
@@ -23,15 +24,16 @@ public class EntityManager {
         entities.remove(e);
     }
 
+    //getter to not violate encap
     public List<Entity> getEntities()
     {
-        return entities;
+        return Collections.unmodifiableList(entities);
     }
 
-    public void updateAll(float deltaTime)
-    {
-        for (Entity e : entities)
-        {
+    public void updateAll(float deltaTime) {
+        for (int i = 0; i < entities.size(); i++)
+        {    
+            Entity e = entities.get(i);
             if (e.isActive())
             {
                 e.update(deltaTime);
@@ -39,13 +41,13 @@ public class EntityManager {
         }
     }
 
-    public void renderAll(SpriteBatch batch, EntityManager entityManager)
+    public void renderAll(SpriteBatch batch)
     {
         for (Entity e : entities)
         {
             if (e.isActive())
             {
-                e.render(batch, entityManager);
+                e.render(batch); 
             }
         }
     }

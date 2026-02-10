@@ -20,7 +20,7 @@ public class RectangleEntity extends Entity {
     }
 
     @Override
-    public void render(SpriteBatch batch, EntityManager entityManager) {
+    public void render(SpriteBatch batch) {
         batch.end();
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(color);

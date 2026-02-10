@@ -184,9 +184,9 @@ public class GameScene extends Scene {
     }
 
     @Override
-    public void render(SpriteBatch batch, EntityManager entityManager) {
+    public void render(SpriteBatch batch) {
         // render game entities (background)
-        super.render(batch, entityManager);
+        super.render(batch);
 
         // render ui (pause menu + overlay)
         if (batch.isDrawing()) batch.end();

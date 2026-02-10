@@ -34,7 +34,7 @@ public class GameMaster extends ApplicationAdapter {
         sceneManager.addScene(gameScene.getId(), gameScene);
         sceneManager.addScene(settingsScene.getId(), settingsScene);
 
-        // Create entities
+        //create entities
         Entity ball = new Circle(
                 1,
                 "Ball",
@@ -62,7 +62,7 @@ public class GameMaster extends ApplicationAdapter {
                 Color.BLACK
         );
 
-        // Coins
+        //create 2 coins for testing
         for (int i = 0; i < 2; i++) {
             Entity coin = new Circle(
             		100 + i,
@@ -94,7 +94,7 @@ public class GameMaster extends ApplicationAdapter {
 
 
         batch.begin();
-        sceneManager.renderActiveScene(batch, entityManager);
+        sceneManager.renderActiveScene(batch);
         batch.end();
     }
 

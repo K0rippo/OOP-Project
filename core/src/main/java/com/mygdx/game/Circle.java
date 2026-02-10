@@ -20,7 +20,7 @@ public class Circle extends Entity {
     }
 
     @Override
-    public void render(SpriteBatch batch, EntityManager entityManager)
+    public void render(SpriteBatch batch)
     {
         // End the batch before using ShapeRenderer
         batch.end();
@@ -37,7 +37,6 @@ public class Circle extends Entity {
     @Override
     public void update(float deltaTime)
     {
-        super.update(deltaTime); // keeps velocity-based movement
-        // You can add extra behavior here (e.g., gravity)
+        super.update(deltaTime);
     }
 }

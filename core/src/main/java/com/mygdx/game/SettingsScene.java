@@ -119,7 +119,7 @@ public class SettingsScene extends Scene {
     }
 
     @Override
-    public void render(SpriteBatch batch, EntityManager entityManager) {
+    public void render(SpriteBatch batch) {
         if (batch.isDrawing()) batch.end();
         stage.draw();
         if (!batch.isDrawing()) batch.begin();

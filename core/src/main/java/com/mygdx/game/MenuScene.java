@@ -87,7 +87,7 @@ public class MenuScene extends Scene {
     @Override
     public void update(float deltaTime) { super.update(deltaTime); stage.act(deltaTime); }
     @Override
-    public void render(SpriteBatch batch, EntityManager entityManager) {
+    public void render(SpriteBatch batch) {
         if (batch.isDrawing()) batch.end();
         stage.draw();
         if (!batch.isDrawing()) batch.begin();
