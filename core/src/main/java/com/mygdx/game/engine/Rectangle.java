@@ -1,4 +1,4 @@
-package com.mygdx.game;
+package com.mygdx.game.engine;
 
 public class Rectangle {
     public float x, y, width, height;

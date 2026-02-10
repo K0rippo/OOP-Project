@@ -1,4 +1,4 @@
-package com.mygdx.game;
+package com.mygdx.game.simulation;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
@@ -16,13 +16,14 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
+import com.mygdx.game.engine.Scene;
+import com.mygdx.game.engine.SceneManager;
+
 public class SettingsScene extends Scene {
 
     private Stage stage;
     private SceneManager sceneManager;
     private TextButton btnMute;
-    
-    // default to MENU, but can be changed to GAME
     private String previousSceneId = "MENU"; 
 
     public SettingsScene(String id, final SceneManager sceneManager) {
@@ -30,7 +31,6 @@ public class SettingsScene extends Scene {
         this.sceneManager = sceneManager;
         stage = new Stage(new ScreenViewport());
 
-        // styling
         BitmapFont font = new BitmapFont();
         Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
         pixmap.setColor(Color.WHITE);
@@ -44,7 +44,6 @@ public class SettingsScene extends Scene {
         style.fontColor = Color.WHITE;
         Label.LabelStyle labelStyle = new Label.LabelStyle(font, Color.WHITE);
 
-        // layout
         Table mainTable = new Table();
         mainTable.setFillParent(true);
         stage.addActor(mainTable);
@@ -65,7 +64,6 @@ public class SettingsScene extends Scene {
         mainTable.row();
         mainTable.add(btnBack).size(200, 50);
 
-        // listeners
         btnMute.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -76,7 +74,6 @@ public class SettingsScene extends Scene {
         btnBack.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                // Go back to wherever we came from (Menu or Game)
                 sceneManager.setActiveScene(previousSceneId);
             }
         });
@@ -108,9 +105,7 @@ public class SettingsScene extends Scene {
     }
 
     @Override
-    public void hide() {
-        Gdx.input.setInputProcessor(null);
-    }
+    public void hide() { Gdx.input.setInputProcessor(null); }
 
     @Override
     public void update(float deltaTime) {

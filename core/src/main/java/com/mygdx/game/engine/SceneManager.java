@@ -1,4 +1,4 @@
-package com.mygdx.game;
+package com.mygdx.game.engine;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import java.util.HashMap;

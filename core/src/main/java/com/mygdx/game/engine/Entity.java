@@ -1,10 +1,10 @@
-package com.mygdx.game;
+package com.mygdx.game.engine;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 
-public abstract class Entity implements Movable{
-	
+public abstract class Entity implements Movable {
+    
     private int id;
     private Vector2 position;
     private Vector2 velocity;
@@ -12,10 +12,7 @@ public abstract class Entity implements Movable{
     private String name;
     private final Transform transform;
 
-
-    //Constructor 
-    public Entity(int id, String name, Vector2 position)
-    {
+    public Entity(int id, String name, Vector2 position) {
         this.id = id;
         this.name = name;
         this.position = position;
@@ -24,68 +21,36 @@ public abstract class Entity implements Movable{
         this.isActive = true;
     }
 
-    public void update(float deltaTime)
-    {
-        //Basic movement logic
+    public void update(float deltaTime) {
         position.add(velocity.x * deltaTime, velocity.y * deltaTime);
+        transform.setPosition(position);
     }
     
-    
-    
-    // Overriding toString makes debugging collisions much easier
-    @Override
-    public String toString() {
-        return "Entity{name='" + name + "'}";
-    }
+    // --- REQUIRED ABSTRACT METHODS ---
+    public abstract Rectangle getBounds();     // "Where am I?"
+    public abstract void onCollision(Entity other); // "What happens when I hit something?"
 
     public abstract void render(SpriteBatch batch);
 
-    //Gett setters
+    // --- Getters & Setters ---
     public int getId() { return id; }
-    
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
-
-    
     public Vector2 getPosition() { return position; }
     public void setPosition(Vector2 position) { this.position = position; }
-    
     public Vector2 getVelocity() { return velocity; }
     public void setVelocity(Vector2 velocity) { this.velocity = velocity; }
-    
     public boolean isActive() { return isActive; }
     public void setActive(boolean active) { this.isActive = active; }
     
     @Override
-    public Transform getTransform() {
-        return transform;
-    }
-    
+    public Transform getTransform() { return transform; }
     @Override
     public void applyMovement(float deltaTime) {
         Vector2 delta = velocity.cpy().scl(deltaTime);
         transform.getPosition().add(delta);
     }
-
-    public void rotate(float angleDegrees) {
-        transform.setRotationDegrees(
-            transform.getRotationDegrees() + angleDegrees
-        );
-    }
-
-    public void lookAt(Vector2 target) {
-        Vector2 dir = target.cpy().sub(transform.getPosition());
-        float angle = (float) Math.toDegrees(Math.atan2(dir.y, dir.x));
-        transform.setRotationDegrees(angle);
-    }
-
-    public void moveTowards(Vector2 target) {
-        Vector2 dir = target.cpy()
-                            .sub(transform.getPosition())
-                            .nor();
-
-        float speed = velocity.len();
-        velocity = dir.scl(speed);
-    }
     
+    @Override
+    public String toString() { return "Entity{name='" + name + "'}"; }
 }

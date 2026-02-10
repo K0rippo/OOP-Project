@@ -1,4 +1,4 @@
-package com.mygdx.game;
+package com.mygdx.game.simulation;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
@@ -14,6 +14,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.mygdx.game.engine.Scene;
+import com.mygdx.game.engine.SceneManager;
 
 public class MenuScene extends Scene {
 
