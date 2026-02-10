@@ -18,7 +18,17 @@ public class Circle extends Entity {
         this.shapeRenderer = new ShapeRenderer();
         this.color = color;
     }
+    
+    public float getRadius()
+    {
+    	return radius;
+    }
 
+    public void setRadius (float r)
+    {
+    	this.radius = r;
+    }
+    
     @Override
     public void render(SpriteBatch batch)
     {

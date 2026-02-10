@@ -28,7 +28,13 @@ public class RectangleEntity extends Entity {
         shapeRenderer.end();
         batch.begin();
     }
-
+    
+    @Override
+    public void update(float deltaTime) {
+        super.update(deltaTime); // Runs the standard movement logic from Entity
+        // Add rectangle-specific logic here (e.g., pulsing colors or shrinking)
+    }
+    
     public float getWidth() { return width; }
     public float getHeight() { return height; }
 }
