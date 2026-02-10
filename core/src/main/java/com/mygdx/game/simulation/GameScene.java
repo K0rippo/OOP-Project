@@ -52,10 +52,12 @@ public class GameScene extends Scene {
     }
 
     private void initializeEntities() {
-        this.ball = new Circle(1, "Ball", new Vector2(200, 400), 15, Color.BROWN);
+        // --- UPDATED: Using the specific Ball class ---
+        this.ball = new Ball(1, new Vector2(200, 400), 15, Color.BROWN);
         ball.setVelocity(new Vector2(150, 0)); // Start with speed to hit the wall
         addEntity(ball);
 
+        // Trampoline remains a RectangleEntity
         this.trampoline = new RectangleEntity(2, "Trampoline", new Vector2(Gdx.graphics.getWidth() / 2 - 75, 50), 150, 20, Color.GREEN);
         addEntity(trampoline);
 
@@ -103,7 +105,6 @@ public class GameScene extends Scene {
         stage.act(deltaTime);
     }
 
-    // --- NEW: Fixes "Holding Key" Issue ---
     private void handleInputPolling() {
         // Trampoline (Arrows)
         if (trampoline != null) {
@@ -137,7 +138,9 @@ public class GameScene extends Scene {
     private void spawnCoin() {
         float randomX = MathUtils.random(50, 550);
         float startY = Gdx.graphics.getHeight() + 20;
-        Entity coin = new Circle(100 + coinCount, "Coin", new Vector2(randomX, startY), 10, Color.GOLD);
+        
+        // --- UPDATED: Using the specific Coin class ---
+        Entity coin = new Coin(100 + coinCount, new Vector2(randomX, startY), 10);
         addEntity(coin);
         coinCount++;
     }
