@@ -6,7 +6,7 @@ public interface Movable {
 
     void applyMovement(float deltaTime);
 
-    Transform getTransform();
+    //Transform getTransform();
 
     Vector2 getVelocity();
     void setVelocity(Vector2 velocity);

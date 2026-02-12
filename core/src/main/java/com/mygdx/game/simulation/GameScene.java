@@ -23,6 +23,8 @@ import com.mygdx.game.engine.IOManager;
 import com.mygdx.game.engine.InputAction;
 import com.mygdx.game.engine.Scene;
 import com.mygdx.game.engine.SceneManager;
+import com.mygdx.game.engine.MovableEntity;
+
 
 public class GameScene extends Scene {
 
@@ -35,8 +37,8 @@ public class GameScene extends Scene {
     private Table topTable;
 
     private IOManager ioManager; 
-    private Entity trampoline;
-    private Entity ball;         
+    private MovableEntity trampoline;
+    private MovableEntity ball;         
     
     private float coinTimer = 0f;
     private int coinCount = 0;
