@@ -6,20 +6,20 @@ import java.util.List;
 public class MovementManager {
 
     private float globalSpeedMultiplier;
-    private final List<Movable> movables;
+    private final List<iMovable> movables;
 
     public MovementManager() {
         globalSpeedMultiplier = 1.0f;
         movables = new ArrayList<>();
     }
 
-    public void registerMovable(Movable m) {
+    public void registerMovable(iMovable m) {
         if (m != null && !movables.contains(m)) {
             movables.add(m);
         }
     }
 
-    public void unregisterMovable(Movable m) {
+    public void unregisterMovable(iMovable m) {
         movables.remove(m);
     }
 
@@ -27,7 +27,7 @@ public class MovementManager {
     public void update(float deltaTime) {
         float scaledDelta = deltaTime * globalSpeedMultiplier;
 
-        for (Movable m : movables) {
+        for (iMovable m : movables) {
             m.applyMovement(scaledDelta);
         }
     }

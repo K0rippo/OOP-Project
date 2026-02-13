@@ -10,15 +10,15 @@ public abstract class Entity {
     //private Vector2 velocity;
     private boolean isActive;
     private String name;
-    private final Transform transform;
+    private final Orientate orientate;
 
     public Entity(int id, String name, Vector2 position) {
         this.id = id;
         this.name = name;
         //this.position = position;
         //this.velocity = new Vector2(0, 0);
-        this.transform = new Transform();
-        this.transform.getPosition().set(position);
+        this.orientate = new Orientate();
+        this.orientate.getPosition().set(position);
         this.isActive = true;
     }
 
@@ -39,8 +39,8 @@ public abstract class Entity {
     public void setName(String name) { this.name = name; }
     
     // added
-    public Vector2 getPosition() { return getTransform().getPosition(); }
-    public void setPosition(Vector2 position) { transform.setPosition(position); }
+    public Vector2 getPosition() { return getOrientate().getPosition(); }
+    public void setPosition(Vector2 position) { orientate.setPosition(position); }
     //public Vector2 getPosition() { return position; }
     //public void setPosition(Vector2 position) { this.position = position; }
     //public Vector2 getVelocity() { return velocity; }
@@ -49,7 +49,7 @@ public abstract class Entity {
     public boolean isActive() { return isActive; }
     public void setActive(boolean active) { this.isActive = active; }
     
-    public Transform getTransform() { return transform; }
+    public Orientate getOrientate() { return orientate; }
     
     //@Override
     //public void applyMovement(float deltaTime) {

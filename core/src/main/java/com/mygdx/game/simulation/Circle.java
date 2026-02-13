@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.engine.Entity;
 import com.mygdx.game.engine.Rectangle;
-import com.mygdx.game.engine.MovableEntity;
+import com.mygdx.game.engine.MovableEntity;		
 
 
 public abstract class Circle extends MovableEntity {

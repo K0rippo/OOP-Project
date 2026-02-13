@@ -2,12 +2,12 @@ package com.mygdx.game.engine;
 
 import com.badlogic.gdx.math.Vector2;
 
-public class Transform {
+public class Orientate {
 
     private Vector2 position;
     private float rotationDegrees;
 
-    public Transform() {
+    public Orientate() {
         this.position = new Vector2(0f, 0f);
         this.rotationDegrees = 0f;
     }

@@ -4,7 +4,7 @@ import com.badlogic.gdx.math.Vector2;
 
 //import com.mygdx.game.engine.Entity;
 
-public abstract class MovableEntity extends Entity implements Movable{
+public abstract class MovableEntity extends Entity implements iMovable{
 	
 	//private Vector2 velocity;
 	private Vector2 velocity = new Vector2(0f, 0f);
@@ -33,10 +33,10 @@ public abstract class MovableEntity extends Entity implements Movable{
 	
 	@Override
 	public void applyMovement(float deltaTime) {
-		getTransform().getPosition().add(velocity.cpy().scl(deltaTime));
+		getOrientate().getPosition().add(velocity.cpy().scl(deltaTime));
 	}
 	
 	public void rotate(float angleDegrees) {
-		getTransform().setRotationDegrees(getTransform().getRotationDegrees() + angleDegrees);
+		getOrientate().setRotationDegrees(getOrientate().getRotationDegrees() + angleDegrees);
 	}
 }

@@ -2,7 +2,7 @@ package com.mygdx.game.engine;
 
 import com.badlogic.gdx.math.Vector2;
 
-public interface Movable {
+public interface iMovable {
 
     void applyMovement(float deltaTime);
 
