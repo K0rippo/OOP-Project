@@ -20,11 +20,9 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.game.engine.Entity;
 import com.mygdx.game.engine.IOManager;
-import com.mygdx.game.engine.InputAction;
 import com.mygdx.game.engine.Scene;
 import com.mygdx.game.engine.SceneManager;
 import com.mygdx.game.engine.MovableEntity;
-
 
 public class GameScene extends Scene {
 
@@ -54,12 +52,11 @@ public class GameScene extends Scene {
     }
 
     private void initializeEntities() {
-        // --- UPDATED: Using the specific Ball class ---
+        // --- Entities remain unchanged ---
         this.ball = new Ball(1, new Vector2(200, 400), 15, Color.BROWN);
-        ball.setVelocity(new Vector2(150, 0)); // Start with speed to hit the wall
+        ball.setVelocity(new Vector2(150, 0)); 
         addEntity(ball);
 
-        // Trampoline remains a RectangleEntity
         this.trampoline = new RectangleEntity(2, "Trampoline", new Vector2(Gdx.graphics.getWidth() / 2 - 75, 50), 150, 20, Color.GREEN);
         addEntity(trampoline);
 
@@ -68,66 +65,85 @@ public class GameScene extends Scene {
     }
 
     private void initializeInput() {
-        // We only register "One-Shot" actions here (like Jump).
-        // Continuous movement (Holding keys) is now in handleInputPolling().
-        
-        ioManager.bindKey(Input.Keys.W, InputAction.JUMP);
-        ioManager.bindKey(Input.Keys.S, InputAction.MOVE_DOWN);
+        // --- UPDATED INPUT SECTION ---
+        // We now bind keys directly to logic using the Generic IOManager.
+        // No "InputAction" enum is used.
 
-        ioManager.registerAction(InputAction.JUMP, new Runnable() {
-            @Override public void run() { if (ball != null) ball.getVelocity().y = 450; }
+        // 1. One-Shot Actions (Jump / Smash) - Happens once per press
+        ioManager.bindKeyJustPressed(Input.Keys.W, new Runnable() {
+            @Override
+            public void run() {
+                if (ball != null) ball.getVelocity().y = 450;
+            }
         });
+
+        ioManager.bindKeyJustPressed(Input.Keys.S, new Runnable() {
+            @Override
+            public void run() {
+                if (ball != null) ball.getVelocity().y = -600;
+            }
+        });
+
+        // 2. Continuous Actions (Movement) - Happens while holding key
+        // This replaces the old handleInputPolling() method
         
-        ioManager.registerAction(InputAction.MOVE_DOWN, new Runnable() {
-            @Override public void run() { if (ball != null) ball.getVelocity().y = -600; }
+        // Ball Left/Right
+        ioManager.bindKeyContinuous(Input.Keys.A, new Runnable() {
+            @Override
+            public void run() {
+                if (ball != null) ball.getVelocity().x = -300;
+            }
         });
+
+        ioManager.bindKeyContinuous(Input.Keys.D, new Runnable() {
+            @Override
+            public void run() {
+                if (ball != null) ball.getVelocity().x = 300;
+            }
+        });
+
+        // Trampoline Left/Right
+        if (trampoline != null) {
+            ioManager.bindKeyContinuous(Input.Keys.LEFT, new Runnable() {
+                @Override
+                public void run() {
+                    trampoline.getVelocity().x = -400;
+                }
+            });
+
+            ioManager.bindKeyContinuous(Input.Keys.RIGHT, new Runnable() {
+                @Override
+                public void run() {
+                    trampoline.getVelocity().x = 400;
+                }
+            });
+        }
     }
 
     @Override
     public void update(float deltaTime) {
         if (!isPaused) {
             
-            // 1. Friction & Reset
+            // 1. Friction & Reset (Unchanged logic)
             // TRAMPOLINE: Stops instantly when no key is pressed
             if (trampoline != null) trampoline.getVelocity().x = 0;
             
-            // BALL: Does NOT stop instantly (Friction). This allows it to bounce off walls!
+            // BALL: Does NOT stop instantly (Friction).
             if (ball != null) ball.getVelocity().x *= 0.95f; 
 
-            // 2. Poll Input (This fixes "Holding" keys)
-            handleInputPolling();
-
-            // 3. Handle One-Shot Inputs
+            // 2. Handle Input
+            // The IOManager now handles both JustPressed and Continuous inputs here.
+            // If keys are held (A/D/Arrows), they will override the friction above.
             ioManager.handleInput();
 
-            // 4. Logic
+            // 3. Logic (Unchanged)
             updateCoinSpawner(deltaTime);
             super.update(deltaTime);
         }
         stage.act(deltaTime);
     }
 
-    private void handleInputPolling() {
-        // Trampoline (Arrows)
-        if (trampoline != null) {
-            if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-                trampoline.getVelocity().x = -400;
-            }
-            if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-                trampoline.getVelocity().x = 400;
-            }
-        }
-
-        // Ball (WASD - Left/Right) overrides friction
-        if (ball != null) {
-            if (Gdx.input.isKeyPressed(Input.Keys.A)) {
-                ball.getVelocity().x = -300;
-            }
-            if (Gdx.input.isKeyPressed(Input.Keys.D)) {
-                ball.getVelocity().x = 300;
-            }
-        }
-    }
+    // REMOVED: handleInputPolling() - Logic moved to initializeInput / ioManager.
 
     private void updateCoinSpawner(float deltaTime) {
         coinTimer += deltaTime;
@@ -141,13 +157,12 @@ public class GameScene extends Scene {
         float randomX = MathUtils.random(50, 550);
         float startY = Gdx.graphics.getHeight() + 20;
         
-        // --- UPDATED: Using the specific Coin class ---
         Entity coin = new Coin(100 + coinCount, new Vector2(randomX, startY), 10);
         addEntity(coin);
         coinCount++;
     }
 
-    // --- UI (Unchanged) ---
+    // --- UI SECTION (Unchanged) ---
     private void initializeUI() {
         stage = new Stage(new ScreenViewport());
         BitmapFont font = new BitmapFont();
