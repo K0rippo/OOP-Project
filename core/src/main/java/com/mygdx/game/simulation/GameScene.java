@@ -35,7 +35,7 @@ public class GameScene extends Scene {
     private Table topTable;
 
     private IOManager ioManager; 
-    private MovableEntity trampoline;
+    private Trampoline trampoline;
     private MovableEntity ball;         
     
     private float coinTimer = 0f;
@@ -57,9 +57,9 @@ public class GameScene extends Scene {
         ball.setVelocity(new Vector2(150, 0)); 
         addEntity(ball);
 
-        this.trampoline = new RectangleEntity(2, "Trampoline", new Vector2(Gdx.graphics.getWidth() / 2 - 75, 50), 150, 20, Color.GREEN);
-        addEntity(trampoline);
-
+        this.trampoline = new Trampoline(2, new Vector2(Gdx.graphics.getWidth()/2f - 75f, 50f), 150f, 20f, Color.GREEN, (Ball) ball );
+       	addEntity(trampoline);
+        
         Entity wall = new RectangleEntity(3, "Wall", new Vector2(600, 0), 40, 400, Color.BLACK);
         addEntity(wall);
     }
@@ -103,21 +103,21 @@ public class GameScene extends Scene {
         });
 
         // Trampoline Left/Right
-        if (trampoline != null) {
-            ioManager.bindKeyContinuous(Input.Keys.LEFT, new Runnable() {
-                @Override
-                public void run() {
-                    trampoline.getVelocity().x = -400;
-                }
-            });
+        //if (trampoline != null) {
+            //ioManager.bindKeyContinuous(Input.Keys.LEFT, new Runnable() {
+                //@Override
+                //public void run() {
+                    //trampoline.getVelocity().x = -400;
+                //}
+            //});
 
-            ioManager.bindKeyContinuous(Input.Keys.RIGHT, new Runnable() {
-                @Override
-                public void run() {
-                    trampoline.getVelocity().x = 400;
-                }
-            });
-        }
+            //ioManager.bindKeyContinuous(Input.Keys.RIGHT, new Runnable() {
+               // @Override
+                //public void run() {
+                   // trampoline.getVelocity().x = 400;
+                //}
+            //});
+        //}
     }
 
     @Override
@@ -126,7 +126,7 @@ public class GameScene extends Scene {
             
             // 1. Friction & Reset (Unchanged logic)
             // TRAMPOLINE: Stops instantly when no key is pressed
-            if (trampoline != null) trampoline.getVelocity().x = 0;
+            //if (trampoline != null) trampoline.getVelocity().x = 0;
             
             // BALL: Does NOT stop instantly (Friction).
             if (ball != null) ball.getVelocity().x *= 0.95f; 
