@@ -24,6 +24,8 @@ import com.mygdx.game.engine.Scene;
 import com.mygdx.game.engine.SceneManager;
 import com.mygdx.game.engine.MovableEntity;
 
+
+
 public class GameScene extends Scene {
 
     private Stage stage;
@@ -36,7 +38,8 @@ public class GameScene extends Scene {
 
     private IOManager ioManager; 
     private Trampoline trampoline;
-    private MovableEntity ball;         
+    private MovableEntity ball; 
+    private RectangleEntity wall;
     
     private float coinTimer = 0f;
     private int coinCount = 0;
@@ -57,11 +60,15 @@ public class GameScene extends Scene {
         ball.setVelocity(new Vector2(150, 0)); 
         addEntity(ball);
 
-        this.trampoline = new Trampoline(2, new Vector2(Gdx.graphics.getWidth()/2f - 75f, 50f), 150f, 20f, Color.GREEN, (Ball) ball );
-       	addEntity(trampoline);
+        this.trampoline = new Trampoline(2, new Vector2(Gdx.graphics.getWidth() / 2f - 75f, 50f), 150f, 20f, Color.GREEN);
+       	trampoline.setSpeed(300f);
+       	
+        addEntity(trampoline);
         
-        Entity wall = new RectangleEntity(3, "Wall", new Vector2(600, 0), 40, 400, Color.BLACK);
+        this.wall = new RectangleEntity(3, "Wall", new Vector2(600, 0), 40, 400, Color.BLACK);
         addEntity(wall);
+        
+        trampoline.setPatrolBounds(0f, wall.getPosition().x);
     }
 
     private void initializeInput() {

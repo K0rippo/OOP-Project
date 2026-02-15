@@ -9,48 +9,41 @@ import com.badlogic.gdx.math.Vector2;
 
 
 public class Trampoline extends RectangleEntity {
-	
-	private final Ball target;
-	private float maxSpeed = 340f;
-	private float stopDist = 10f;
-	
-	public Trampoline(int id, Vector2 position, float width, float height, Color color, Ball target) {
-		
-		super(id, "Trampoline", position, width, height, color);
-		this.target = target;
-		
-	}
-	
-	@Override
-	public void update(float dt) {
-		if (target != null && target.isActive()) {
-			float targetX = target.getPosition().x;
-			float myCenter = getPosition().x + getWidth() / 2f;
-			float dx = targetX - myCenter;
-			
-			if (Math.abs(dx) <= stopDist) {
-				getVelocity().x = 0f;
-			} else {
-				getVelocity().x = Math.signum(dx) * maxSpeed;
-			}
-		} else {
-			getVelocity().x = 0f;
-		}
-		
-		super.update(dt);
-		
-		float minX = 0f;
-		float maxX = Gdx.graphics.getWidth() - getWidth();
-		getPosition().x = MathUtils.clamp(getPosition().x, minX, maxX);
-		
-	}
-	
-	public void setMaxSpped(float maxSpeed) {
-		this.maxSpeed = Math.max(0f, maxSpeed);
-	}
-	
-	public void setStopDist(float stopDist) {
-		 this.stopDist = Math.max(0f,  stopDist);
-	}
-	
+
+    private float speed = 260f;
+    private float leftBound = 0f;
+    private float rightBound;
+    private int dir = 1; // +1 = right, -1 = left
+
+    public Trampoline(int id, Vector2 position, float width, float height, Color color) {
+        super(id, "Trampoline", position, width, height, color);
+        this.rightBound = Gdx.graphics.getWidth() - width;
+    }
+
+  
+    public void setPatrolBounds(float left, float right) {
+        this.leftBound = left;
+        this.rightBound = Math.max(left, right - getWidth());
+    }
+
+    public void setSpeed(float speed) {
+        this.speed = Math.max(0f, speed);
+    }
+
+    @Override
+    public void update(float dt) {
+        getVelocity().x = dir * speed;
+
+        super.update(dt);
+
+        if (getPosition().x <= leftBound) {
+            getPosition().x = leftBound;
+            dir = 1;
+        } else if (getPosition().x >= rightBound) {
+            getPosition().x = rightBound;
+            dir = -1;
+        }
+
+        getPosition().x = MathUtils.clamp(getPosition().x, leftBound, rightBound);
+    }
 }
