@@ -9,7 +9,13 @@ import com.mygdx.game.engine.Rectangle;
 public class Ball extends Circle {
 
     private static final float GRAVITY = 600f;
-    private static final float BOUNCE_DAMPING = 0.8f;
+    
+    // --- UPDATED BOUNCE SETTINGS ---
+    private static final float FLOOR_DAMPING = 0.6f;       // Set to 0.6
+    private static final float TRAMPOLINE_DAMPING = 0.7f;  // Set to 0.7
+    
+    private static final float MAX_VELOCITY = 450f; 
+    private static final float TRAMPOLINE_BOOST = 80f; 
 
     public Ball(int id, Vector2 position, float radius, Color color) {
         super(id, "Ball", position, radius, color);
@@ -21,17 +27,22 @@ public class Ball extends Circle {
         getVelocity().y -= GRAVITY * deltaTime;
         super.update(deltaTime);
 
-        // Floor Bounce
+        // --- FLOOR BOUNCE ---
         if (getPosition().y - radius < 0) {
-            getPosition().y = radius;
+            getPosition().y = radius; // Snap to floor
+            
             if (Math.abs(getVelocity().y) < 100) {
-                getVelocity().y = 0;
+                getVelocity().y = 0; 
             } else {
-                getVelocity().y = Math.abs(getVelocity().y) * BOUNCE_DAMPING;
+                getVelocity().y = Math.abs(getVelocity().y) * FLOOR_DAMPING;
+                
+                if (getVelocity().y > MAX_VELOCITY) {
+                    getVelocity().y = MAX_VELOCITY;
+                }
             }
         }
 
-        // Wall Bounce
+        // Wall Bounce (Sides)
         if (getPosition().x + radius > Gdx.graphics.getWidth()) {
             getPosition().x = Gdx.graphics.getWidth() - radius;
             getVelocity().x *= -1;
@@ -62,15 +73,34 @@ public class Ball extends Circle {
         float overlapHeight = maxY - minY;
 
         if (overlapWidth < overlapHeight) {
+            // Horizontal Collision
             getVelocity().x *= -1;
             if (getPosition().x < other.getPosition().x) getPosition().x -= overlapWidth;
             else getPosition().x += overlapWidth;
         } else {
-            getVelocity().y = Math.abs(getVelocity().y) * BOUNCE_DAMPING;
-            if (getPosition().y > other.getPosition().y) getPosition().y += overlapHeight;
-            else getPosition().y -= overlapHeight;
+            // Vertical Collision
+            float otherCenterY = otherBounds.y + otherBounds.height / 2f;
 
-            if (other.getName().contains("Trampoline")) getVelocity().y += 120;
+            if (getPosition().y > otherCenterY) {
+                // Hit the TOP
+                getPosition().y += overlapHeight;
+                
+                if (other.getName().contains("Trampoline")) {
+                    getVelocity().y = Math.abs(getVelocity().y) * TRAMPOLINE_DAMPING;
+                    getVelocity().y += TRAMPOLINE_BOOST;
+                } else {
+                    getVelocity().y = Math.abs(getVelocity().y) * FLOOR_DAMPING;
+                }
+
+                if (getVelocity().y > MAX_VELOCITY) {
+                    getVelocity().y = MAX_VELOCITY;
+                }
+
+            } else {
+                // Hit the BOTTOM
+                getPosition().y -= overlapHeight;
+                getVelocity().y = -Math.abs(getVelocity().y) * FLOOR_DAMPING; 
+            }
         }
     }
 }

@@ -2,6 +2,8 @@ package com.mygdx.game.simulation;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.audio.Music; // Import added
+import com.badlogic.gdx.audio.Sound; // Import added
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
@@ -24,8 +26,6 @@ import com.mygdx.game.engine.Scene;
 import com.mygdx.game.engine.SceneManager;
 import com.mygdx.game.engine.MovableEntity;
 
-
-
 public class GameScene extends Scene {
 
     private Stage stage;
@@ -43,44 +43,60 @@ public class GameScene extends Scene {
     
     private float coinTimer = 0f;
     private int coinCount = 0;
+    private int jumpCount = 0;
+
+    // --- AUDIO VARIABLES ---
+    private Music backgroundMusic;
+    private Sound coinSound;
 
     public GameScene(String id, final SceneManager sceneManager) {
         super(id);
         this.sceneManager = sceneManager;
         this.ioManager = new IOManager();
         
+        // 1. Load Audio
+        try {
+            backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("Game Music.mp3"));
+            coinSound = Gdx.audio.newSound(Gdx.files.internal("Coin.wav"));
+            
+            // 2. Configure Music
+            backgroundMusic.setLooping(true);
+            backgroundMusic.setVolume(0.3f); // 30% volume
+        } catch (Exception e) {
+            System.out.println("Audio files not found! Check assets folder.");
+            e.printStackTrace();
+        }
+
         initializeEntities();
         initializeInput(); 
         initializeUI();
     }
 
     private void initializeEntities() {
-        // --- Entities remain unchanged ---
-        this.ball = new Ball(1, new Vector2(200, 400), 15, Color.BROWN);
+        this.ball = new Ball(1, new Vector2(200, 400), 10, Color.BROWN);
         ball.setVelocity(new Vector2(150, 0)); 
         addEntity(ball);
 
-        this.trampoline = new Trampoline(2, new Vector2(Gdx.graphics.getWidth() / 2f - 75f, 50f), 150f, 20f, Color.GREEN);
+        this.trampoline = new Trampoline(2, new Vector2(Gdx.graphics.getWidth() / 2f - 50f, 50f), 100f, 15f, Color.GREEN);
        	trampoline.setSpeed(300f);
-       	
         addEntity(trampoline);
         
-        this.wall = new RectangleEntity(3, "Wall", new Vector2(600, 0), 40, 400, Color.BLACK);
+        this.wall = new RectangleEntity(3, "Wall", new Vector2(600, 0), 25, 250, Color.BLACK);
         addEntity(wall);
         
         trampoline.setPatrolBounds(0f, wall.getPosition().x);
     }
 
     private void initializeInput() {
-        // --- UPDATED INPUT SECTION ---
-        // We now bind keys directly to logic using the Generic IOManager.
-        // No "InputAction" enum is used.
-
-        // 1. One-Shot Actions (Jump / Smash) - Happens once per press
         ioManager.bindKeyJustPressed(Input.Keys.W, new Runnable() {
             @Override
             public void run() {
-                if (ball != null) ball.getVelocity().y = 450;
+                if (ball != null) {
+                    if (jumpCount < 1) {
+                        ball.getVelocity().y = 450; 
+                        jumpCount++;
+                    }
+                }
             }
         });
 
@@ -91,10 +107,6 @@ public class GameScene extends Scene {
             }
         });
 
-        // 2. Continuous Actions (Movement) - Happens while holding key
-        // This replaces the old handleInputPolling() method
-        
-        // Ball Left/Right
         ioManager.bindKeyContinuous(Input.Keys.A, new Runnable() {
             @Override
             public void run() {
@@ -108,49 +120,40 @@ public class GameScene extends Scene {
                 if (ball != null) ball.getVelocity().x = 300;
             }
         });
-
-        // Trampoline Left/Right
-        //if (trampoline != null) {
-            //ioManager.bindKeyContinuous(Input.Keys.LEFT, new Runnable() {
-                //@Override
-                //public void run() {
-                    //trampoline.getVelocity().x = -400;
-                //}
-            //});
-
-            //ioManager.bindKeyContinuous(Input.Keys.RIGHT, new Runnable() {
-               // @Override
-                //public void run() {
-                   // trampoline.getVelocity().x = 400;
-                //}
-            //});
-        //}
     }
 
     @Override
     public void update(float deltaTime) {
+        // 3. Audio Control (Mute logic)
+        if (backgroundMusic != null) {
+            if (GameMaster.isMuted && backgroundMusic.isPlaying()) {
+                backgroundMusic.pause();
+            } else if (!GameMaster.isMuted && !backgroundMusic.isPlaying() && !isPaused) {
+                backgroundMusic.play();
+            }
+        }
+
         if (!isPaused) {
-            
-            // 1. Friction & Reset (Unchanged logic)
-            // TRAMPOLINE: Stops instantly when no key is pressed
-            //if (trampoline != null) trampoline.getVelocity().x = 0;
-            
-            // BALL: Does NOT stop instantly (Friction).
             if (ball != null) ball.getVelocity().x *= 0.95f; 
+            
+            float vyBefore = (ball != null) ? ball.getVelocity().y : 0;
 
-            // 2. Handle Input
-            // The IOManager now handles both JustPressed and Continuous inputs here.
-            // If keys are held (A/D/Arrows), they will override the friction above.
             ioManager.handleInput();
-
-            // 3. Logic (Unchanged)
             updateCoinSpawner(deltaTime);
-            super.update(deltaTime);
+            super.update(deltaTime); 
+
+            if (ball != null) {
+                float vyAfter = ball.getVelocity().y;
+                if (vyBefore < 0 && vyAfter >= 0) {
+                    jumpCount = 0;
+                }
+                if (Math.abs(vyAfter) < 10f && ball.getPosition().y < 15f) {
+                    jumpCount = 0;
+                }
+            }
         }
         stage.act(deltaTime);
     }
-
-    // REMOVED: handleInputPolling() - Logic moved to initializeInput / ioManager.
 
     private void updateCoinSpawner(float deltaTime) {
         coinTimer += deltaTime;
@@ -164,12 +167,13 @@ public class GameScene extends Scene {
         float randomX = MathUtils.random(50, 550);
         float startY = Gdx.graphics.getHeight() + 20;
         
-        Entity coin = new Coin(100 + coinCount, new Vector2(randomX, startY), 10);
+        // 4. Pass the loaded 'coinSound' to the new Coin
+        Entity coin = new Coin(100 + coinCount, new Vector2(randomX, startY), 6, coinSound);
         addEntity(coin);
         coinCount++;
     }
 
-    // --- UI SECTION (Unchanged) ---
+    // --- UI SECTION ---
     private void initializeUI() {
         stage = new Stage(new ScreenViewport());
         BitmapFont font = new BitmapFont();
@@ -247,6 +251,13 @@ public class GameScene extends Scene {
         isPaused = paused;
         pauseMenuTable.setVisible(paused);
         dimOverlay.setVisible(paused);
+        
+        // PAUSE MUSIC LOGIC
+        if (backgroundMusic != null) {
+            if (paused) backgroundMusic.pause();
+            else if (!GameMaster.isMuted) backgroundMusic.play();
+        }
+
         topTable.setVisible(!paused);
     }
     @Override
@@ -255,9 +266,17 @@ public class GameScene extends Scene {
         multiplexer.addProcessor(stage);      
         multiplexer.addProcessor(ioManager);  
         Gdx.input.setInputProcessor(multiplexer);
+        
+        // RESUME MUSIC ON SHOW
+        if (backgroundMusic != null && !GameMaster.isMuted) {
+            backgroundMusic.play();
+        }
     }
     @Override
-    public void hide() { Gdx.input.setInputProcessor(null); }
+    public void hide() { 
+        Gdx.input.setInputProcessor(null);
+        if (backgroundMusic != null) backgroundMusic.pause();
+    }
     @Override
     public void render(SpriteBatch batch) {
         super.render(batch);
