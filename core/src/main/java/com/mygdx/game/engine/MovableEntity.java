@@ -12,12 +12,12 @@ public abstract class MovableEntity extends Entity implements iMovable{
 	public MovableEntity(int id, String name, Vector2 position) {
 		
 		super(id,name,position);
-		
+		this.velocity = new Vector2(0f, 0f);
 	}
 	
 	@Override
 	public void update(float deltaTime) {
-	    applyMovement(deltaTime);
+	    //applyMovement(deltaTime);
 	}
 
 	

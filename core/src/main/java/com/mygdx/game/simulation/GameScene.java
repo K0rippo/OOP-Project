@@ -25,6 +25,9 @@ import com.mygdx.game.engine.IOManager;
 import com.mygdx.game.engine.Scene;
 import com.mygdx.game.engine.SceneManager;
 import com.mygdx.game.engine.MovableEntity;
+import com.mygdx.game.engine.MovementManager;
+import com.mygdx.game.engine.iMovable;
+
 
 public class GameScene extends Scene {
 
@@ -44,6 +47,9 @@ public class GameScene extends Scene {
     private float coinTimer = 0f;
     private int coinCount = 0;
     private int jumpCount = 0;
+    
+    private MovementManager movementManager = new MovementManager();
+
 
     // --- AUDIO VARIABLES ---
     private Music backgroundMusic;
@@ -76,11 +82,13 @@ public class GameScene extends Scene {
         this.ball = new Ball(1, new Vector2(200, 400), 10, Color.BROWN);
         ball.setVelocity(new Vector2(150, 0)); 
         addEntity(ball);
+        movementManager.registerMovable((iMovable) ball);
 
         this.trampoline = new Trampoline(2, new Vector2(Gdx.graphics.getWidth() / 2f - 50f, 50f), 100f, 15f, Color.GREEN);
        	trampoline.setSpeed(300f);
         addEntity(trampoline);
-        
+        movementManager.registerMovable((iMovable) trampoline);
+       
         this.wall = new RectangleEntity(3, "Wall", new Vector2(600, 0), 25, 250, Color.BLACK);
         addEntity(wall);
         
@@ -141,6 +149,7 @@ public class GameScene extends Scene {
             ioManager.handleInput();
             updateCoinSpawner(deltaTime);
             super.update(deltaTime); 
+            movementManager.update(deltaTime);
 
             if (ball != null) {
                 float vyAfter = ball.getVelocity().y;
@@ -168,8 +177,9 @@ public class GameScene extends Scene {
         float startY = Gdx.graphics.getHeight() + 20;
         
         // 4. Pass the loaded 'coinSound' to the new Coin
-        Entity coin = new Coin(100 + coinCount, new Vector2(randomX, startY), 6, coinSound);
+        Coin coin = new Coin(100 + coinCount, new Vector2(randomX, startY), 6, coinSound);
         addEntity(coin);
+        movementManager.registerMovable(coin);
         coinCount++;
     }
 
