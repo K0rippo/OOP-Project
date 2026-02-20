@@ -6,7 +6,7 @@ public interface iMovable {
 
     void applyMovement(float deltaTime);
 
-    //Transform getTransform();
+    Orientate getOrientate();
 
     Vector2 getVelocity();
     void setVelocity(Vector2 velocity);
