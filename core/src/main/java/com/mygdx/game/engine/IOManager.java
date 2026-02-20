@@ -17,22 +17,18 @@ public class IOManager implements InputProcessor {
         
     }
 
-    /**
-     * Triggers only once when the key is first pressed. (Single Action/Jumping etc)
-     */
+    // Triggers only once when the key is first pressed. (Single Action)
     public void bindKeyJustPressed(int keyCode, Runnable command) {
         justPressedBindings.put(keyCode, command);
     }
 
-    /**
-     * Triggers every frame while the key is held down. (Walking/Driving)
-     */
+    // Triggers every frame while the key is held down. (Moving)
     public void bindKeyContinuous(int keyCode, Runnable command) {
         continuousBindings.put(keyCode, command);
     }
 
     public void handleInput() {
-        // 1. Handle "One-Shot" inputs (Jumps, Toggles)
+
         if (!justPressedBindings.isEmpty()) {
             for (Map.Entry<Integer, Runnable> entry : justPressedBindings.entrySet()) {
                 if (Gdx.input.isKeyJustPressed(entry.getKey())) {
@@ -41,7 +37,6 @@ public class IOManager implements InputProcessor {
             }
         }
         
-        // 2. Handle "Continuous" inputs (Movement)
         if (!continuousBindings.isEmpty()) {
             for (Map.Entry<Integer, Runnable> entry : continuousBindings.entrySet()) {
                 if (Gdx.input.isKeyPressed(entry.getKey())) {
