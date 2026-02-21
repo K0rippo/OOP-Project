@@ -46,7 +46,6 @@ public class GameScene extends Scene {
     
     private float coinTimer = 0f;
     private int coinCount = 0;
-    private int jumpCount = 0;
     
     private MovementManager movementManager = new MovementManager();
 
@@ -138,22 +137,12 @@ public class GameScene extends Scene {
         if (!isPaused) {
             if (ball != null) ball.getVelocity().x *= 0.95f; 
             
-            float vyBefore = (ball != null) ? ball.getVelocity().y : 0;
-
             ioManager.handleInput();
             updateCoinSpawner(deltaTime);
             super.update(deltaTime); 
             movementManager.update(deltaTime);
 
-            if (ball != null) {
-                float vyAfter = ball.getVelocity().y;
-                if (vyBefore < 0 && vyAfter >= 0) {
-                    jumpCount = 0;
-                }
-                if (Math.abs(vyAfter) < 10f && ball.getPosition().y < 15f) {
-                    jumpCount = 0;
-                }
-            }
+           
         }
         stage.act(deltaTime);
     }
