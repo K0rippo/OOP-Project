@@ -41,7 +41,7 @@ public class GameScene extends Scene {
 
     private IOManager ioManager; 
     private Trampoline trampoline;
-    private MovableEntity ball; 
+    private Ball ball; 
     private RectangleEntity wall;
     
     private float coinTimer = 0f;
@@ -100,20 +100,14 @@ public class GameScene extends Scene {
             @Override
             public void run() {
                 if (ball != null) {
-                    if (jumpCount < 1) {
-                        ball.getVelocity().y = 450; 
-                        jumpCount++;
-                    }
+                	if (ball.getJumpCount() < 1) { // If hasn't jumped yet
+                	    ball.getVelocity().y = 450; // Jump up
+                	    ball.setJumpCount(1);       // Mark as jumped
+                	}
                 }
             }
         });
 
-        ioManager.bindKeyJustPressed(Input.Keys.S, new Runnable() {
-            @Override
-            public void run() {
-                if (ball != null) ball.getVelocity().y = -600;
-            }
-        });
 
         ioManager.bindKeyContinuous(Input.Keys.A, new Runnable() {
             @Override

@@ -9,13 +9,14 @@ import com.mygdx.game.engine.Rectangle;
 public class Ball extends Circle {
 
     private static final float GRAVITY = 600f;
-    
-    // --- UPDATED BOUNCE SETTINGS ---
-    private static final float FLOOR_DAMPING = 0.6f;       // Set to 0.6
-    private static final float TRAMPOLINE_DAMPING = 0.7f;  // Set to 0.7
-    
-    private static final float MAX_VELOCITY = 450f; 
-    private static final float TRAMPOLINE_BOOST = 80f; 
+    private static final float FLOOR_DAMPING = 0.3f;
+    private static final float TRAMPOLINE_DAMPING = 1f;
+    private static final float WALL_DAMPING = 0.0f; 
+    private static final float MAX_VELOCITY = 800f; // Increased to allow big bounces
+    private static final float TRAMPOLINE_BOOST = 20f; // Increased for "significant" bounce
+
+    // FIX: This tracks how many times we've jumped
+    private int jumpCount = 0;
 
     public Ball(int id, Vector2 position, float radius, Color color) {
         super(id, "Ball", position, radius, color);
@@ -23,26 +24,25 @@ public class Ball extends Circle {
 
     @Override
     public void update(float deltaTime) {
-        // Gravity
         getVelocity().y -= GRAVITY * deltaTime;
         super.update(deltaTime);
 
-        // --- FLOOR BOUNCE ---
+        // 1. Floor Bounce (Existing)
         if (getPosition().y - radius < 0) {
-            getPosition().y = radius; // Snap to floor
-            
-            if (Math.abs(getVelocity().y) < 100) {
-                getVelocity().y = 0; 
-            } else {
+            getPosition().y = radius; 
+            if (getVelocity().y < 0) {
+                this.setJumpCount(0);
                 getVelocity().y = Math.abs(getVelocity().y) * FLOOR_DAMPING;
-                
-                if (getVelocity().y > MAX_VELOCITY) {
-                    getVelocity().y = MAX_VELOCITY;
-                }
             }
         }
 
-        // Wall Bounce (Sides)
+        // 2. Ceiling Cap (NEW)
+        if (getPosition().y + radius > Gdx.graphics.getHeight()) {
+            getPosition().y = Gdx.graphics.getHeight() - radius;
+            getVelocity().y = -Math.abs(getVelocity().y) * FLOOR_DAMPING;
+        }
+
+        // 3. Wall Bounces (Existing)
         if (getPosition().x + radius > Gdx.graphics.getWidth()) {
             getPosition().x = Gdx.graphics.getWidth() - radius;
             getVelocity().x *= -1;
@@ -73,34 +73,43 @@ public class Ball extends Circle {
         float overlapHeight = maxY - minY;
 
         if (overlapWidth < overlapHeight) {
-            // Horizontal Collision
-            getVelocity().x *= -1;
+            getVelocity().x = (getPosition().x < other.getPosition().x ? -1 : 1) * Math.abs(getVelocity().x) * WALL_DAMPING;
             if (getPosition().x < other.getPosition().x) getPosition().x -= overlapWidth;
             else getPosition().x += overlapWidth;
         } else {
-            // Vertical Collision
             float otherCenterY = otherBounds.y + otherBounds.height / 2f;
 
             if (getPosition().y > otherCenterY) {
-                // Hit the TOP
                 getPosition().y += overlapHeight;
                 
+                // FIX: Only reset jump if we are landing on the platform
+                if (getVelocity().y < 0) {
+                    this.jumpCount = 0;
+                }
+
                 if (other.getName().contains("Trampoline")) {
                     getVelocity().y = Math.abs(getVelocity().y) * TRAMPOLINE_DAMPING;
                     getVelocity().y += TRAMPOLINE_BOOST;
+                    // Trampolines are bouncy, so we count that as a "jump" state
+                    this.jumpCount = 1; 
                 } else {
                     getVelocity().y = Math.abs(getVelocity().y) * FLOOR_DAMPING;
                 }
 
-                if (getVelocity().y > MAX_VELOCITY) {
-                    getVelocity().y = MAX_VELOCITY;
+                // Capping logic (Allows trampoline to go higher than normal floor)
+                float currentMax = other.getName().contains("Trampoline") ? 1200f : MAX_VELOCITY;
+                if (getVelocity().y > currentMax) {
+                    getVelocity().y = currentMax;
                 }
 
             } else {
-                // Hit the BOTTOM
                 getPosition().y -= overlapHeight;
                 getVelocity().y = -Math.abs(getVelocity().y) * FLOOR_DAMPING; 
             }
         }
     }
+
+    // FIX: These allow GameScene to talk to the Ball
+    public int getJumpCount() { return jumpCount; }
+    public void setJumpCount(int count) { this.jumpCount = count; }
 }

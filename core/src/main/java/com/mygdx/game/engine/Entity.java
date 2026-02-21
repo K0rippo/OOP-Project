@@ -56,7 +56,5 @@ public abstract class Entity {
         //Vector2 delta = velocity.cpy().scl(deltaTime);
         //transform.getPosition().add(delta);
     //}
-    
-    @Override
-    public String toString() { return "Entity{name='" + name + "'}"; }
+
 }
