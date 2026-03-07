@@ -34,6 +34,8 @@ public class Scene {
         entityManager.renderAll(batch);
     }
 
+    public void resize(int width, int height) {}
+
     public String getId() { return id; }
     public boolean isActive() { return isActive; }
     public void setActive(boolean active) { this.isActive = active; }

@@ -2,6 +2,9 @@ package com.mygdx.game.simulation;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.mygdx.game.engine.SceneManager;
@@ -10,7 +13,7 @@ public class GameMaster extends ApplicationAdapter {
 
     private SpriteBatch batch;
     private SceneManager sceneManager;
-
+    private Texture uiButtonTexture; 
     public static boolean isMuted = false;
 
     @Override
@@ -18,19 +21,20 @@ public class GameMaster extends ApplicationAdapter {
         batch = new SpriteBatch();
         sceneManager = new SceneManager();
 
-        // 1. Initialize Scenes
-        MenuScene menuScene = new MenuScene("MENU", sceneManager);
-        GameScene gameScene = new GameScene("GAME", sceneManager);
-        SettingsScene settingsScene = new SettingsScene("SETTINGS", sceneManager);
+        // Generate the texture once
+        Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
+        pixmap.setColor(Color.WHITE);
+        pixmap.fill();
+        uiButtonTexture = new Texture(pixmap);
+        pixmap.dispose();
 
-        // 2. Register Scenes
-        sceneManager.addScene(menuScene.getId(), menuScene);
-        sceneManager.addScene(gameScene.getId(), gameScene);
-        sceneManager.addScene(settingsScene.getId(), settingsScene);
+        // Pass the shared texture to the scenes that need it
+        sceneManager.addScene("MENU", new MenuScene("MENU", sceneManager, uiButtonTexture));
+        sceneManager.addScene("GAME", new GameScene("GAME", sceneManager));
+        sceneManager.addScene("SETTINGS", new SettingsScene("SETTINGS", sceneManager, uiButtonTexture));
+        sceneManager.addScene("RESULT", new ResultScene("RESULT", sceneManager, uiButtonTexture));
 
-        // 3. Set initial state
         sceneManager.setActiveScene("MENU");
-      
     }
 
     @Override
@@ -46,7 +50,13 @@ public class GameMaster extends ApplicationAdapter {
     }
 
     @Override
+    public void resize(int width, int height) {
+        sceneManager.resize(width, height);
+    }
+
+    @Override
     public void dispose() {
         batch.dispose();
+        uiButtonTexture.dispose(); // Free memory
     }
 }

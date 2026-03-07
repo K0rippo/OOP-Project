@@ -2,7 +2,6 @@ package com.mygdx.game.simulation;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -13,50 +12,40 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.mygdx.game.engine.Scene;
 import com.mygdx.game.engine.SceneManager;
 
 public class MenuScene extends Scene {
 
     private Stage stage;
-    private SceneManager sceneManager;
 
-    public MenuScene(String id, final SceneManager sceneManager) {
+    public MenuScene(String id, final SceneManager sceneManager, Texture buttonTexture) {
         super(id);
-        this.sceneManager = sceneManager;
-        stage = new Stage(new ScreenViewport());
+        stage = new Stage(new FitViewport(800, 600));
 
         BitmapFont font = new BitmapFont();
-        Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
-        pixmap.setColor(Color.WHITE);
-        pixmap.fill();
-        Texture buttonTexture = new Texture(pixmap);
-        pixmap.dispose();
 
-        TextButton.TextButtonStyle style = new TextButton.TextButtonStyle();
-        style.font = font;
-        style.up = new TextureRegionDrawable(new TextureRegion(buttonTexture));
-        style.fontColor = Color.BLACK;
+        TextButton.TextButtonStyle textButtonStyle = new TextButton.TextButtonStyle();
+        textButtonStyle.up = new TextureRegionDrawable(new TextureRegion(buttonTexture));
+        textButtonStyle.font = font;
+        textButtonStyle.fontColor = Color.DARK_GRAY;
+
+        TextButton btnPlay = new TextButton("PLAY", textButtonStyle);
+        TextButton btnSettings = new TextButton("SETTINGS", textButtonStyle);
+        TextButton btnQuit = new TextButton("QUIT", textButtonStyle);
 
         Table mainTable = new Table();
         mainTable.setFillParent(true);
-        stage.addActor(mainTable);
-
-        TextButton btnPlay = new TextButton("PLAY", style);
-        btnPlay.setColor(Color.GRAY);
-        TextButton btnSettings = new TextButton("SETTINGS", style);
-        btnSettings.setColor(Color.GRAY);
-        TextButton btnQuit = new TextButton("QUIT", style);
-        btnQuit.setColor(Color.GRAY);
-
-        mainTable.center();
         mainTable.add(btnPlay).size(200, 50).padBottom(15);
         mainTable.row();
         mainTable.add(btnSettings).size(200, 50).padBottom(15);
         mainTable.row();
         mainTable.add(btnQuit).size(200, 50);
 
+        stage.addActor(mainTable);
+
+        // Change to game scene
         btnPlay.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -64,16 +53,17 @@ public class MenuScene extends Scene {
             }
         });
 
+        // Change to settings scene
         btnSettings.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                // When coming from Menu, we want 'Back' to go to Menu
                 SettingsScene settings = (SettingsScene) sceneManager.getScene("SETTINGS");
                 if (settings != null) settings.setPreviousScene("MENU");
                 sceneManager.setActiveScene("SETTINGS");
             }
         });
 
+        // Exit application
         btnQuit.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -83,13 +73,22 @@ public class MenuScene extends Scene {
     }
 
     @Override
+    public void resize(int width, int height) {
+        stage.getViewport().update(width, height, true);
+    }
+
+    @Override
     public void show() { Gdx.input.setInputProcessor(stage); }
+    
     @Override
     public void hide() { Gdx.input.setInputProcessor(null); }
+    
     @Override
     public void update(float deltaTime) { super.update(deltaTime); stage.act(deltaTime); }
+    
     @Override
     public void render(SpriteBatch batch) {
+        stage.getViewport().apply();
         if (batch.isDrawing()) batch.end();
         stage.draw();
         if (!batch.isDrawing()) batch.begin();
