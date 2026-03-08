@@ -24,6 +24,10 @@ public abstract class Circle extends MovableEntity {
     public void render(SpriteBatch batch) {
         // Subclasses like PlayerCharacter override this to draw PNGs
     }
+
+    public float getRadius() {
+        return radius;
+    }
     
     // The renderShape method has been removed to prevent unwanted geometric overlays.
 }

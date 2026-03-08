@@ -4,10 +4,10 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 public abstract class Scene {
     private final String id;
-    protected final Engine engine; 
+    protected final IGameEngine engine; 
     private boolean isActive;
 
-    public Scene(String id, Engine engine) {
+    public Scene(String id, IGameEngine engine) {
         this.id = id;
         this.engine = engine;
         this.isActive = true;

@@ -13,15 +13,15 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.mygdx.game.engine.Engine;
+import com.mygdx.game.engine.IGameEngine;
+import com.mygdx.game.engine.ISceneNavigator;
 import com.mygdx.game.engine.Scene;
-import com.mygdx.game.engine.SceneManager;
 
 public class MenuScene extends Scene {
 
     private Stage stage;
 
-    public MenuScene(String id, final SceneManager sceneManager, Engine engine, Texture buttonTexture) {
+    public MenuScene(String id, final ISceneNavigator sceneNavigator, IGameEngine engine, Texture buttonTexture) {
         super(id, engine);
         this.stage = new Stage(new FitViewport(800, 600));
 
@@ -49,16 +49,16 @@ public class MenuScene extends Scene {
         btnPlay.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                sceneManager.setActiveScene("GAME");
+                sceneNavigator.goToScene("GAME");
             }
         });
 
         btnSettings.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                SettingsScene settings = (SettingsScene) sceneManager.getScene("SETTINGS");
+                SettingsScene settings = (SettingsScene) sceneNavigator.getScene("SETTINGS");
                 if (settings != null) settings.setPreviousScene("MENU");
-                sceneManager.setActiveScene("SETTINGS");
+                sceneNavigator.goToScene("SETTINGS");
             }
         });
 

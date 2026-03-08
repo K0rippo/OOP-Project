@@ -13,10 +13,14 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.mygdx.game.engine.Engine;
+import com.mygdx.game.engine.IGameEngine;
+import com.mygdx.game.engine.ISceneNavigator;
 import com.mygdx.game.engine.Scene;
-import com.mygdx.game.engine.SceneManager;
 
+/**
+ * SettingsScene - displays settings and mute toggle.
+ * Updated to use ISceneNavigator and IGameEngine abstractions (DIP).
+ */
 public class SettingsScene extends Scene {
 
     private Stage stage;
@@ -25,7 +29,7 @@ public class SettingsScene extends Scene {
     private TextButton btnExitMenu;
     private String previousSceneId = "MENU"; 
 
-    public SettingsScene(String id, final SceneManager sceneManager, Engine engine, Texture buttonTexture) {
+    public SettingsScene(String id, final ISceneNavigator sceneNavigator, IGameEngine engine, Texture buttonTexture) {
         super(id, engine);
         this.stage = new Stage(new FitViewport(800, 600));
 
@@ -60,14 +64,14 @@ public class SettingsScene extends Scene {
         btnBack.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                sceneManager.setActiveScene(previousSceneId);
+                sceneNavigator.goToScene(previousSceneId);
             }
         });
 
         btnExitMenu.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                sceneManager.setActiveScene("MENU");
+                sceneNavigator.goToScene("MENU");
             }
         });
     }

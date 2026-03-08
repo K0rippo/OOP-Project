@@ -2,7 +2,7 @@ package com.mygdx.game.engine;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
-public class Engine {
+public class Engine implements IGameEngine {
     private final EntityManager entityManager;
     private final CollisionManager collisionManager;
     private final IOManager ioManager;

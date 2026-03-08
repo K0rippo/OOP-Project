@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SceneManager {
+public class SceneManager implements ISceneNavigator {
     private Map<String, Scene> scenes;
     private Scene activeScene;
 
@@ -31,6 +31,11 @@ public class SceneManager {
         } else {
             System.out.println("Scene " + id + " does not exist.");
         }
+    }
+
+    @Override
+    public void goToScene(String sceneId) {
+        setActiveScene(sceneId);
     }
 
     public void updateActiveScene(float deltaTime) {

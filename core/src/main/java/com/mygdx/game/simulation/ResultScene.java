@@ -14,16 +14,20 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.mygdx.game.engine.Engine;
+import com.mygdx.game.engine.IGameEngine;
+import com.mygdx.game.engine.ISceneNavigator;
 import com.mygdx.game.engine.Scene;
-import com.mygdx.game.engine.SceneManager;
 
+/**
+ * ResultScene - displays game results and score.
+ * Updated to use ISceneNavigator and IGameEngine abstractions (DIP).
+ */
 public class ResultScene extends Scene {
 
     private Stage stage;
     private Label scoreLabel;
 
-    public ResultScene(String id, final SceneManager sceneManager, Engine engine, Texture buttonTexture) {
+    public ResultScene(String id, final ISceneNavigator sceneNavigator, IGameEngine engine, Texture buttonTexture) {
         super(id, engine);
         this.stage = new Stage(new FitViewport(800, 600));
 
@@ -55,14 +59,14 @@ public class ResultScene extends Scene {
         btnRestart.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                sceneManager.setActiveScene("GAME"); 
+                sceneNavigator.goToScene("GAME");
             }
         });
 
         btnMenu.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                sceneManager.setActiveScene("MENU");
+                sceneNavigator.goToScene("MENU");
             }
         });
     }

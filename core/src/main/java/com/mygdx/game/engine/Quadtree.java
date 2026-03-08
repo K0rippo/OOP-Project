@@ -30,10 +30,10 @@ public class Quadtree {
     }
 
     private void split() {
-        float subWidth = bounds.width / 2;
-        float subHeight = bounds.height / 2;
-        float x = bounds.x;
-        float y = bounds.y;
+        float subWidth = bounds.getWidth() / 2;
+        float subHeight = bounds.getHeight() / 2;
+        float x = bounds.getX();
+        float y = bounds.getY();
 
         nodes[0] = new Quadtree(level + 1, new Rectangle(x + subWidth, y, subWidth, subHeight));
         nodes[1] = new Quadtree(level + 1, new Rectangle(x, y, subWidth, subHeight));
@@ -44,19 +44,19 @@ public class Quadtree {
     private int getIndex(Entity pEntity) {
         int index = -1;
         Rectangle pRect = pEntity.getBounds();
-        double verticalMidpoint = bounds.x + (bounds.width / 2);
-        double horizontalMidpoint = bounds.y + (bounds.height / 2);
+        double verticalMidpoint = bounds.getX() + (bounds.getWidth() / 2);
+        double horizontalMidpoint = bounds.getY() + (bounds.getHeight() / 2);
 
-        boolean topQuadrant = (pRect.y < horizontalMidpoint && pRect.y + pRect.height < horizontalMidpoint);
-        boolean bottomQuadrant = (pRect.y > horizontalMidpoint);
+        boolean topQuadrant = (pRect.getY() < horizontalMidpoint && pRect.getY() + pRect.getHeight() < horizontalMidpoint);
+        boolean bottomQuadrant = (pRect.getY() > horizontalMidpoint);
 
-        if (pRect.x < verticalMidpoint && pRect.x + pRect.width < verticalMidpoint) {
+        if (pRect.getX() < verticalMidpoint && pRect.getX() + pRect.getWidth() < verticalMidpoint) {
             if (topQuadrant) {
                 index = 1;
             } else if (bottomQuadrant) {
                 index = 2;
             }
-        } else if (pRect.x > verticalMidpoint) {
+        } else if (pRect.getX() > verticalMidpoint) {
             if (topQuadrant) {
                 index = 0;
             } else if (bottomQuadrant) {

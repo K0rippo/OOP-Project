@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 
-public abstract class Entity {
+public abstract class Entity implements ICollidable, IRenderable {
     private int id;
     private boolean isActive;
     private String name;
@@ -23,10 +23,16 @@ public abstract class Entity {
 
     public void update(float deltaTime) {}
 
+    @Override
     public abstract Rectangle getBounds();
+    
+    @Override
     public abstract void onCollision(Entity other);
+    
+    @Override
     public abstract void render(SpriteBatch batch);
 
+    @Override
     public void renderShape(ShapeRenderer shapeRenderer) {}
 
     public int getId() { return id; }

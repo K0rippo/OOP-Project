@@ -8,13 +8,14 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.mygdx.game.engine.Engine;
+import com.mygdx.game.engine.IGameEngine;
 import com.mygdx.game.engine.SceneManager;
 
 public class GameMaster extends ApplicationAdapter {
 
     private SpriteBatch batch;
     private SceneManager sceneManager;
-    private Engine gameEngine;
+    private IGameEngine gameEngine;
     private Texture uiButtonTexture; 
     public static boolean isMuted = false;
 
@@ -36,7 +37,7 @@ public class GameMaster extends ApplicationAdapter {
         // Inject the single Engine instance into all scenes
         sceneManager.addScene("MENU", new MenuScene("MENU", sceneManager, gameEngine, uiButtonTexture));
         
-        sceneManager.addScene("GAME", new GameScene("GAME", sceneManager, gameEngine));
+        sceneManager.addScene("GAME", new GameScene("GAME", sceneManager, gameEngine, new DefaultQuestionProvider()));
         
         sceneManager.addScene("SETTINGS", new SettingsScene("SETTINGS", sceneManager, gameEngine, uiButtonTexture));
         

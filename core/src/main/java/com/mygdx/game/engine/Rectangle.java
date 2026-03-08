@@ -1,7 +1,7 @@
 package com.mygdx.game.engine;
 
 public class Rectangle {
-    public float x, y, width, height;
+    private float x, y, width, height;
 
     public Rectangle(float x, float y, float width, float height) {
         this.x = x;
@@ -24,4 +24,11 @@ public class Rectangle {
                y < other.y + other.height &&
                y + height > other.y;
     }
+    
+    public float getX() { return x; }
+    public float getY() { return y; }
+    public float getWidth() { return width; }
+    public float getHeight() { return height; }
+    
+    
 }

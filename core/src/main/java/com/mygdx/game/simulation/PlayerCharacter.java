@@ -29,13 +29,17 @@ public class PlayerCharacter extends Circle {
     public void update(float deltaTime) {
         super.update(deltaTime);
 
-        // Screen boundary checks
-        if (getPosition().y + radius > WORLD_HEIGHT) {
-            getPosition().y = WORLD_HEIGHT - radius;
-            getVelocity().y = 0;
-        } else if (getPosition().y - radius < 0) {
-            getPosition().y = radius;
-            getVelocity().y = 0;
+        // Screen boundary checks - prevent movement beyond limits
+        float topLimit = WORLD_HEIGHT - radius;
+        float bottomLimit = radius;
+
+        // Clamp position to valid range
+        if (getPosition().y > topLimit) {
+            getPosition().y = topLimit;
+            getVelocity().y = 0;  // Stop all vertical movement at boundary
+        } else if (getPosition().y < bottomLimit) {
+            getPosition().y = bottomLimit;
+            getVelocity().y = 0;  // Stop all vertical movement at boundary
         }
 
         // Recovery logic: push player forward if they were knocked back
