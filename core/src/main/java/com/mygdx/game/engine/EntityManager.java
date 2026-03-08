@@ -1,59 +1,62 @@
 package com.mygdx.game.engine;
 
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import java.util.ArrayList;
-import java.util.Collections; // Added for safety
+import java.util.Collections;
 import java.util.List;
 
 public class EntityManager {
     
     private final List<Entity> entities;
+    private MovementManager movementManager;
 
-    public EntityManager()
-    {
+    public EntityManager() {
         this.entities = new ArrayList<>();
     }
 
-    public void addEntity(Entity e)
-    {
-        entities.add(e);
+    public void linkManagers(MovementManager movementManager) {
+        this.movementManager = movementManager;
     }
 
-    public void removeEntity(Entity e)
-    {
-        entities.remove(e);
+    public void addEntity(Entity e) { 
+        if (!entities.contains(e)) {
+            entities.add(e); 
+            if (movementManager != null && e instanceof iMovable) {
+                movementManager.registerMovable((iMovable) e);
+            }
+        }
     }
 
-    //getter to not violate encap
-    public List<Entity> getEntities()
-    {
+    public void removeEntity(Entity e) { 
+        if (entities.remove(e)) {
+            if (movementManager != null && e instanceof iMovable) {
+                movementManager.unregisterMovable((iMovable) e);
+            }
+        }
+    }
+
+    public List<Entity> getEntities() {
         return Collections.unmodifiableList(entities);
     }
 
     public void updateAll(float deltaTime) {
-        for (int i = 0; i < entities.size(); i++)
-        {    
+        for (int i = 0; i < entities.size(); i++) {    
             Entity e = entities.get(i);
-            if (e.isActive())
-            {
+            if (e.isActive()) {
                 e.update(deltaTime);
             }
         }
     }
 
-    public void renderAll(SpriteBatch batch)
-    {
-        for (Entity e : entities)
-        {
-            if (e.isActive())
-            {
-                e.render(batch); 
+    public void clear() {
+        if (movementManager != null) {
+            for (Entity e : entities) {
+                if (e instanceof iMovable) movementManager.unregisterMovable((iMovable) e);
             }
         }
-    }
-
-    public void clear()
-    {
         entities.clear();
+    }
+    
+    public void dispose() {
+        // Resources moved to RenderManager
     }
 }

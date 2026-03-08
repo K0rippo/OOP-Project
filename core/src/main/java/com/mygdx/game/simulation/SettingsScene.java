@@ -2,67 +2,53 @@ package com.mygdx.game.simulation;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
-
+import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.mygdx.game.engine.Engine;
 import com.mygdx.game.engine.Scene;
 import com.mygdx.game.engine.SceneManager;
 
 public class SettingsScene extends Scene {
 
     private Stage stage;
-    private SceneManager sceneManager;
     private TextButton btnMute;
+    private TextButton btnBack;
+    private TextButton btnExitMenu;
     private String previousSceneId = "MENU"; 
 
-    public SettingsScene(String id, final SceneManager sceneManager) {
-        super(id);
-        this.sceneManager = sceneManager;
-        stage = new Stage(new ScreenViewport());
+    public SettingsScene(String id, final SceneManager sceneManager, Engine engine, Texture buttonTexture) {
+        super(id, engine);
+        this.stage = new Stage(new FitViewport(800, 600));
 
         BitmapFont font = new BitmapFont();
-        Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
-        pixmap.setColor(Color.WHITE);
-        pixmap.fill();
-        Texture texture = new Texture(pixmap);
-        pixmap.dispose();
 
-        TextButton.TextButtonStyle style = new TextButton.TextButtonStyle();
-        style.font = font;
-        style.up = new TextureRegionDrawable(new TextureRegion(texture));
-        style.fontColor = Color.WHITE;
-        Label.LabelStyle labelStyle = new Label.LabelStyle(font, Color.WHITE);
+        TextButton.TextButtonStyle textButtonStyle = new TextButton.TextButtonStyle();
+        textButtonStyle.up = new TextureRegionDrawable(new TextureRegion(buttonTexture));
+        textButtonStyle.font = font;
+        textButtonStyle.fontColor = Color.DARK_GRAY;
+
+        btnMute = new TextButton("SOUND: UNMUTED", textButtonStyle);
+        btnBack = new TextButton("BACK", textButtonStyle);
+        btnExitMenu = new TextButton("EXIT TO MENU", textButtonStyle);
 
         Table mainTable = new Table();
         mainTable.setFillParent(true);
+        mainTable.add(btnMute).size(200, 50).padBottom(15);
+        mainTable.row();
+        mainTable.add(btnBack).size(200, 50).padBottom(15);
+        mainTable.row();
+        mainTable.add(btnExitMenu).size(200, 50);
+
         stage.addActor(mainTable);
-
-        Label title = new Label("SETTINGS", labelStyle);
-        title.setFontScale(1.5f);
-
-        btnMute = new TextButton("SOUND: UNMUTED", style);
-        btnMute.setColor(Color.DARK_GRAY);
-
-        TextButton btnBack = new TextButton("BACK", style);
-        btnBack.setColor(Color.GRAY);
-
-        mainTable.top().padTop(50);
-        mainTable.add(title).padBottom(50);
-        mainTable.row();
-        mainTable.add(btnMute).size(250, 50).padBottom(20);
-        mainTable.row();
-        mainTable.add(btnBack).size(200, 50);
 
         btnMute.addListener(new ClickListener() {
             @Override
@@ -77,10 +63,24 @@ public class SettingsScene extends Scene {
                 sceneManager.setActiveScene(previousSceneId);
             }
         });
+
+        btnExitMenu.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                sceneManager.setActiveScene("MENU");
+            }
+        });
     }
 
     public void setPreviousScene(String id) {
         this.previousSceneId = id;
+        if (id.equals("MENU")) {
+            btnBack.setText("BACK TO MENU");
+            btnExitMenu.setVisible(false);
+        } else {
+            btnBack.setText("BACK TO GAME");
+            btnExitMenu.setVisible(true);
+        }
     }
 
     private void toggleMute() {
@@ -96,6 +96,11 @@ public class SettingsScene extends Scene {
             btnMute.setText("SOUND: UNMUTED");
             btnMute.setColor(Color.DARK_GRAY);
         }
+    }
+
+    @Override
+    public void resize(int width, int height) {
+        stage.getViewport().update(width, height, true);
     }
 
     @Override
@@ -115,6 +120,7 @@ public class SettingsScene extends Scene {
 
     @Override
     public void render(SpriteBatch batch) {
+        stage.getViewport().apply();
         if (batch.isDrawing()) batch.end();
         stage.draw();
         if (!batch.isDrawing()) batch.begin();
