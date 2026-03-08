@@ -13,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.mygdx.game.engine.Engine;
 import com.mygdx.game.engine.Scene;
 import com.mygdx.game.engine.SceneManager;
 
@@ -20,9 +21,9 @@ public class MenuScene extends Scene {
 
     private Stage stage;
 
-    public MenuScene(String id, final SceneManager sceneManager, Texture buttonTexture) {
-        super(id);
-        stage = new Stage(new FitViewport(800, 600));
+    public MenuScene(String id, final SceneManager sceneManager, Engine engine, Texture buttonTexture) {
+        super(id, engine);
+        this.stage = new Stage(new FitViewport(800, 600));
 
         BitmapFont font = new BitmapFont();
 
@@ -45,7 +46,6 @@ public class MenuScene extends Scene {
 
         stage.addActor(mainTable);
 
-        // Change to game scene
         btnPlay.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -53,7 +53,6 @@ public class MenuScene extends Scene {
             }
         });
 
-        // Change to settings scene
         btnSettings.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -63,7 +62,6 @@ public class MenuScene extends Scene {
             }
         });
 
-        // Exit application
         btnQuit.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -84,7 +82,10 @@ public class MenuScene extends Scene {
     public void hide() { Gdx.input.setInputProcessor(null); }
     
     @Override
-    public void update(float deltaTime) { super.update(deltaTime); stage.act(deltaTime); }
+    public void update(float deltaTime) { 
+        super.update(deltaTime); 
+        stage.act(deltaTime); 
+    }
     
     @Override
     public void render(SpriteBatch batch) {

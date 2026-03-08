@@ -7,12 +7,14 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.mygdx.game.engine.Engine;
 import com.mygdx.game.engine.SceneManager;
 
 public class GameMaster extends ApplicationAdapter {
 
     private SpriteBatch batch;
     private SceneManager sceneManager;
+    private Engine gameEngine;
     private Texture uiButtonTexture; 
     public static boolean isMuted = false;
 
@@ -20,19 +22,25 @@ public class GameMaster extends ApplicationAdapter {
     public void create() {
         batch = new SpriteBatch();
         sceneManager = new SceneManager();
+        
+        // Phase 1: Initialize the unified Engine Facade
+        gameEngine = new Engine();
 
-        // Generate the texture once
+        // Create a shared UI texture for buttons
         Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
         pixmap.setColor(Color.WHITE);
         pixmap.fill();
         uiButtonTexture = new Texture(pixmap);
         pixmap.dispose();
 
-        // Pass the shared texture to the scenes that need it
-        sceneManager.addScene("MENU", new MenuScene("MENU", sceneManager, uiButtonTexture));
-        sceneManager.addScene("GAME", new GameScene("GAME", sceneManager));
-        sceneManager.addScene("SETTINGS", new SettingsScene("SETTINGS", sceneManager, uiButtonTexture));
-        sceneManager.addScene("RESULT", new ResultScene("RESULT", sceneManager, uiButtonTexture));
+        // Inject the single Engine instance into all scenes
+        sceneManager.addScene("MENU", new MenuScene("MENU", sceneManager, gameEngine, uiButtonTexture));
+        
+        sceneManager.addScene("GAME", new GameScene("GAME", sceneManager, gameEngine));
+        
+        sceneManager.addScene("SETTINGS", new SettingsScene("SETTINGS", sceneManager, gameEngine, uiButtonTexture));
+        
+        sceneManager.addScene("RESULT", new ResultScene("RESULT", sceneManager, gameEngine, uiButtonTexture));
 
         sceneManager.setActiveScene("MENU");
     }
@@ -42,6 +50,7 @@ public class GameMaster extends ApplicationAdapter {
         ScreenUtils.clear(0.1f, 0.1f, 0.2f, 1f);
         float deltaTime = Gdx.graphics.getDeltaTime();
 
+        // SceneManager handles the active scene's update and render calls
         sceneManager.updateActiveScene(deltaTime);
 
         batch.begin();
@@ -57,6 +66,7 @@ public class GameMaster extends ApplicationAdapter {
     @Override
     public void dispose() {
         batch.dispose();
-        uiButtonTexture.dispose(); // Free memory
+        uiButtonTexture.dispose();
+        gameEngine.dispose(); // Ensure engine resources are cleaned up
     }
 }

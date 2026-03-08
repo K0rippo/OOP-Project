@@ -1,7 +1,5 @@
 package com.mygdx.game.engine;
 
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -9,15 +7,32 @@ import java.util.List;
 public class EntityManager {
     
     private final List<Entity> entities;
-    private final ShapeRenderer shapeRenderer;
+    private MovementManager movementManager;
 
     public EntityManager() {
         this.entities = new ArrayList<>();
-        this.shapeRenderer = new ShapeRenderer();
     }
 
-    public void addEntity(Entity e) { entities.add(e); }
-    public void removeEntity(Entity e) { entities.remove(e); }
+    public void linkManagers(MovementManager movementManager) {
+        this.movementManager = movementManager;
+    }
+
+    public void addEntity(Entity e) { 
+        if (!entities.contains(e)) {
+            entities.add(e); 
+            if (movementManager != null && e instanceof iMovable) {
+                movementManager.registerMovable((iMovable) e);
+            }
+        }
+    }
+
+    public void removeEntity(Entity e) { 
+        if (entities.remove(e)) {
+            if (movementManager != null && e instanceof iMovable) {
+                movementManager.unregisterMovable((iMovable) e);
+            }
+        }
+    }
 
     public List<Entity> getEntities() {
         return Collections.unmodifiableList(entities);
@@ -32,36 +47,16 @@ public class EntityManager {
         }
     }
 
-    public void renderAll(SpriteBatch batch) {
-        // Loop 1: Draw all sprites
-        for (Entity e : entities) {
-            if (e.isActive()) {
-                e.render(batch); 
-            }
-        }
-
-        // Pause batch, prepare shape renderer
-        batch.end();
-        shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-
-        // Loop 2: Draw all shapes
-        for (Entity e : entities) {
-            if (e.isActive()) {
-                e.renderShape(shapeRenderer);
-            }
-        }
-
-        // End shapes, resume batch
-        shapeRenderer.end();
-        batch.begin();
-    }
-
     public void clear() {
+        if (movementManager != null) {
+            for (Entity e : entities) {
+                if (e instanceof iMovable) movementManager.unregisterMovable((iMovable) e);
+            }
+        }
         entities.clear();
     }
     
     public void dispose() {
-        shapeRenderer.dispose();
+        // Resources moved to RenderManager
     }
 }

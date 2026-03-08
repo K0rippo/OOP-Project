@@ -2,7 +2,6 @@ package com.mygdx.game.engine;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 
 public abstract class Circle extends MovableEntity {
@@ -23,12 +22,8 @@ public abstract class Circle extends MovableEntity {
 
     @Override
     public void render(SpriteBatch batch) {
-        // Keep empty. PlayerCharacter overrides this to draw its sprite.
+        // Subclasses like PlayerCharacter override this to draw PNGs
     }
     
-    @Override
-    public void renderShape(ShapeRenderer shapeRenderer) {
-        shapeRenderer.setColor(color);
-        shapeRenderer.circle(getPosition().x, getPosition().y, radius);
-    }
+    // The renderShape method has been removed to prevent unwanted geometric overlays.
 }

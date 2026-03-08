@@ -13,7 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-
+import com.mygdx.game.engine.Engine;
 import com.mygdx.game.engine.Scene;
 import com.mygdx.game.engine.SceneManager;
 
@@ -25,9 +25,9 @@ public class SettingsScene extends Scene {
     private TextButton btnExitMenu;
     private String previousSceneId = "MENU"; 
 
-    public SettingsScene(String id, final SceneManager sceneManager, Texture buttonTexture) {
-        super(id);
-        stage = new Stage(new FitViewport(800, 600));
+    public SettingsScene(String id, final SceneManager sceneManager, Engine engine, Texture buttonTexture) {
+        super(id, engine);
+        this.stage = new Stage(new FitViewport(800, 600));
 
         BitmapFont font = new BitmapFont();
 
@@ -50,7 +50,6 @@ public class SettingsScene extends Scene {
 
         stage.addActor(mainTable);
 
-        // Toggle audio mute state
         btnMute.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -58,7 +57,6 @@ public class SettingsScene extends Scene {
             }
         });
 
-        // Return to previous scene
         btnBack.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -66,7 +64,6 @@ public class SettingsScene extends Scene {
             }
         });
 
-        // Exit directly to menu
         btnExitMenu.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -75,7 +72,6 @@ public class SettingsScene extends Scene {
         });
     }
 
-    // Store origin scene id to handle back button logic
     public void setPreviousScene(String id) {
         this.previousSceneId = id;
         if (id.equals("MENU")) {
@@ -87,13 +83,11 @@ public class SettingsScene extends Scene {
         }
     }
 
-    // Switch mute flag and update button text
     private void toggleMute() {
         GameMaster.isMuted = !GameMaster.isMuted;
         updateButtonText();
     }
 
-    // Refresh UI to match mute flag
     private void updateButtonText() {
         if (GameMaster.isMuted) {
             btnMute.setText("SOUND: MUTED");

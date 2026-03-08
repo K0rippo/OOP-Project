@@ -14,7 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-
+import com.mygdx.game.engine.Engine;
 import com.mygdx.game.engine.Scene;
 import com.mygdx.game.engine.SceneManager;
 
@@ -23,8 +23,8 @@ public class ResultScene extends Scene {
     private Stage stage;
     private Label scoreLabel;
 
-    public ResultScene(String id, final SceneManager sceneManager, Texture buttonTexture) {
-        super(id);
+    public ResultScene(String id, final SceneManager sceneManager, Engine engine, Texture buttonTexture) {
+        super(id, engine);
         this.stage = new Stage(new FitViewport(800, 600));
 
         BitmapFont font = new BitmapFont();
@@ -52,7 +52,6 @@ public class ResultScene extends Scene {
 
         stage.addActor(table);
 
-        // Restart game scene
         btnRestart.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -60,7 +59,6 @@ public class ResultScene extends Scene {
             }
         });
 
-        // Return to main menu
         btnMenu.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -69,7 +67,6 @@ public class ResultScene extends Scene {
         });
     }
 
-    // Update score display
     public void setScore(int current, int max) {
         scoreLabel.setText("Score: " + current + " / " + max);
     }
@@ -86,7 +83,10 @@ public class ResultScene extends Scene {
     public void hide() { Gdx.input.setInputProcessor(null); }
 
     @Override
-    public void update(float deltaTime) { stage.act(deltaTime); }
+    public void update(float deltaTime) { 
+        super.update(deltaTime);
+        stage.act(deltaTime); 
+    }
 
     @Override
     public void render(SpriteBatch batch) {

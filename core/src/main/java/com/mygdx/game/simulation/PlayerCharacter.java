@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.engine.Circle;
 import com.mygdx.game.engine.Entity;
+
 public class PlayerCharacter extends Circle {
 
     public boolean isLevelComplete = false;
@@ -15,7 +16,8 @@ public class PlayerCharacter extends Circle {
     private Texture texture;
 
     public PlayerCharacter(int id, Vector2 position, float radius, float speedX) {
-        super(id, "Player", position, radius, Color.CLEAR); // Make base shape invisible
+        // Use Color.CLEAR as a property, though it won't be drawn by the engine anymore.
+        super(id, "Player", position, radius, Color.CLEAR); 
         this.defaultSpeedX = speedX;
         getVelocity().x = speedX;
         
@@ -27,6 +29,7 @@ public class PlayerCharacter extends Circle {
     public void update(float deltaTime) {
         super.update(deltaTime);
 
+        // Screen boundary checks
         if (getPosition().y + radius > WORLD_HEIGHT) {
             getPosition().y = WORLD_HEIGHT - radius;
             getVelocity().y = 0;
@@ -35,6 +38,7 @@ public class PlayerCharacter extends Circle {
             getVelocity().y = 0;
         }
 
+        // Recovery logic: push player forward if they were knocked back
         if (getVelocity().x < defaultSpeedX) {
             getVelocity().x += 150f * deltaTime; 
             if (getVelocity().x > defaultSpeedX) {
@@ -53,14 +57,13 @@ public class PlayerCharacter extends Circle {
     @Override
     public void onCollision(Entity other) {
         if (other.getName().equals("WrongWall")) {
-            getVelocity().x = -150f; 
+            getVelocity().x = -150f; // Knockback
             hitWrongWall = true; 
         } else if (other.getName().equals("CorrectWall")) {
             isLevelComplete = true; 
         }
     }
 
-    // Free memory when destroyed
     public void dispose() {
         if (texture != null) {
             texture.dispose();
