@@ -2,14 +2,9 @@ package com.mygdx.game.simulation;
 
 import com.badlogic.gdx.graphics.Color;
 
-/**
- * Enum for wall types to support open/closed principle.
- * Adding new wall types doesn't require modifying ObstacleFactory.
- * Walls are transparent (Color.CLEAR) so quiz answers aren't revealed visually.
- */
 public enum WallType {
-    CORRECT("CorrectWall", Color.CLEAR),
-    WRONG("WrongWall", Color.CLEAR);
+    CORRECT("CorrectWall", new Color(0.20f, 0.60f, 0.30f, 0.28f)),
+    WRONG("WrongWall", new Color(0.20f, 0.60f, 0.30f, 0.28f));
 
     public final String name;
     public final Color color;

@@ -9,63 +9,91 @@ import com.mygdx.game.engine.Entity;
 
 public class PlayerCharacter extends Circle {
 
-    public boolean isLevelComplete = false;
-    public boolean hitWrongWall = false; 
-    private float defaultSpeedX;
-    private final float WORLD_HEIGHT = 600f; 
-    private Texture texture;
+    public boolean reachedGate = false;
+    public boolean tookDamage = false;
 
-    public PlayerCharacter(int id, Vector2 position, float radius, float speedX) {
-        // Use Color.CLEAR as a property, though it won't be drawn by the engine anymore.
-        super(id, "Player", position, radius, Color.CLEAR); 
-        this.defaultSpeedX = speedX;
-        getVelocity().x = speedX;
-        
-        // Load the character image
+    private final float WORLD_HEIGHT = 600f;
+    private Texture texture;
+    private float invulnerabilityTimer = 0f;
+    
+    public boolean shootRequested = false;
+
+    public PlayerCharacter(int id, Vector2 position, float radius) {
+        super(id, "Player", position, radius, Color.CLEAR);
         this.texture = new Texture("player.png");
+        getVelocity().x = 0;
     }
 
     @Override
     public void update(float deltaTime) {
         super.update(deltaTime);
 
-        // Screen boundary checks - prevent movement beyond limits
+        if (invulnerabilityTimer > 0) {
+            invulnerabilityTimer -= deltaTime;
+        }
+
         float topLimit = WORLD_HEIGHT - radius;
         float bottomLimit = radius;
 
-        // Clamp position to valid range
         if (getPosition().y > topLimit) {
             getPosition().y = topLimit;
-            getVelocity().y = 0;  // Stop all vertical movement at boundary
+            getVelocity().y = 0;
         } else if (getPosition().y < bottomLimit) {
             getPosition().y = bottomLimit;
-            getVelocity().y = 0;  // Stop all vertical movement at boundary
+            getVelocity().y = 0;
         }
 
-        // Recovery logic: push player forward if they were knocked back
-        if (getVelocity().x < defaultSpeedX) {
-            getVelocity().x += 150f * deltaTime; 
-            if (getVelocity().x > defaultSpeedX) {
-                getVelocity().x = defaultSpeedX;
+        // Small bounce-back recovery after damage
+        if (getVelocity().x < 0) {
+            getVelocity().x += 220f * deltaTime;
+            if (getVelocity().x > 0) {
+                getVelocity().x = 0;
             }
+        } else {
+            getVelocity().x = 0;
         }
     }
 
     @Override
     public void render(SpriteBatch batch) {
-        // Draw the PNG centered on the collision radius
+        // Blink while invulnerable
+        if (invulnerabilityTimer > 0 && ((int)(invulnerabilityTimer * 12) % 2 == 0)) {
+            return;
+        }
+
         float size = radius * 2;
         batch.draw(texture, getPosition().x - radius, getPosition().y - radius, size, size);
     }
 
     @Override
     public void onCollision(Entity other) {
-        if (other.getName().equals("WrongWall")) {
-            getVelocity().x = -150f; // Knockback
-            hitWrongWall = true; 
-        } else if (other.getName().equals("CorrectWall")) {
-            isLevelComplete = true; 
+        String name = other.getName();
+
+        if (name.equals("CorrectWall")) {
+            reachedGate = true;
+            return;
         }
+
+        if (name.equals("WrongWall") || name.equals("Bullet") || name.equals("Cannon")
+                || name.equals("WrongBarrier") || name.equals("CorrectBarrier")) {
+            if (invulnerabilityTimer <= 0f) {
+                tookDamage = true;
+                invulnerabilityTimer = 1.0f;
+                getVelocity().x = -140f;
+            }
+        }
+    }
+
+    public void consumeDamage() {
+        tookDamage = false;
+    }
+
+    public void consumeGoal() {
+        reachedGate = false;
+    }
+    
+    public void requestShoot() {
+        shootRequested = true;
     }
 
     public void dispose() {

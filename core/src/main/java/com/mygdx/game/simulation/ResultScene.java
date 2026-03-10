@@ -88,7 +88,7 @@ public class ResultScene extends Scene {
 
     @Override
     public void update(float deltaTime) { 
-        super.update(deltaTime);
+        //super.update(deltaTime);
         stage.act(deltaTime); 
     }
 

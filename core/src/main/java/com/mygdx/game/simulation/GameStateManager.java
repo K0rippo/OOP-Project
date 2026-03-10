@@ -52,4 +52,7 @@ public class GameStateManager {
     public int getTotalQuestions() {
         return questionProvider.getTotalQuestions();
     }
+    
+    
+    
 }
