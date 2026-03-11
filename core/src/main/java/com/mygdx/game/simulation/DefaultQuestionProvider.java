@@ -16,6 +16,7 @@ public class DefaultQuestionProvider implements IQuestionProvider {
     }
 
     private void createQuestionBank() {
+        // Shuffle so question order is different every game
         questions.add(new Question(
             "What is the probability of flipping tails on a fair coin?", 
             new String[]{"1/2", "1/3", "1/4"}, 
@@ -46,6 +47,8 @@ public class DefaultQuestionProvider implements IQuestionProvider {
             new Color(0.1f, 0.1f, 0.1f, 1f), 
             3.5f
         ));
+        // Randomize order each game
+        questions.shuffle();
     }
 
     @Override
