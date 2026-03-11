@@ -13,7 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
-import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.mygdx.game.engine.IGameEngine;
 import com.mygdx.game.engine.ISceneNavigator;
 import com.mygdx.game.engine.Scene;
@@ -29,7 +29,7 @@ public class ResultScene extends Scene {
 
     public ResultScene(String id, final ISceneNavigator sceneNavigator, IGameEngine engine, Texture buttonTexture) {
         super(id, engine);
-        this.stage = new Stage(new FitViewport(800, 600));
+        this.stage = new Stage(new StretchViewport(1280, 720));
 
         BitmapFont font = new BitmapFont();
         Label.LabelStyle labelStyle = new Label.LabelStyle(font, Color.YELLOW);

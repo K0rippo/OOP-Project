@@ -9,7 +9,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.mygdx.game.engine.*;
 
 /**
@@ -29,16 +29,16 @@ public class GameScene extends Scene {
     public static final int LAYER_HAZARD = 4;
 
     // ── World constants ─────────────────────────────────────────────────────
-    private static final float WORLD_WIDTH      = 800f;
-    private static final float WORLD_HEIGHT     = 600f;
+    private static final float WORLD_WIDTH      = 1280f;
+    private static final float WORLD_HEIGHT     = 720f;
     private static final float PLAYER_X         = 140f;
-    private static final float SCROLL_SPEED     = 180f;
+    private static final float SCROLL_SPEED     = 100f;
     private static final float FIRST_SEGMENT_X  = WORLD_WIDTH + 200f;
     private static final float SHOOT_INTERVAL   = 0.25f;
 
     /**
      * Distance (world units) at which the HUD switches to a segment's question.
-     * 2.5 × WORLD_WIDTH gives ~11 s reading time at SCROLL_SPEED = 180.
+     * 2.5 × WORLD_WIDTH gives ~20 s reading time at SCROLL_SPEED = 100.
      */
     private static final float HUD_SWITCH_DISTANCE = WORLD_WIDTH * 2.5f;
 
@@ -131,7 +131,7 @@ public class GameScene extends Scene {
         this.questionProvider= questionProvider;
         this.obstacleFactory = new ObstacleFactory();
         this.gameState       = new GameStateManager(questionProvider);
-        this.stage           = new Stage(new FitViewport(WORLD_WIDTH, WORLD_HEIGHT));
+        this.stage           = new Stage(new StretchViewport(WORLD_WIDTH, WORLD_HEIGHT));
         this.uiManager       = new GameUIManager(stage, WORLD_HEIGHT);
         this.heartTexture    = new Texture("heart.png");
         this.background      = new ScrollingBackground(WORLD_WIDTH, WORLD_HEIGHT);
