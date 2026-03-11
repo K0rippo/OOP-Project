@@ -1,4 +1,4 @@
-package groupProject;
+package com.mygdx.game;
 
 public class Entity {
     private String name;
