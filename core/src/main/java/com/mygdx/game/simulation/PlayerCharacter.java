@@ -12,7 +12,7 @@ public class PlayerCharacter extends Circle {
     public boolean reachedGate = false;
     public boolean tookDamage = false;
 
-    private final float WORLD_HEIGHT = 600f;
+    private final float WORLD_HEIGHT = 720f;
     private Texture texture;
     private float invulnerabilityTimer = 0f;
     private float gateCooldown = 0f;  // prevents correct wall re-triggering after passing
