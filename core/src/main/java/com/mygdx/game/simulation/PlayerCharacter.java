@@ -15,7 +15,6 @@ public class PlayerCharacter extends Circle {
     private final float WORLD_HEIGHT = 600f;
     private Texture texture;
     private float invulnerabilityTimer = 0f;
-    private float gateCooldown = 0f;  // prevents correct wall re-triggering after passing
     
     public boolean shootRequested = false;
 
@@ -29,8 +28,9 @@ public class PlayerCharacter extends Circle {
     public void update(float deltaTime) {
         super.update(deltaTime);
 
-        if (invulnerabilityTimer > 0) invulnerabilityTimer -= deltaTime;
-        if (gateCooldown > 0)         gateCooldown -= deltaTime;
+        if (invulnerabilityTimer > 0) {
+            invulnerabilityTimer -= deltaTime;
+        }
 
         float topLimit = WORLD_HEIGHT - radius;
         float bottomLimit = radius;
@@ -69,56 +69,18 @@ public class PlayerCharacter extends Circle {
     public void onCollision(Entity other) {
         String name = other.getName();
 
-        if (name.equals("CorrectWall") || name.equals("CorrectBarrier")) {
-            if (!reachedGate && gateCooldown <= 0f) {
-                reachedGate = true;
-                gateCooldown = 2.0f;  // block re-trigger for 2s while wall scrolls off
+        if (name.equals("CorrectWall")) {
+            reachedGate = true;
+            return;
+        }
+
+        if (name.equals("WrongWall") || name.equals("Bullet") || name.equals("Cannon")
+                || name.equals("WrongBarrier") || name.equals("CorrectBarrier")) {
+            if (invulnerabilityTimer <= 0f) {
+                tookDamage = true;
+                invulnerabilityTimer = 1.0f;
+                getVelocity().x = -140f;
             }
-            return;
-        }
-
-        // ---- wrong lane walls/barriers ----
-        // Guard 1: if we already hit the correct wall this frame, ignore all
-        //          wrong walls — the engine fires every overlap in one pass.
-        // Guard 2: only damage if the player's centre is strictly inside this
-        //          wall's vertical band, so adjacent-lane walls don't trigger
-        //          when the player's circle merely grazes their edge.
-        if (name.equals("WrongWall") || name.equals("WrongBarrier")) {
-            if (reachedGate) return;
-            if (!isPlayerCentreInsideWall(other)) return;
-            applyDamage();
-            return;
-        }
-
-        // ---- hazards always damage ----
-        if (name.equals("Bullet") || name.equals("Cannon")) {
-            applyDamage();
-        }
-    }
-
-    /**
-     * Returns true only if this player's Y centre is strictly inside the
-     * middle 80 % of the wall's vertical extent.
-     *
-     * Using 80 % (10 % margin each side) instead of the full height means a
-     * player whose circle grazes the very edge of a wrong-lane wall — while
-     * actually travelling through the correct lane — will not be penalised.
-     */
-    private boolean isPlayerCentreInsideWall(Entity other) {
-        if (!(other instanceof com.mygdx.game.engine.RectangleEntity)) return true;
-        com.mygdx.game.engine.RectangleEntity rect = (com.mygdx.game.engine.RectangleEntity) other;
-        float playerY  = getPosition().y;
-        float bottom   = rect.getPosition().y;
-        float height   = rect.getHeight();
-        float margin   = height * 0.10f;
-        return playerY >= (bottom + margin) && playerY <= (bottom + height - margin);
-    }
-
-    private void applyDamage() {
-        if (invulnerabilityTimer <= 0f) {
-            tookDamage = true;
-            invulnerabilityTimer = 1.0f;
-            getVelocity().x = -140f;
         }
     }
 
