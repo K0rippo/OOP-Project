@@ -88,12 +88,12 @@ public class SettingsScene extends Scene {
     }
 
     private void toggleMute() {
-        GameMaster.isMuted = !GameMaster.isMuted;
+        GameMaster.setMuted(!GameMaster.isMuted());
         updateButtonText();
     }
 
     private void updateButtonText() {
-        if (GameMaster.isMuted) {
+        if (GameMaster.isMuted()) {
             btnMute.setText("SOUND: MUTED");
             btnMute.setColor(Color.RED);
         } else {
@@ -118,7 +118,8 @@ public class SettingsScene extends Scene {
 
     @Override
     public void update(float deltaTime) {
-        super.update(deltaTime);
+        // Do NOT call super.update() — that would tick the shared engine and
+        // advance game physics while the settings overlay is open.
         stage.act(deltaTime);
     }
 

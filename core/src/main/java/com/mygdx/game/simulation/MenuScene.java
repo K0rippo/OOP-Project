@@ -49,6 +49,8 @@ public class MenuScene extends Scene {
         btnPlay.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                GameScene gameScene = (GameScene) sceneNavigator.getScene("GAME");
+                if (gameScene != null) gameScene.requestRestart();
                 sceneNavigator.goToScene("GAME");
             }
         });
