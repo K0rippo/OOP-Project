@@ -8,11 +8,13 @@ public class CollisionManager {
     private Quadtree quadtree;
     private HashSet<Long> processedPairs;
 
-    public CollisionManager() {
-        this.quadtree = new Quadtree(0, new Rectangle(0, 0, 1280, 720)); 
+    // Initializes the collision manager with dynamic world bounds
+    public CollisionManager(float worldWidth, float worldHeight) {
+        this.quadtree = new Quadtree(0, new Rectangle(0, 0, worldWidth, worldHeight)); 
         this.processedPairs = new HashSet<>();
     }
 
+    // Checks and processes collisions for a list of active entities
     public void checkCollisions(List<Entity> entities) {
         quadtree.clear();
         processedPairs.clear();
@@ -37,14 +39,12 @@ public class CollisionManager {
                 
                 if (!b.isActive() || a == b) continue;
 
-                // Create a unique, order-independent ID for the collision pair
                 long idA = System.identityHashCode(a);
                 long idB = System.identityHashCode(b);
                 long min = Math.min(idA, idB);
                 long max = Math.max(idA, idB);
                 long pairId = (min << 32) | (max & 0xFFFFFFFFL);
 
-                // If this pair was already processed this frame, skip to prevent double-hits
                 if (!processedPairs.add(pairId)) continue;
 
                 if (a.canCollideWith(b) || b.canCollideWith(a)) {

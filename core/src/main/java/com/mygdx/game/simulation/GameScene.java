@@ -1,7 +1,6 @@
 package com.mygdx.game.simulation;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
@@ -11,21 +10,6 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.mygdx.game.engine.*;
-
-/**
- * GameScene — main gameplay scene.
- *
- * SOLID compliance:
- *  SRP — WallGroup is private; spawning delegated to ContinuousLevelSpawner.
- *  OCP — new question types only require a new IQuestionProvider.
- *  DIP — depends on IQuestionProvider, ISceneNavigator, IGameEngine abstractions.
- *
- * APIE compliance:
- *  Encapsulation — PlayerCharacter state via query/consume methods only.
- *  Polymorphism  — Entity hierarchy; WallType enum.
- *  Inheritance   — extends Scene.
- *  Abstraction   — all dependencies are interfaces.
- */
 
 public class GameScene extends Scene {
 
@@ -48,6 +32,7 @@ public class GameScene extends Scene {
     private final ScrollingBackground background;
     private final IQuestionProvider   questionProvider;
     private ContinuousLevelSpawner    levelSpawner;
+    private final GameInputHandler    inputHandler;
 
     private PlayerCharacter player;
     private Texture         heartTexture;
@@ -130,8 +115,9 @@ public class GameScene extends Scene {
         this.uiManager        = new GameUIManager(stage, WORLD_HEIGHT);
         this.heartTexture     = new Texture("heart.png");
         this.background       = new ScrollingBackground(WORLD_WIDTH, WORLD_HEIGHT);
+        this.inputHandler     = new GameInputHandler(engine, sceneNavigator, WORLD_HEIGHT);
 
-        initializeInput();
+        this.inputHandler.initializeInput();
         startLevel();
     }
 
@@ -156,6 +142,7 @@ public class GameScene extends Scene {
             player.consumeGoal();
         }
 
+        inputHandler.setPlayer(player);
         levelSpawner = new ContinuousLevelSpawner(questionProvider, FIRST_SEGMENT_X, this::spawnSegment);
     }
 
@@ -287,26 +274,6 @@ public class GameScene extends Scene {
         }
     }
 
-    // Binds keyboard input to engine actions
-    private void initializeInput() {
-        engine.bindKeyContinuous(Input.Keys.UP, () -> {
-            if (player != null && player.getPosition().y + player.getRadius() < WORLD_HEIGHT - 5)
-                player.getVelocity().y = 250;
-        });
-        engine.bindKeyContinuous(Input.Keys.DOWN, () -> {
-            if (player != null && player.getPosition().y - player.getRadius() > 5)
-                player.getVelocity().y = -250;
-        });
-        engine.bindKeyJustPressed(Input.Keys.SPACE, () -> {
-            if (player != null) player.requestShoot();
-        });
-        engine.bindKeyJustPressed(Input.Keys.ESCAPE, () -> {
-            SettingsScene settings = (SettingsScene) sceneNavigator.getScene("SETTINGS");
-            if (settings != null) settings.setPreviousScene("GAME");
-            sceneNavigator.goToScene("SETTINGS");
-        });
-    }
-
     // Processes logic for each frame
     @Override
     public void update(float deltaTime) {
@@ -365,7 +332,7 @@ public class GameScene extends Scene {
         if (shootCooldown > 0) shootCooldown -= deltaTime;
     }
 
-    // Removes entities that have completely scrolled off the screen to prevent UI flooding
+    // Removes entities that have completely scrolled off the screen
     private void cleanupOffScreen() {
         for (Entity e : engine.getEntitiesByLayer(LAYER_GATE)) {
             if (e.getPosition().x < -200f) {
@@ -427,7 +394,7 @@ public class GameScene extends Scene {
         }
     }
 
-    // Switches view to the result scene and passes the score
+    // Switches view to the result scene
     private void transitionToResult() {
         ResultScene result = (ResultScene) sceneNavigator.getScene("RESULT");
         if (result != null) result.setScore(score, gameState.getTotalQuestions());
