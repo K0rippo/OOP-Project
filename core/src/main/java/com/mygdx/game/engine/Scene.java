@@ -23,11 +23,19 @@ public abstract class Scene {
         engine.render(batch);
     }
 
-    public void addEntity(Entity e) { engine.getEntityManager().addEntity(e); }
-    public void removeEntity(Entity e) { engine.getEntityManager().removeEntity(e); }
+    // Adds an entity to the engine
+    public void addEntity(Entity e) { engine.addEntity(e); }
+    
+    // Removes an entity from the engine
+    public void removeEntity(Entity e) { engine.removeEntity(e); }
 
     public String getId() { return id; }
+    
+    // Sets scene to active state
     public void show() { this.isActive = true; }
+    
+    // Sets scene to inactive state
     public void hide() { this.isActive = false; }
+    
     public abstract void resize(int width, int height);
 }

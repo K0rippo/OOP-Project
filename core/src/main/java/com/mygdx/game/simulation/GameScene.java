@@ -26,13 +26,12 @@ import com.mygdx.game.engine.*;
  *  Inheritance   — extends Scene.
  *  Abstraction   — all dependencies are interfaces.
  */
+
 public class GameScene extends Scene {
 
-    // ── Collision layers ────────────────────────────────────────────────────
     public static final int LAYER_PLAYER = 1;
     public static final int LAYER_GATE   = 2;
 
-    // ── World constants ──────────────────────────────────────────────────────
     private static final float WORLD_WIDTH         = 1280f;
     private static final float WORLD_HEIGHT        = 720f;
     private static final float PLAYER_X            = 140f;
@@ -41,7 +40,6 @@ public class GameScene extends Scene {
     private static final float SHOOT_INTERVAL      = 0.25f;
     private static final float HUD_SWITCH_DISTANCE = WORLD_WIDTH;
 
-    // ── Dependencies ────────────────────────────────────────────────────────
     private final ISceneNavigator     sceneNavigator;
     private final ObstacleFactory     obstacleFactory;
     private final GameStateManager    gameState;
@@ -51,32 +49,17 @@ public class GameScene extends Scene {
     private final IQuestionProvider   questionProvider;
     private ContinuousLevelSpawner    levelSpawner;
 
-    // ── Entities ────────────────────────────────────────────────────────────
     private PlayerCharacter player;
     private Texture         heartTexture;
 
-    private final Array<RectangleEntity>  currentWalls  = new Array<>();
-    private final Array<BreakableBarrier> barriers      = new Array<>();
-    private final Array<PlayerBullet>     playerBullets = new Array<>();
-
-    // ── State ────────────────────────────────────────────────────────────────
     private Color   currentBGColor     = new Color(0.08f, 0.10f, 0.18f, 1f);
     private int     nextPlayerBulletId = 1000;
     private float   shootCooldown      = 0f;
     private float   scrolledDistance   = 0f;
     private int     score              = 0;
-    /** True while this scene is not the active scene (e.g. settings is open). */
-    private boolean paused          = false;
-    /** True when the next show() should restart the level from scratch. */
-    private boolean pendingRestart  = true;
+    private boolean paused             = false;
+    private boolean pendingRestart     = true;
 
-    // ── WallGroup ─────────────────────────────────────────────────────────────
-
-    /**
-     * WallGroup — private inner class, never exposed outside GameScene.
-     * Holds the 3 gate walls for one question segment and their shuffled answers.
-     * Encapsulates all position-checking and label-data-filling logic.
-     */
     private static class WallGroup {
         private final int                    questionIndex;
         private final Array<RectangleEntity> walls           = new Array<>();
@@ -84,27 +67,40 @@ public class GameScene extends Scene {
         private boolean                      hudShown        = false;
         private boolean                      passed          = false;
 
+        // Initializes the wall group with the question and answers
         WallGroup(int questionIndex, String[] shuffledAnswers) {
             this.questionIndex   = questionIndex;
             this.shuffledAnswers = shuffledAnswers;
         }
 
-        int     getQuestionIndex() { return questionIndex; }
-        boolean isHudShown()       { return hudShown; }
-        boolean isPassed()         { return passed; }
-        void    markHudShown()     { hudShown = true; }
-        void    addWall(RectangleEntity wall) { walls.add(wall); }
+        // Retrieves the index of the question
+        int getQuestionIndex() { return questionIndex; }
 
+        // Checks if the HUD currently shows this question
+        boolean isHudShown() { return hudShown; }
+
+        // Checks if the player passed the wall group
+        boolean isPassed() { return passed; }
+
+        // Marks the HUD as shown for this group
+        void markHudShown() { hudShown = true; }
+
+        // Adds a wall entity to the group
+        void addWall(RectangleEntity wall) { walls.add(wall); }
+
+        // Gets the X position of the first wall
         float leadingWallX() {
             return walls.isEmpty() ? Float.MAX_VALUE : walls.first().getPosition().x;
         }
 
+        // Checks the player position and marks the group as passed if cleared
         void checkAndMarkPassed(float playerX) {
             if (passed || walls.isEmpty()) return;
             RectangleEntity first = walls.first();
             if (first.getPosition().x + first.getWidth() < playerX) passed = true;
         }
 
+        // Populates arrays with answer data for rendering
         int fillAnswerData(String[] texts, float[] xs, float[] ys,
                            float[] heights, int offset) {
             if (passed) return offset;
@@ -122,8 +118,7 @@ public class GameScene extends Scene {
 
     private final Array<WallGroup> wallGroups = new Array<>();
 
-    // ── Constructor ─────────────────────────────────────────────────────────
-
+    // Initializes the main gameplay scene
     public GameScene(String id, ISceneNavigator sceneNavigator, IGameEngine engine,
                      IQuestionProvider questionProvider) {
         super(id, engine);
@@ -140,8 +135,7 @@ public class GameScene extends Scene {
         startLevel();
     }
 
-    // ── Level init ───────────────────────────────────────────────────────────
-
+    // Resets the level state and clears entities
     private void startLevel() {
         gameState.resetState();
         scrolledDistance = 0f;
@@ -165,34 +159,30 @@ public class GameScene extends Scene {
         levelSpawner = new ContinuousLevelSpawner(questionProvider, FIRST_SEGMENT_X, this::spawnSegment);
     }
 
-    // ── Lifecycle show/hide ──────────────────────────────────────────────────
-
-    /**
-     * Called by MenuScene and ResultScene before navigating to "GAME" so that
-     * show() knows to restart from scratch rather than just unpause.
-     */
+    // Flags the scene to restart on the next show
     public void requestRestart() {
         pendingRestart = true;
     }
 
+    // Restores speed and starts level when the scene becomes active
     @Override
     public void show() {
         paused = false;
-        engine.getMovementManager().setSpeedMultiplier(1f);
+        engine.setSpeedMultiplier(1f);
         if (pendingRestart) {
             pendingRestart = false;
             startLevel();
         }
     }
 
+    // Pauses game elements when the scene becomes inactive
     @Override
     public void hide() {
         paused = true;
-        engine.getMovementManager().setSpeedMultiplier(0f);
+        engine.setSpeedMultiplier(0f);
     }
 
-
-
+    // Creates a new segment with questions, gates, and barriers
     private void spawnSegment(LevelSegment segment) {
         int qi     = segment.getQuestionIndex();
         Question q = questionProvider.getQuestion(qi);
@@ -210,15 +200,13 @@ public class GameScene extends Scene {
         spawnBarriers   (segment.barrierX(), sectionH, correctIndex, qi);
         wallGroups.add(group);
 
-        // Show the first segment's question immediately; later ones use distance-based switch.
         if (wallGroups.size == 1) {
             group.markHudShown();
             showQuestionOnHud(qi);
         }
     }
 
-    // ── Spawning helpers ─────────────────────────────────────────────────────
-
+    // Generates the answer gate walls
     private void spawnAnswerGates(float spawnX, float sectionH, int correctIndex,
                                    int segId, WallGroup group) {
         for (int i = 0; i < 3; i++) {
@@ -230,11 +218,11 @@ public class GameScene extends Scene {
             wall.setCollisionLayer(LAYER_GATE);
             wall.setCollisionMask(LAYER_PLAYER);
             addEntity(wall);
-            currentWalls.add(wall);
             group.addWall(wall);
         }
     }
 
+    // Generates breakable barriers in front of the gates
     private void spawnBarriers(float spawnX, float sectionH, int correctIndex, int segId) {
         for (int i = 0; i < 3; i++) {
             BreakableBarrier barrier = new BreakableBarrier(
@@ -245,12 +233,10 @@ public class GameScene extends Scene {
             barrier.setCollisionLayer(LAYER_GATE);
             barrier.setCollisionMask(LAYER_PLAYER);
             addEntity(barrier);
-            barriers.add(barrier);
         }
     }
 
-    // ── HUD helpers ──────────────────────────────────────────────────────────
-
+    // Updates the UI with the specified question and theme
     private void showQuestionOnHud(int qi) {
         Question q = questionProvider.getQuestion(qi);
         if (q == null) return;
@@ -258,6 +244,7 @@ public class GameScene extends Scene {
         uiManager.updateQuestion(q);
     }
 
+    // Checks distance and updates the HUD for upcoming questions
     private void updateHudForApproachingSegments() {
         for (WallGroup group : wallGroups) {
             if (!group.isHudShown()) {
@@ -269,6 +256,7 @@ public class GameScene extends Scene {
         }
     }
 
+    // Synchronizes physical wall positions with UI labels
     private void syncAnswerLabelsToUI() {
         int max = wallGroups.size * 3;
         if (max == 0) {
@@ -286,43 +274,40 @@ public class GameScene extends Scene {
         uiManager.syncAnswerLabels(texts, xs, ys, heights, count);
     }
 
-    // ── End-game condition ───────────────────────────────────────────────────
-
+    // Determines if all spawned level segments are passed
     private boolean allSegmentsCompleted() {
         if (!levelSpawner.allSegmentsSpawned()) return false;
         return wallGroups.isEmpty();
     }
 
+    // Removes wall groups that the player has bypassed
     private void prunePassedGroups() {
         for (int i = wallGroups.size - 1; i >= 0; i--) {
             if (wallGroups.get(i).isPassed()) wallGroups.removeIndex(i);
         }
     }
 
-    // ── Input ────────────────────────────────────────────────────────────────
-
+    // Binds keyboard input to engine actions
     private void initializeInput() {
-        engine.getIOManager().bindKeyContinuous(Input.Keys.UP, () -> {
+        engine.bindKeyContinuous(Input.Keys.UP, () -> {
             if (player != null && player.getPosition().y + player.getRadius() < WORLD_HEIGHT - 5)
                 player.getVelocity().y = 250;
         });
-        engine.getIOManager().bindKeyContinuous(Input.Keys.DOWN, () -> {
+        engine.bindKeyContinuous(Input.Keys.DOWN, () -> {
             if (player != null && player.getPosition().y - player.getRadius() > 5)
                 player.getVelocity().y = -250;
         });
-        engine.getIOManager().bindKeyJustPressed(Input.Keys.SPACE, () -> {
+        engine.bindKeyJustPressed(Input.Keys.SPACE, () -> {
             if (player != null) player.requestShoot();
         });
-        // ESC opens settings without losing game state
-        engine.getIOManager().bindKeyJustPressed(Input.Keys.ESCAPE, () -> {
+        engine.bindKeyJustPressed(Input.Keys.ESCAPE, () -> {
             SettingsScene settings = (SettingsScene) sceneNavigator.getScene("SETTINGS");
             if (settings != null) settings.setPreviousScene("GAME");
             sceneNavigator.goToScene("SETTINGS");
         });
     }
 
-    // ── Update ───────────────────────────────────────────────────────────────
-
+    // Processes logic for each frame
     @Override
     public void update(float deltaTime) {
         if (paused) return;
@@ -354,6 +339,7 @@ public class GameScene extends Scene {
         }
 
         super.update(deltaTime);
+        cleanupOffScreen();
 
         for (WallGroup g : wallGroups) g.checkAndMarkPassed(PLAYER_X);
         prunePassedGroups();
@@ -365,15 +351,35 @@ public class GameScene extends Scene {
 
         updateHudForApproachingSegments();
         syncAnswerLabelsToUI();
-        uiManager.syncBarrierHp(barriers);
+        
+        Array<BreakableBarrier> activeBarriers = new Array<>();
+        for (Entity e : engine.getEntitiesByLayer(LAYER_GATE)) {
+            if (e instanceof BreakableBarrier) {
+                activeBarriers.add((BreakableBarrier) e);
+            }
+        }
+        uiManager.syncBarrierHp(activeBarriers);
+        
         uiManager.act(deltaTime);
 
-        cleanupInactive();
         if (shootCooldown > 0) shootCooldown -= deltaTime;
     }
 
-    // ── Player shooting ───────────────────────────────────────────────────────
+    // Removes entities that have completely scrolled off the screen to prevent UI flooding
+    private void cleanupOffScreen() {
+        for (Entity e : engine.getEntitiesByLayer(LAYER_GATE)) {
+            if (e.getPosition().x < -200f) {
+                removeEntity(e);
+            }
+        }
+        for (Entity e : engine.getEntitiesByLayer(LAYER_PLAYER)) {
+            if (e != player && e.getPosition().x > WORLD_WIDTH + 200f) {
+                removeEntity(e);
+            }
+        }
+    }
 
+    // Triggers bullet creation based on player input
     private void updatePlayerShooting() {
         if (player != null && player.isShootRequested() && shootCooldown <= 0f) {
             PlayerBullet bullet = new PlayerBullet(
@@ -382,14 +388,12 @@ public class GameScene extends Scene {
             bullet.setCollisionLayer(LAYER_PLAYER);
             bullet.setCollisionMask(LAYER_GATE);
             addEntity(bullet);
-            playerBullets.add(bullet);
             player.consumeShoot();
             shootCooldown = SHOOT_INTERVAL;
         }
     }
 
-    // ── Render ───────────────────────────────────────────────────────────────
-
+    // Draws the background and game stage
     @Override
     public void render(SpriteBatch batch) {
         Gdx.gl.glClearColor(0.03f, 0.04f, 0.08f, 1f);
@@ -401,6 +405,7 @@ public class GameScene extends Scene {
         renderUI(batch);
     }
 
+    // Draws the player lives
     private void renderUI(SpriteBatch batch) {
         for (int i = 0; i < gameState.getLives(); i++) {
             batch.draw(heartTexture, WORLD_WIDTH - 50 - (i * 40), WORLD_HEIGHT - 50, 30, 30);
@@ -410,49 +415,33 @@ public class GameScene extends Scene {
         if (!batch.isDrawing()) batch.begin();
     }
 
-    // ── Cleanup ──────────────────────────────────────────────────────────────
-
+    // Removes specific entities from the engine
     private void clearDynamicEntities() {
-        for (RectangleEntity  e : currentWalls)  removeEntity(e);
-        for (BreakableBarrier e : barriers)       removeEntity(e);
-        for (PlayerBullet     e : playerBullets)  removeEntity(e);
-        currentWalls.clear();
-        barriers.clear();
-        playerBullets.clear();
-    }
-
-    private void cleanupInactive() {
-        cleanupArray(currentWalls);
-        cleanupArray(barriers);
-        cleanupArray(playerBullets);
-    }
-
-    private <T extends Entity> void cleanupArray(Array<T> entities) {
-        for (int i = entities.size - 1; i >= 0; i--) {
-            Entity e = entities.get(i);
-            if (!e.isActive() || e.getPosition().x < -100f) {
+        for (Entity e : engine.getEntitiesByLayer(LAYER_GATE)) {
+            removeEntity(e);
+        }
+        for (Entity e : engine.getEntitiesByLayer(LAYER_PLAYER)) {
+            if (e != player) {
                 removeEntity(e);
-                entities.removeIndex(i);
             }
         }
     }
 
-    // ── Result ───────────────────────────────────────────────────────────────
-
+    // Switches view to the result scene and passes the score
     private void transitionToResult() {
         ResultScene result = (ResultScene) sceneNavigator.getScene("RESULT");
         if (result != null) result.setScore(score, gameState.getTotalQuestions());
-        pendingRestart = true; // next show() will restart the level
+        pendingRestart = true; 
         sceneNavigator.goToScene("RESULT");
     }
 
-    // ── Lifecycle ────────────────────────────────────────────────────────────
-
+    // Adjusts viewport elements to screen size
     @Override
     public void resize(int width, int height) {
         stage.getViewport().update(width, height, true);
     }
 
+    // Frees memory
     public void dispose() {
         if (heartTexture != null) heartTexture.dispose();
         if (player       != null) player.dispose();
