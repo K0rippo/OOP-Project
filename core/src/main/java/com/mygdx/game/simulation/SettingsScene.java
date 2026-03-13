@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -19,7 +20,7 @@ import com.mygdx.game.engine.Scene;
 
 /**
  * SettingsScene - displays settings and mute toggle.
- * Updated to use ISceneNavigator and IGameEngine abstractions (DIP).
+ * Updated with clean UI hover effects.
  */
 public class SettingsScene extends Scene {
 
@@ -34,26 +35,42 @@ public class SettingsScene extends Scene {
         this.stage = new Stage(new StretchViewport(1280, 720));
 
         BitmapFont font = new BitmapFont();
+        font.getData().setScale(1.5f); // Match the MenuScene scale
 
+        // 1. Create base drawable and set up the tinted style
+        TextureRegionDrawable baseDrawable = new TextureRegionDrawable(new TextureRegion(buttonTexture));
+        
         TextButton.TextButtonStyle textButtonStyle = new TextButton.TextButtonStyle();
-        textButtonStyle.up = new TextureRegionDrawable(new TextureRegion(buttonTexture));
         textButtonStyle.font = font;
-        textButtonStyle.fontColor = Color.DARK_GRAY;
+        textButtonStyle.fontColor = Color.WHITE;
+        
+        // Idle (Dark Grey), Hover (Lighter Grey), Clicked (Almost Black)
+        textButtonStyle.up = baseDrawable.tint(new Color(0.2f, 0.2f, 0.2f, 1f));     
+        textButtonStyle.over = baseDrawable.tint(new Color(0.35f, 0.35f, 0.35f, 1f)); 
+        textButtonStyle.down = baseDrawable.tint(new Color(0.1f, 0.1f, 0.1f, 1f));   
 
+        // 2. Add Title Label
+        Label.LabelStyle labelStyle = new Label.LabelStyle(font, Color.WHITE);
+        Label titleLabel = new Label("SETTINGS", labelStyle);
+        titleLabel.setFontScale(2.5f);
+
+        // 3. Instantiate Buttons
         btnMute = new TextButton("SOUND: UNMUTED", textButtonStyle);
         btnBack = new TextButton("BACK", textButtonStyle);
         btnExitMenu = new TextButton("EXIT TO MENU", textButtonStyle);
 
+        // 4. Build the Table Layout
         Table mainTable = new Table();
         mainTable.setFillParent(true);
-        mainTable.add(btnMute).size(200, 50).padBottom(15);
-        mainTable.row();
-        mainTable.add(btnBack).size(200, 50).padBottom(15);
-        mainTable.row();
-        mainTable.add(btnExitMenu).size(200, 50);
+        
+        mainTable.add(titleLabel).padBottom(70).row();
+        mainTable.add(btnMute).size(250, 60).padBottom(20).row();
+        mainTable.add(btnBack).size(250, 60).padBottom(20).row();
+        mainTable.add(btnExitMenu).size(250, 60);
 
         stage.addActor(mainTable);
 
+        // --- Listeners ---
         btnMute.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -95,10 +112,10 @@ public class SettingsScene extends Scene {
     private void updateButtonText() {
         if (GameMaster.isMuted()) {
             btnMute.setText("SOUND: MUTED");
-            btnMute.setColor(Color.RED);
+            btnMute.setColor(Color.RED); // Tints the button red
         } else {
             btnMute.setText("SOUND: UNMUTED");
-            btnMute.setColor(Color.DARK_GRAY);
+            btnMute.setColor(Color.WHITE); // Resets to default style colors
         }
     }
 
