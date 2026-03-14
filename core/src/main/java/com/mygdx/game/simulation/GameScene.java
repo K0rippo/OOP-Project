@@ -150,6 +150,11 @@ public class GameScene extends Scene {
         clearDynamicEntities();
         wallGroups.clear();
 
+        // Shuffle questions for a fresh game experience
+        if (questionProvider instanceof CsvQuestionProvider) {
+            ((CsvQuestionProvider) questionProvider).shuffleForNewGame();
+        }
+
         if (player == null) {
             player = new PlayerCharacter(1, new Vector2(PLAYER_X, WORLD_HEIGHT / 2f), 25f);
             player.setCollisionLayer(LAYER_PLAYER);
@@ -240,7 +245,7 @@ public class GameScene extends Scene {
             BreakableBarrier barrier = new BreakableBarrier(
                     200 + segId * 10 + i,
                     new Vector2(spawnX, sectionH * (2 - i)),
-                    12f, sectionH, 3, (i == correctIndex));
+                    20f, sectionH, 3, (i == correctIndex));
             barrier.getVelocity().x = -SCROLL_SPEED;
             barrier.setCollisionLayer(LAYER_GATE);
             barrier.setCollisionMask(LAYER_PLAYER);
@@ -310,6 +315,14 @@ public class GameScene extends Scene {
             if (player != null && player.getPosition().y - player.getRadius() > 5)
                 player.getVelocity().y = -250;
         });
+        engine.getIOManager().bindKeyContinuous(Input.Keys.LEFT, () -> {
+            if (player != null && player.getPosition().x - player.getRadius() > 5)
+                player.getVelocity().x = -250;
+        });
+        engine.getIOManager().bindKeyContinuous(Input.Keys.RIGHT, () -> {
+            if (player != null && player.getPosition().x + player.getRadius() < WORLD_WIDTH - 5)
+                player.getVelocity().x = 250;
+        });
         engine.getIOManager().bindKeyJustPressed(Input.Keys.SPACE, () -> {
             if (player != null) player.requestShoot();
         });
@@ -336,6 +349,7 @@ public class GameScene extends Scene {
 
         if (player != null) {
             player.getVelocity().y *= 0.85f;
+            player.getVelocity().x *= 0.85f;
 
             if (player.hasTakenDamage()) {
                 gameState.loseLife();
@@ -414,7 +428,9 @@ public class GameScene extends Scene {
 
     private void clearDynamicEntities() {
         for (RectangleEntity  e : currentWalls)  removeEntity(e);
-        for (BreakableBarrier e : barriers)       removeEntity(e);
+        for (BreakableBarrier e : barriers) {
+            removeEntity(e);
+        }
         for (PlayerBullet     e : playerBullets)  removeEntity(e);
         currentWalls.clear();
         barriers.clear();
@@ -423,8 +439,18 @@ public class GameScene extends Scene {
 
     private void cleanupInactive() {
         cleanupArray(currentWalls);
-        cleanupArray(barriers);
+        cleanupBarriers();
         cleanupArray(playerBullets);
+    }
+
+    private void cleanupBarriers() {
+        for (int i = barriers.size - 1; i >= 0; i--) {
+            BreakableBarrier e = barriers.get(i);
+            if (!e.isActive() || e.getPosition().x < -100f) {
+                removeEntity(e);
+                barriers.removeIndex(i);
+            }
+        }
     }
 
     private <T extends Entity> void cleanupArray(Array<T> entities) {
@@ -458,5 +484,6 @@ public class GameScene extends Scene {
         if (player       != null) player.dispose();
         if (uiManager    != null) uiManager.dispose();
         background.dispose();
+        BreakableBarrier.disposeTextures();
     }
 }

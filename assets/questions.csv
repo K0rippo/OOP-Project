@@ -1,0 +1,11 @@
+question,correct_answer,wrong_answer_1,wrong_answer_2,theme_color_r,theme_color_g,theme_color_b,time_limit
+What is the probability of flipping tails on a fair coin?,1/2,1/3,1/4,0.1,0.1,0.2,5
+What is the probability of rolling a 4 on a 6-sided die?,1/6,1/2,1/4,0.1,0.2,0.1,5
+What is the probability of drawing an Ace from a standard deck?,1/13,1/4,1/52,0.2,0.1,0.1,4
+What is the probability of flipping two heads in a row?,1/4,1/2,3/4,0.2,0.2,0.1,4
+What is the probability of rolling a sum of 7 with two dice?,1/6,1/12,1/36,0.1,0.1,0.1,3.5
+What is 2 + 2?,4,3,5,0.15,0.15,0.25,6
+What is the capital of France?,Paris,London,Berlin,0.25,0.15,0.15,5
+What is the largest planet in our solar system?,Jupiter,Saturn,Neptune,0.15,0.25,0.15,5
+What is the chemical symbol for Gold?,Au,Ag,Fe,0.2,0.15,0.25,4
+What is the speed of light in m/s?,299792458,150000000,1000000,0.1,0.2,0.25,3
