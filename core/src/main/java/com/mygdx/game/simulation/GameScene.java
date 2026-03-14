@@ -172,6 +172,11 @@ public class GameScene extends Scene {
         nextEnemyShipId    = 2000;
         nextEnemyBulletId  = 3000;
 
+        // Shuffle questions for a fresh game experience
+        if (questionProvider instanceof CsvQuestionProvider) {
+            ((CsvQuestionProvider) questionProvider).shuffleForNewGame();
+        }
+
         if (player == null) {
             player = new PlayerCharacter(1, new Vector2(PLAYER_X, WORLD_HEIGHT / 2f), 25f);
             player.setCollisionLayer(LAYER_PLAYER);
@@ -288,7 +293,7 @@ public class GameScene extends Scene {
             BreakableBarrier barrier = new BreakableBarrier(
                     200 + segmentId * 10 + i,
                     new Vector2(spawnX, sectionHeight * (2 - i)),
-                    12f,
+                    20f,
                     sectionHeight,
                     3,
                     (i == correctIndex)
@@ -394,6 +399,18 @@ public class GameScene extends Scene {
             }
         });
 
+        engine.getIOManager().bindKeyContinuous(Input.Keys.LEFT, () -> {
+            if (player != null && player.getPosition().x - player.getRadius() > 5f) {
+                player.getVelocity().x = -250f;
+            }
+        });
+
+        engine.getIOManager().bindKeyContinuous(Input.Keys.RIGHT, () -> {
+            if (player != null && player.getPosition().x + player.getRadius() < WORLD_WIDTH - 5f) {
+                player.getVelocity().x = 250f;
+            }
+        });
+
         engine.getIOManager().bindKeyJustPressed(Input.Keys.SPACE, () -> {
             if (player != null) {
                 player.requestShoot();
@@ -425,6 +442,7 @@ public class GameScene extends Scene {
 
         if (player != null) {
             player.getVelocity().y *= 0.85f;
+            player.getVelocity().x *= 0.85f;
 
             if (player.hasTakenDamage()) {
                 gameState.loseLife();
@@ -563,10 +581,20 @@ public class GameScene extends Scene {
 
     private void cleanupInactive() {
         cleanupArray(currentWalls);
-        cleanupArray(barriers);
+        cleanupBarriers();
         cleanupArray(playerBullets);
         cleanupArray(enemyShips);
         cleanupArray(enemyBullets);
+    }
+
+    private void cleanupBarriers() {
+        for (int i = barriers.size - 1; i >= 0; i--) {
+            BreakableBarrier e = barriers.get(i);
+            if (!e.isActive() || e.getPosition().x < -100f) {
+                removeEntity(e);
+                barriers.removeIndex(i);
+            }
+        }
     }
 
     private <T extends Entity> void cleanupArray(Array<T> entities) {
@@ -603,5 +631,6 @@ public class GameScene extends Scene {
         if (player != null) player.dispose();
         if (uiManager != null) uiManager.dispose();
         background.dispose();
+        BreakableBarrier.disposeTextures();
     }
 }

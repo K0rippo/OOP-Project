@@ -48,8 +48,9 @@ public class GameMaster extends ApplicationAdapter {
         uiButtonTexture = new Texture(pixmap);
         pixmap.dispose();
 
-        // CsvQuestionProvider loads from assets/questions.csv, falls back to built-in data
-        IQuestionProvider questionProvider = new DefaultQuestionProvider();
+        // Load questions from CSV file (assets/questions.csv)
+        // Falls back to default questions if CSV is not found
+        IQuestionProvider questionProvider = new CsvQuestionProvider();
 
         sceneManager.addScene("MENU",     new MenuScene    ("MENU",     sceneManager, gameEngine, uiButtonTexture));
         sceneManager.addScene("GAME",     new GameScene    ("GAME",     sceneManager, gameEngine, questionProvider));

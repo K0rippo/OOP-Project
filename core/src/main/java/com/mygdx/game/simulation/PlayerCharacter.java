@@ -20,7 +20,8 @@ import com.mygdx.game.engine.Entity;
  */
 public class PlayerCharacter extends Circle {
 
-    private static final float WORLD_HEIGHT         = 720f;
+	private static final float WORLD_HEIGHT         = 720f;
+	private static final float WORLD_WIDTH          = 1280f;
     private static final float INVULNERABILITY_TIME = 3.0f;
     private static final float GATE_COOLDOWN_TIME   = 2.0f;
     private static final float BOUNCE_BACK_SPEED    = -140f;
@@ -50,6 +51,8 @@ public class PlayerCharacter extends Circle {
 
         float topLimit    = WORLD_HEIGHT - radius;
         float bottomLimit = radius;
+        float rightLimit  = WORLD_WIDTH - radius;
+        float leftLimit   = radius;
 
         if (getPosition().y > topLimit) {
             getPosition().y = topLimit;
@@ -59,11 +62,17 @@ public class PlayerCharacter extends Circle {
             getVelocity().y = 0;
         }
 
+        if (getPosition().x > rightLimit) {
+            getPosition().x = rightLimit;
+            getVelocity().x = 0;
+        } else if (getPosition().x < leftLimit) {
+            getPosition().x = leftLimit;
+            getVelocity().x = 0;
+        }
+
         if (getVelocity().x < 0) {
             getVelocity().x += BOUNCE_RECOVERY * deltaTime;
             if (getVelocity().x > 0) getVelocity().x = 0;
-        } else {
-            getVelocity().x = 0;
         }
     }
 
