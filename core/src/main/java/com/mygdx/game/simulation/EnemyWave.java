@@ -34,9 +34,7 @@ public class EnemyWave {
         activated = true;
 
         for (EnemyShip ship : ships) {
-            if (ship.isActive()) {
-                ship.setWaveActive(true);
-            }
+            ship.setWaveActive(true);
         }
     }
 }

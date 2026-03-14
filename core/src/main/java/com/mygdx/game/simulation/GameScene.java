@@ -438,7 +438,6 @@ public class GameScene extends Scene {
         levelSpawner.update(scrolledDistance + WORLD_WIDTH);
 
         updatePlayerShooting();
-        updateEnemyShooting();
 
         if (player != null) {
             player.getVelocity().y *= 0.85f;
@@ -462,6 +461,7 @@ public class GameScene extends Scene {
         }
 
         super.update(deltaTime);
+        updateEnemyShooting();
 
         for (WallGroup group : wallGroups) {
             group.checkAndMarkPassed(PLAYER_X);
@@ -486,7 +486,6 @@ public class GameScene extends Scene {
             shootCooldown -= deltaTime;
         }
     }
-
     // ── Shooting ────────────────────────────────────────────────────────────
 
     private void updatePlayerShooting() {
@@ -511,7 +510,7 @@ public class GameScene extends Scene {
             if (!ship.isActive()) continue;
 
             if (ship.shouldFire()) {
-                Array<EnemyBullet> burst = ship.fireCircleBurst(
+                Array<EnemyBullet> burst = ship.fire(
                         nextEnemyBulletId,
                         LAYER_ENEMY_BULLET,
                         LAYER_PLAYER
@@ -526,7 +525,6 @@ public class GameScene extends Scene {
             }
         }
     }
-
     // ── Render ──────────────────────────────────────────────────────────────
 
     @Override

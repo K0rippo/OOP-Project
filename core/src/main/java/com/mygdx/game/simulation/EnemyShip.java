@@ -10,34 +10,35 @@ import com.mygdx.game.engine.RectangleEntity;
 
 public class EnemyShip extends RectangleEntity {
 
+    private static final float SCREEN_WIDTH = 1280f;
+    private static final int MAX_SHOTS_PER_WAVE = 2;
+
     private final float baseY;
     private final float bobAmplitude;
     private final float bobSpeed;
 
-    // New: 2 movement speeds
     private final float inactiveMoveSpeed;
     private final float activeMoveSpeed;
 
+    private final float firstShotDelay;
     private final float fireInterval;
     private float fireTimer = 0f;
 
-    private final float bulletSpeed;
-    private final float angleStepDegrees;
-    private final int bulletsPerShot;
-    private float currentAngleDeg = 180f;
+    private final BulletPattern bulletPattern;
 
     private float bobTime = 0f;
     private boolean waveActive = false;
+    private boolean hasEnteredScreen = false;
+    private int shotsFired = 0;
 
     public EnemyShip(int id,
                      Vector2 position,
                      float inactiveMoveSpeed,
                      float activeMoveSpeed,
+                     float firstShotDelay,
                      float fireInterval,
                      float bobAmplitude,
-                     float bulletSpeed,
-                     int bulletsPerShot,
-                     float angleStepDegrees) {
+                     BulletPattern bulletPattern) {
         super(id, "EnemyShip", position, 58f, 34f, Color.CLEAR);
 
         this.baseY = position.y;
@@ -47,24 +48,22 @@ public class EnemyShip extends RectangleEntity {
         this.inactiveMoveSpeed = inactiveMoveSpeed;
         this.activeMoveSpeed = activeMoveSpeed;
 
+        this.firstShotDelay = firstShotDelay;
         this.fireInterval = fireInterval;
-        this.bulletSpeed = bulletSpeed;
-        this.bulletsPerShot = bulletsPerShot;
-        this.angleStepDegrees = angleStepDegrees;
+        this.bulletPattern = bulletPattern;
 
-        // Starts scrolling at normal pace
         getVelocity().x = -inactiveMoveSpeed;
         getVelocity().y = 0f;
     }
 
     public void setWaveActive(boolean active) {
-        if (this.waveActive == active) return;
-
-        this.waveActive = active;
+        waveActive = active;
 
         if (active) {
             getVelocity().x = -activeMoveSpeed;
-            fireTimer = fireInterval; // fire almost immediately on activation
+            fireTimer = 0f;
+            shotsFired = 0;
+            hasEnteredScreen = false;
         } else {
             getVelocity().x = -inactiveMoveSpeed;
         }
@@ -79,11 +78,16 @@ public class EnemyShip extends RectangleEntity {
         super.update(deltaTime);
 
         bobTime += deltaTime;
-        if (waveActive) {
-            fireTimer += deltaTime;
+        getPosition().y = baseY + MathUtils.sin(bobTime * bobSpeed) * bobAmplitude;
+
+        if (!hasEnteredScreen && getPosition().x < SCREEN_WIDTH) {
+            hasEnteredScreen = true;
+            fireTimer = 0f;
         }
 
-        getPosition().y = baseY + MathUtils.sin(bobTime * bobSpeed) * bobAmplitude;
+        if (waveActive && hasEnteredScreen && shotsFired < MAX_SHOTS_PER_WAVE) {
+            fireTimer += deltaTime;
+        }
 
         if (getPosition().x + getWidth() < -80f) {
             setActive(false);
@@ -91,48 +95,21 @@ public class EnemyShip extends RectangleEntity {
     }
 
     public boolean shouldFire() {
-        if (!waveActive) return false;
-
-        if (fireTimer >= fireInterval) {
-            fireTimer = 0f;
-            return true;
+        if (!waveActive || !hasEnteredScreen || shotsFired >= MAX_SHOTS_PER_WAVE) {
+            return false;
         }
-        return false;
+
+        if (shotsFired == 0) {
+            return fireTimer >= firstShotDelay;
+        }
+
+        return fireTimer >= fireInterval;
     }
 
-    public Array<EnemyBullet> fireCircleBurst(int firstBulletId, int bulletLayer, int bulletMask) {
-        Array<EnemyBullet> bullets = new Array<EnemyBullet>();
-
-        float spawnX = getPosition().x - 6f;
-        float spawnY = getPosition().y + getHeight() / 2f;
-
-        float spacingWithinShot = 10f;
-        float startOffset = -spacingWithinShot * (bulletsPerShot - 1) / 2f;
-
-        for (int i = 0; i < bulletsPerShot; i++) {
-            float angleDeg = currentAngleDeg + startOffset + (i * spacingWithinShot);
-            float angleRad = angleDeg * MathUtils.degreesToRadians;
-
-            float vx = MathUtils.cos(angleRad) * bulletSpeed;
-            float vy = MathUtils.sin(angleRad) * bulletSpeed;
-
-            EnemyBullet bullet = new EnemyBullet(
-                    firstBulletId + i,
-                    new Vector2(spawnX, spawnY),
-                    vx,
-                    vy
-            );
-            bullet.setCollisionLayer(bulletLayer);
-            bullet.setCollisionMask(bulletMask);
-            bullets.add(bullet);
-        }
-
-        currentAngleDeg += angleStepDegrees;
-
-        while (currentAngleDeg >= 360f) currentAngleDeg -= 360f;
-        while (currentAngleDeg < 0f) currentAngleDeg += 360f;
-
-        return bullets;
+    public Array<EnemyBullet> fire(int firstBulletId, int bulletLayer, int bulletMask) {
+        fireTimer = 0f;
+        shotsFired++;
+        return bulletPattern.fire(this, firstBulletId, bulletLayer, bulletMask);
     }
 
     @Override

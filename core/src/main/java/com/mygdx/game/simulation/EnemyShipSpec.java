@@ -5,30 +5,24 @@ public class EnemyShipSpec {
     private final float yRatio;
     private final float inactiveMoveSpeed;
     private final float activeMoveSpeed;
+    private final float firstShotDelay;
     private final float fireInterval;
     private final float bobAmplitude;
-    private final float bulletSpeed;
-    private final int bulletsPerShot;
-    private final float angleStepDegrees;
 
     public EnemyShipSpec(float offsetX,
                          float yRatio,
                          float inactiveMoveSpeed,
                          float activeMoveSpeed,
+                         float firstShotDelay,
                          float fireInterval,
-                         float bobAmplitude,
-                         float bulletSpeed,
-                         int bulletsPerShot,
-                         float angleStepDegrees) {
+                         float bobAmplitude) {
         this.offsetX = offsetX;
         this.yRatio = yRatio;
         this.inactiveMoveSpeed = inactiveMoveSpeed;
         this.activeMoveSpeed = activeMoveSpeed;
+        this.firstShotDelay = firstShotDelay;
         this.fireInterval = fireInterval;
         this.bobAmplitude = bobAmplitude;
-        this.bulletSpeed = bulletSpeed;
-        this.bulletsPerShot = bulletsPerShot;
-        this.angleStepDegrees = angleStepDegrees;
     }
 
     public float getOffsetX() {
@@ -47,23 +41,15 @@ public class EnemyShipSpec {
         return activeMoveSpeed;
     }
 
+    public float getFirstShotDelay() {
+        return firstShotDelay;
+    }
+
     public float getFireInterval() {
         return fireInterval;
     }
 
     public float getBobAmplitude() {
         return bobAmplitude;
-    }
-
-    public float getBulletSpeed() {
-        return bulletSpeed;
-    }
-
-    public int getBulletsPerShot() {
-        return bulletsPerShot;
-    }
-
-    public float getAngleStepDegrees() {
-        return angleStepDegrees;
     }
 }

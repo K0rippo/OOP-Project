@@ -16,17 +16,24 @@ public class EnemyWaveFactory {
 
         int nextId = firstShipId;
         for (EnemyShipSpec spec : specs) {
+
+            CircleBulletPattern pattern = new CircleBulletPattern(
+                    15,    // bullet count
+                    90f,  // bullet speed
+                    125f    // bullet spread
+            );
+
             EnemyShip ship = new EnemyShip(
                     nextId++,
                     new Vector2(sectionStartX + spec.getOffsetX(), worldHeight * spec.getYRatio()),
                     spec.getInactiveMoveSpeed(),
                     spec.getActiveMoveSpeed(),
+                    spec.getFirstShotDelay(),
                     spec.getFireInterval(),
                     spec.getBobAmplitude(),
-                    spec.getBulletSpeed(),
-                    spec.getBulletsPerShot(),
-                    spec.getAngleStepDegrees()
+                    pattern
             );
+
             wave.addShip(ship);
         }
 
@@ -40,17 +47,14 @@ public class EnemyWaveFactory {
     private Array<EnemyShipSpec> buildDefaultSpecs(float scrollSpeed) {
         Array<EnemyShipSpec> specs = new Array<EnemyShipSpec>();
 
-        // Same rough behavior you already have now
         specs.add(new EnemyShipSpec(
-                -120f,              // offsetX
-                0.70f,              // yRatio
-                scrollSpeed,        // inactiveMoveSpeed
-                scrollSpeed + 35f,  // activeMoveSpeed
-                0.30f,              // fireInterval
-                22f,                // bobAmplitude
-                175f,               // bulletSpeed
-                1,                  // bulletsPerShot
-                20f                 // angleStepDegrees
+                -120f,
+                0.70f,
+                scrollSpeed,
+                scrollSpeed + 35f,
+                0.25f,
+                2.5f,
+                22f
         ));
 
         specs.add(new EnemyShipSpec(
@@ -58,11 +62,9 @@ public class EnemyWaveFactory {
                 0.30f,
                 scrollSpeed,
                 scrollSpeed + 28f,
-                0.34f,
-                18f,
-                170f,
-                1,
-                -20f
+                0.25f,
+                2.5f,
+                18f
         ));
 
         return specs;
