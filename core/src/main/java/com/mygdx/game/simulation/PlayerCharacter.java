@@ -14,22 +14,26 @@ import com.mygdx.game.engine.Entity;
  * query methods (hasTakenDamage, hasReachedGate, isShootRequested) and
  * consumes it via consume* methods. No public mutable fields are exposed.
  */
+
+/**
+ * PlayerCharacter — the player-controlled entity.
+ */
 public class PlayerCharacter extends Circle {
 
-    private static final float WORLD_HEIGHT        = 720f;
+    private static final float WORLD_HEIGHT         = 720f;
     private static final float INVULNERABILITY_TIME = 3.0f;
     private static final float GATE_COOLDOWN_TIME   = 2.0f;
     private static final float BOUNCE_BACK_SPEED    = -140f;
     private static final float BOUNCE_RECOVERY      = 220f;
 
     private final Texture texture;
+
     private float invulnerabilityTimer = 0f;
     private float gateCooldown         = 0f;
 
-    // ── Private state flags (encapsulated) ──────────────────────────────────
-    private boolean tookDamage      = false;
-    private boolean reachedGate     = false;
-    private boolean shootRequested  = false;
+    private boolean tookDamage     = false;
+    private boolean reachedGate    = false;
+    private boolean shootRequested = false;
 
     public PlayerCharacter(int id, Vector2 position, float radius) {
         super(id, "Player", position, radius, Color.CLEAR);
@@ -42,7 +46,7 @@ public class PlayerCharacter extends Circle {
         super.update(deltaTime);
 
         if (invulnerabilityTimer > 0) invulnerabilityTimer -= deltaTime;
-        if (gateCooldown > 0)         gateCooldown         -= deltaTime;
+        if (gateCooldown > 0) gateCooldown -= deltaTime;
 
         float topLimit    = WORLD_HEIGHT - radius;
         float bottomLimit = radius;
@@ -55,7 +59,6 @@ public class PlayerCharacter extends Circle {
             getVelocity().y = 0;
         }
 
-        // Smooth bounce-back recovery after damage
         if (getVelocity().x < 0) {
             getVelocity().x += BOUNCE_RECOVERY * deltaTime;
             if (getVelocity().x > 0) getVelocity().x = 0;
@@ -66,9 +69,9 @@ public class PlayerCharacter extends Circle {
 
     @Override
     public void render(SpriteBatch batch) {
-        // Blink while invulnerable
         if (invulnerabilityTimer > 0 && ((int) (invulnerabilityTimer * 12) % 2 == 0)) return;
-        float size = radius * 2;
+
+        float size = radius * 2f;
         batch.draw(texture, getPosition().x - radius, getPosition().y - radius, size, size);
     }
 
@@ -76,8 +79,6 @@ public class PlayerCharacter extends Circle {
     public void onCollision(Entity other) {
         String name = other.getName();
 
-        // CorrectWall is only reachable once the CorrectBarrier in front of it
-        // has been fully destroyed (inactive). It registers a successful answer.
         if (name.equals("CorrectWall")) {
             if (!reachedGate && gateCooldown <= 0f) {
                 reachedGate  = true;
@@ -86,68 +87,75 @@ public class PlayerCharacter extends Circle {
             return;
         }
 
-        // Both barrier types are solid obstacles the player must shoot down.
-        // Hitting either one while it is still standing costs a life —
-        // this forces the player to break the correct barrier before passing.
         if (name.equals("CorrectBarrier") || name.equals("WrongBarrier")) {
             if (!isPlayerCentreInsideWall(other)) return;
             applyDamage();
             return;
         }
 
-        // WrongWall behind a destroyed WrongBarrier — still penalises the player.
         if (name.equals("WrongWall")) {
             if (!isPlayerCentreInsideWall(other)) return;
             applyDamage();
             return;
         }
 
-        // No other hazard types currently in use.
+        // New: enemy bullets damage the player
+        if (name.equals("EnemyBullet")) {
+            applyDamage();
+            return;
+        }
+
+        // Optional contact damage if you later enable enemy ship collision
+        if (name.equals("EnemyShip")) {
+            applyDamage();
+        }
     }
 
-    // ── State query methods (read-only access for GameScene) ─────────────────
+    public boolean hasTakenDamage() {
+        return tookDamage;
+    }
 
-    /** Returns true if the player was damaged since the last consumeDamage() call. */
-    public boolean hasTakenDamage() { return tookDamage; }
+    public boolean hasReachedGate() {
+        return reachedGate;
+    }
 
-    /** Returns true if the player reached a correct gate since the last consumeGoal() call. */
-    public boolean hasReachedGate() { return reachedGate; }
+    public boolean isShootRequested() {
+        return shootRequested;
+    }
 
-    /** Returns true if the player has requested a shot since the last consumeShoot() call. */
-    public boolean isShootRequested() { return shootRequested; }
+    public void consumeDamage() {
+        tookDamage = false;
+    }
 
-    // ── State consume methods (reset flags after GameScene reads them) ────────
+    public void consumeGoal() {
+        reachedGate = false;
+    }
 
-    public void consumeDamage() { tookDamage = false; }
-    public void consumeGoal()   { reachedGate = false; }
-    public void consumeShoot()  { shootRequested = false; }
+    public void consumeShoot() {
+        shootRequested = false;
+    }
 
-    /** Called by input bindings to request firing a bullet. */
-    public void requestShoot() { shootRequested = true; }
+    public void requestShoot() {
+        shootRequested = true;
+    }
 
-    // ── Private helpers ──────────────────────────────────────────────────────
-
-    /**
-     * Returns true only if this player's Y centre is strictly inside the
-     * middle 80% of the wall's vertical extent.
-     * Using 80% (10% margin each side) prevents penalising a player whose
-     * circle grazes the very edge of a wrong-lane wall while in the correct lane.
-     */
     private boolean isPlayerCentreInsideWall(Entity other) {
         if (!(other instanceof com.mygdx.game.engine.RectangleEntity)) return true;
+
         com.mygdx.game.engine.RectangleEntity rect = (com.mygdx.game.engine.RectangleEntity) other;
         float playerY = getPosition().y;
         float bottom  = rect.getPosition().y;
         float height  = rect.getHeight();
         float margin  = height * 0.10f;
+
         return playerY >= (bottom + margin) && playerY <= (bottom + height - margin);
     }
 
     private void applyDamage() {
         if (invulnerabilityTimer <= 0f) {
-            tookDamage         = true;
+            tookDamage           = true;
             invulnerabilityTimer = INVULNERABILITY_TIME;
-            getVelocity().x    = BOUNCE_BACK_SPEED;
+            getVelocity().x      = BOUNCE_BACK_SPEED;
         }
     }
 
