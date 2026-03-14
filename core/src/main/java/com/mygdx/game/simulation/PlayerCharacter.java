@@ -38,7 +38,7 @@ public class PlayerCharacter extends Circle {
 
     public PlayerCharacter(int id, Vector2 position, float radius) {
         super(id, "Player", position, radius, Color.CLEAR);
-        this.texture = new Texture("player.png");
+        this.texture = new Texture("spaceship.png");
         getVelocity().x = 0;
     }
 
