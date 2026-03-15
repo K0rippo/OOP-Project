@@ -24,7 +24,7 @@ public class GameScene extends Scene {
     private static final float SHOOT_INTERVAL      = 0.25f;
     private static final float HUD_SWITCH_DISTANCE = WORLD_WIDTH;
 
-    private final IGameEngine         engine; // <-- Local engine reference
+    private final IGameEngine         engine; 
     private final ISceneNavigator     sceneNavigator;
     private final ObstacleFactory     obstacleFactory;
     private final GameStateManager    gameState;
@@ -109,7 +109,6 @@ public class GameScene extends Scene {
         startLevel();
     }
 
-    // Engine Wrappers
     private void addEntity(Entity e) { engine.addEntity(e); }
     private void removeEntity(Entity e) { engine.removeEntity(e); }
 
@@ -121,7 +120,6 @@ public class GameScene extends Scene {
         clearDynamicEntities();
         wallGroups.clear();
 
-        // Shuffle questions for a fresh game experience
         if (questionProvider instanceof CsvQuestionProvider) {
             ((CsvQuestionProvider) questionProvider).shuffleForNewGame();
         }
@@ -261,36 +259,6 @@ public class GameScene extends Scene {
         }
     }
 
-    // ── Input ────────────────────────────────────────────────────────────────
-
-    private void initializeInput() {
-        engine.getIOManager().bindKeyContinuous(com.badlogic.gdx.Input.Keys.UP, () -> {
-            if (player != null && player.getPosition().y + player.getRadius() < WORLD_HEIGHT - 5)
-                player.getVelocity().y = 250;
-        });
-        engine.getIOManager().bindKeyContinuous(com.badlogic.gdx.Input.Keys.DOWN, () -> {
-            if (player != null && player.getPosition().y - player.getRadius() > 5)
-                player.getVelocity().y = -250;
-        });
-        engine.getIOManager().bindKeyContinuous(com.badlogic.gdx.Input.Keys.LEFT, () -> {
-            if (player != null && player.getPosition().x - player.getRadius() > 5)
-                player.getVelocity().x = -250;
-        });
-        engine.getIOManager().bindKeyContinuous(com.badlogic.gdx.Input.Keys.RIGHT, () -> {
-            if (player != null && player.getPosition().x + player.getRadius() < WORLD_WIDTH - 5)
-                player.getVelocity().x = 250;
-        });
-        engine.getIOManager().bindKeyJustPressed(com.badlogic.gdx.Input.Keys.SPACE, () -> {
-            if (player != null) player.requestShoot();
-        });
-        // ESC opens settings without losing game state
-        engine.getIOManager().bindKeyJustPressed(com.badlogic.gdx.Input.Keys.ESCAPE, () -> {
-            SettingsScene settings = (SettingsScene) sceneNavigator.getScene("SETTINGS");
-            if (settings != null) settings.setPreviousScene("GAME");
-            sceneNavigator.goToScene("SETTINGS");
-        });
-    }
-
     // ── Update ───────────────────────────────────────────────────────────────
 
     @Override
@@ -401,7 +369,6 @@ public class GameScene extends Scene {
         if (!batch.isDrawing()) batch.begin();
     }
 
-    // RESOLVED CONFLICT HERE: Kept the new layer-based logic!
     private void clearDynamicEntities() {
         for (Entity e : engine.getEntitiesByLayer(LAYER_GATE)) {
             removeEntity(e);
@@ -430,6 +397,6 @@ public class GameScene extends Scene {
         if (player       != null) player.dispose();
         if (uiManager    != null) uiManager.dispose();
         background.dispose();
-        BreakableBarrier.disposeTextures(); // Kept this from the main branch
+        BreakableBarrier.disposeTextures(); 
     }
 }
