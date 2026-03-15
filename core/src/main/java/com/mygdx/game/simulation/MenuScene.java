@@ -15,6 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.mygdx.game.engine.ISceneNavigator;
 import com.mygdx.game.engine.Scene;
@@ -27,61 +28,74 @@ public class MenuScene extends Scene {
         super(id);
         this.stage = new Stage(new StretchViewport(1280, 720));
 
-        // 1. Setup Default BitmapFonts (Scaled for UI)
         BitmapFont buttonFont = new BitmapFont();
         buttonFont.getData().setScale(1.5f);
 
         BitmapFont titleFont = new BitmapFont();
-        titleFont.getData().setScale(3.5f);
+        titleFont.getData().setScale(2.8f); // Scaled to fit nicely in the panel header
 
-        // 2. Programmatic Space Background
+        // 1. Space Background
         TextureRegionDrawable baseDrawable = new TextureRegionDrawable(new TextureRegion(buttonTexture));
         Image bgImage = new Image(baseDrawable);
-        bgImage.setColor(new Color(0.05f, 0.08f, 0.2f, 1f)); 
+        bgImage.setColor(new Color(0.05f, 0.08f, 0.15f, 1f)); 
         bgImage.setFillParent(true);
         stage.addActor(bgImage);
 
         // --- DEFINING THE COLORS ---
-        Color darkBlueBg = new Color(0.02f, 0.1f, 0.25f, 0.9f); 
-        Color hoverBlueBg = new Color(0.1f, 0.25f, 0.45f, 0.9f); 
-        
-        Color cyanBorder = new Color(0.1f, 0.7f, 1f, 1f);       
-        Color yellowBorder = new Color(1f, 0.8f, 0.1f, 1f);     
+        Color cyanBorder  = new Color(0.0f, 0.8f, 1.0f, 1f);     
+        Color yellowBorder = new Color(1.0f, 0.8f, 0.1f, 1f); 
+        Color coreBlue    = new Color(0.15f, 0.35f, 0.65f, 1f); 
+        Color hoverBlue   = new Color(0.25f, 0.50f, 0.85f, 1f); 
 
-        // 3. Setup CYAN Button Style
+        // 2. Setup Button Styles
         TextButton.TextButtonStyle cyanStyle = new TextButton.TextButtonStyle();
         cyanStyle.font = buttonFont; 
-        cyanStyle.fontColor = cyanBorder; 
-        cyanStyle.up = createBorderedDrawable(darkBlueBg, cyanBorder);     
-        cyanStyle.over = createBorderedDrawable(hoverBlueBg, cyanBorder); 
-        cyanStyle.down = createBorderedDrawable(cyanBorder, Color.WHITE); 
+        cyanStyle.fontColor = Color.WHITE; 
+        cyanStyle.up = createPillButtonDrawable(coreBlue, cyanBorder);     
+        cyanStyle.over = createPillButtonDrawable(hoverBlue, cyanBorder); 
+        cyanStyle.down = createPillButtonDrawable(cyanBorder, Color.WHITE); 
 
-        // 4. Setup YELLOW Button Style
         TextButton.TextButtonStyle yellowStyle = new TextButton.TextButtonStyle();
         yellowStyle.font = buttonFont; 
-        yellowStyle.fontColor = yellowBorder; 
-        yellowStyle.up = createBorderedDrawable(darkBlueBg, yellowBorder);     
-        yellowStyle.over = createBorderedDrawable(hoverBlueBg, yellowBorder); 
-        yellowStyle.down = createBorderedDrawable(yellowBorder, Color.WHITE); 
+        yellowStyle.fontColor = Color.WHITE; 
+        yellowStyle.up = createPillButtonDrawable(coreBlue, yellowBorder);     
+        yellowStyle.over = createPillButtonDrawable(hoverBlue, yellowBorder); 
+        yellowStyle.down = createPillButtonDrawable(yellowBorder, Color.WHITE); 
 
-        // 5. Game Title Text
+        // 3. Create the Main Panel Background
+        TextureRegionDrawable panelBackground = createPanelDrawable(cyanBorder);
+
+        // 4. Game Title Text
         Label.LabelStyle titleStyle = new Label.LabelStyle(titleFont, Color.WHITE); 
-        Label titleLabel = new Label("FOOD RUN", titleStyle);
+        Label titleLabel = new Label("MATH RUN", titleStyle);
+        titleLabel.setAlignment(Align.center);
 
-        // 6. Instantiate Buttons
-        TextButton btnPlay = new TextButton("START RUN", cyanStyle);
+        // 5. Instantiate Buttons
+        TextButton btnPlay = new TextButton("PLAY", cyanStyle);
         TextButton btnSettings = new TextButton("SYSTEM SETTINGS", yellowStyle); 
         TextButton btnQuit = new TextButton("EXIT DESKTOP", cyanStyle);
+
+        // 6. Layout within the Panel
+        Table panelTable = new Table();
+        panelTable.setBackground(panelBackground);
+        panelTable.setSize(500, 550); // Panel size to perfectly fit 3 buttons
+        
+        // Add Header
+        panelTable.add(titleLabel).width(500).padTop(25).padBottom(50).row();
+        
+        // Add Body Elements
+        panelTable.add(btnPlay).size(350, 65).padBottom(20).row();
+        panelTable.add(btnSettings).size(350, 65).padBottom(20).row();
+        panelTable.add(btnQuit).size(350, 65);
+        
+        // Push everything up slightly
+        panelTable.add().expandY().fillY(); 
 
         // 7. Master Table Layout
         Table masterTable = new Table();
         masterTable.setFillParent(true);
         masterTable.center();
-        
-        masterTable.add(titleLabel).padBottom(60).row();
-        masterTable.add(btnPlay).size(350, 70).padBottom(20).row();
-        masterTable.add(btnSettings).size(350, 70).padBottom(20).row();
-        masterTable.add(btnQuit).size(350, 70);
+        masterTable.add(panelTable).size(500, 550);
 
         stage.addActor(masterTable);
 
@@ -89,9 +103,8 @@ public class MenuScene extends Scene {
         btnPlay.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                GameScene gameScene = (GameScene) sceneNavigator.getScene("GAME");
-                if (gameScene != null) gameScene.requestRestart();
-                sceneNavigator.goToScene("GAME");
+                // Routes to your new Instructions Scene!
+                sceneNavigator.goToScene("INSTRUCTIONS");
             }
         });
 
@@ -112,19 +125,64 @@ public class MenuScene extends Scene {
         });
     }
 
-    private TextureRegionDrawable createBorderedDrawable(Color bgColor, Color borderColor) {
-        Pixmap pixmap = new Pixmap(350, 70, Pixmap.Format.RGBA8888);
-        pixmap.setColor(bgColor);
-        pixmap.fill();
-        pixmap.setColor(borderColor);
-        pixmap.drawRectangle(0, 0, 350, 70);
-        pixmap.drawRectangle(1, 1, 348, 68);
-        pixmap.drawRectangle(2, 2, 346, 66); 
+    private TextureRegionDrawable createPillButtonDrawable(Color coreColor, Color borderColor) {
+        int w = 350;
+        int h = 65;
+        int r = h / 2;
+        Pixmap p = new Pixmap(w, h, Pixmap.Format.RGBA8888);
 
-        Texture tex = new Texture(pixmap);
-        pixmap.dispose();
+        p.setColor(borderColor);
+        fillRoundedRect(p, 0, 0, w, h, r);
+
+        p.setColor(new Color(0.02f, 0.1f, 0.25f, 1f));
+        fillRoundedRect(p, 3, 3, w - 6, h - 6, r - 3);
+
+        p.setColor(coreColor);
+        fillRoundedRect(p, 6, 6, w - 12, h - 12, r - 6);
         
+        p.setColor(new Color(1f, 1f, 1f, 0.15f));
+        p.fillRectangle(r, 6, w - 2 * r, (h - 12) / 2);
+
+        Texture tex = new Texture(p);
+        p.dispose();
         return new TextureRegionDrawable(new TextureRegion(tex));
+    }
+
+    private TextureRegionDrawable createPanelDrawable(Color borderColor) {
+        int w = 500;
+        int h = 550; 
+        int r = 20; 
+        Pixmap p = new Pixmap(w, h, Pixmap.Format.RGBA8888);
+
+        // 1. Outer Border
+        p.setColor(borderColor);
+        fillRoundedRect(p, 0, 0, w, h, r);
+
+        // 2. Inner Dark Body (Fills the whole panel)
+        p.setColor(new Color(0.02f, 0.1f, 0.25f, 0.95f));
+        fillRoundedRect(p, 5, 5, w - 10, h - 10, r - 5);
+
+        // 3. Lighter Header Bar (Fixed: Placed properly at the top)
+        p.setColor(new Color(0.05f, 0.2f, 0.5f, 1f));
+        fillRoundedRect(p, 5, 5, w - 10, 80, r - 5); // Draws with rounded top corners
+        p.fillRectangle(5, 25, w - 10, 60);          // Squares off the bottom of the header
+
+        // 4. Header Divider Line
+        p.setColor(borderColor);
+        p.fillRectangle(5, 85, w - 10, 4);
+
+        Texture tex = new Texture(p);
+        p.dispose();
+        return new TextureRegionDrawable(new TextureRegion(tex));
+    }
+
+    private void fillRoundedRect(Pixmap p, int x, int y, int width, int height, int radius) {
+        p.fillRectangle(x + radius, y, width - 2 * radius, height);
+        p.fillRectangle(x, y + radius, width, height - 2 * radius);
+        p.fillCircle(x + radius, y + radius, radius);
+        p.fillCircle(x + width - radius, y + radius, radius);
+        p.fillCircle(x + radius, y + height - radius, radius);
+        p.fillCircle(x + width - radius, y + height - radius, radius);
     }
 
     @Override

@@ -15,6 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.mygdx.game.engine.ISceneNavigator;
 import com.mygdx.game.engine.Scene;
@@ -35,52 +36,62 @@ public class ResultScene extends Scene {
         scoreFont.getData().setScale(2.5f);
 
         BitmapFont titleFont = new BitmapFont();
-        titleFont.getData().setScale(3.5f);
+        titleFont.getData().setScale(2.2f); // Scaled to fit in the panel header
 
         TextureRegionDrawable baseDrawable = new TextureRegionDrawable(new TextureRegion(buttonTexture));
         Image bgImage = new Image(baseDrawable);
-        bgImage.setColor(new Color(0.05f, 0.08f, 0.2f, 1f)); 
+        bgImage.setColor(new Color(0.05f, 0.08f, 0.15f, 1f)); 
         bgImage.setFillParent(true);
         stage.addActor(bgImage);
 
-        Color darkBlueBg = new Color(0.02f, 0.1f, 0.25f, 0.9f);
-        Color hoverBlueBg = new Color(0.1f, 0.25f, 0.45f, 0.9f);
-        Color cyanBorder = new Color(0.1f, 0.7f, 1f, 1f);     
-        Color yellowBorder = new Color(1f, 0.8f, 0.1f, 1f);   
+        Color cyanBorder  = new Color(0.0f, 0.8f, 1.0f, 1f);     
+        Color yellowBorder = new Color(1.0f, 0.8f, 0.1f, 1f); 
+        Color coreBlue    = new Color(0.15f, 0.35f, 0.65f, 1f); 
+        Color hoverBlue   = new Color(0.25f, 0.50f, 0.85f, 1f); 
 
         TextButton.TextButtonStyle cyanStyle = new TextButton.TextButtonStyle();
         cyanStyle.font = buttonFont;
-        cyanStyle.fontColor = cyanBorder; 
-        cyanStyle.up = createBorderedDrawable(darkBlueBg, cyanBorder);     
-        cyanStyle.over = createBorderedDrawable(hoverBlueBg, cyanBorder); 
-        cyanStyle.down = createBorderedDrawable(cyanBorder, Color.WHITE); 
+        cyanStyle.fontColor = Color.WHITE; 
+        cyanStyle.up = createPillButtonDrawable(coreBlue, cyanBorder);     
+        cyanStyle.over = createPillButtonDrawable(hoverBlue, cyanBorder); 
+        cyanStyle.down = createPillButtonDrawable(cyanBorder, Color.WHITE); 
 
         TextButton.TextButtonStyle yellowStyle = new TextButton.TextButtonStyle();
         yellowStyle.font = buttonFont;
-        yellowStyle.fontColor = yellowBorder; 
-        yellowStyle.up = createBorderedDrawable(darkBlueBg, yellowBorder);     
-        yellowStyle.over = createBorderedDrawable(hoverBlueBg, yellowBorder); 
-        yellowStyle.down = createBorderedDrawable(yellowBorder, Color.WHITE);
+        yellowStyle.fontColor = Color.WHITE; 
+        yellowStyle.up = createPillButtonDrawable(coreBlue, yellowBorder);     
+        yellowStyle.over = createPillButtonDrawable(hoverBlue, yellowBorder); 
+        yellowStyle.down = createPillButtonDrawable(yellowBorder, Color.WHITE);
 
-        Label.LabelStyle titleStyle = new Label.LabelStyle(titleFont, cyanBorder); 
-        Label titleLabel = new Label("RUN COMPLETE!", titleStyle); 
+        TextureRegionDrawable panelBackground = createPanelDrawable(cyanBorder);
+
+        Label.LabelStyle titleStyle = new Label.LabelStyle(titleFont, Color.WHITE); 
+        Label titleLabel = new Label("MISSION COMPLETE", titleStyle); 
+        titleLabel.setAlignment(Align.center);
 
         Label.LabelStyle scoreStyle = new Label.LabelStyle(scoreFont, yellowBorder);
         scoreLabel = new Label("Score: 0 / 5", scoreStyle);
+        scoreLabel.setAlignment(Align.center);
 
-        TextButton btnRestart = new TextButton("RESTART RUN", cyanStyle);
+        TextButton btnRestart = new TextButton("RESTART MISSION", cyanStyle);
         TextButton btnMenu = new TextButton("RETURN TO MENU", yellowStyle);
 
-        Table table = new Table();
-        table.setFillParent(true);
-        table.center();
+        Table panelTable = new Table();
+        panelTable.setBackground(panelBackground);
+        panelTable.setSize(500, 500); 
         
-        table.add(titleLabel).padBottom(20).row();
-        table.add(scoreLabel).padBottom(60).row();
-        table.add(btnRestart).size(350, 70).padBottom(20).row();
-        table.add(btnMenu).size(350, 70);
+        panelTable.add(titleLabel).width(500).padTop(25).padBottom(40).row();
+        panelTable.add(scoreLabel).padBottom(40).row();
+        panelTable.add(btnRestart).size(350, 65).padBottom(20).row();
+        panelTable.add(btnMenu).size(350, 65);
+        panelTable.add().expandY().fillY(); 
 
-        stage.addActor(table);
+        Table masterTable = new Table();
+        masterTable.setFillParent(true);
+        masterTable.center();
+        masterTable.add(panelTable).size(500, 500);
+
+        stage.addActor(masterTable);
 
         btnRestart.addListener(new ClickListener() {
             @Override
@@ -99,19 +110,61 @@ public class ResultScene extends Scene {
         });
     }
 
-    private TextureRegionDrawable createBorderedDrawable(Color bgColor, Color borderColor) {
-        Pixmap pixmap = new Pixmap(350, 70, Pixmap.Format.RGBA8888);
-        pixmap.setColor(bgColor);
-        pixmap.fill();
-        pixmap.setColor(borderColor);
-        pixmap.drawRectangle(0, 0, 350, 70);
-        pixmap.drawRectangle(1, 1, 348, 68);
-        pixmap.drawRectangle(2, 2, 346, 66);
+    private TextureRegionDrawable createPillButtonDrawable(Color coreColor, Color borderColor) {
+        int w = 350;
+        int h = 65;
+        int r = h / 2;
+        Pixmap p = new Pixmap(w, h, Pixmap.Format.RGBA8888);
 
-        Texture tex = new Texture(pixmap);
-        pixmap.dispose();
+        p.setColor(borderColor);
+        fillRoundedRect(p, 0, 0, w, h, r);
+
+        p.setColor(new Color(0.02f, 0.1f, 0.25f, 1f));
+        fillRoundedRect(p, 3, 3, w - 6, h - 6, r - 3);
+
+        p.setColor(coreColor);
+        fillRoundedRect(p, 6, 6, w - 12, h - 12, r - 6);
         
+        p.setColor(new Color(1f, 1f, 1f, 0.15f));
+        p.fillRectangle(r, 6, w - 2 * r, (h - 12) / 2);
+
+        Texture tex = new Texture(p);
+        p.dispose();
         return new TextureRegionDrawable(new TextureRegion(tex));
+    }
+
+    private TextureRegionDrawable createPanelDrawable(Color borderColor) {
+        int w = 500;
+        int h = 500; // Shorter panel
+        int r = 20; 
+        Pixmap p = new Pixmap(w, h, Pixmap.Format.RGBA8888);
+
+        p.setColor(borderColor);
+        fillRoundedRect(p, 0, 0, w, h, r);
+
+        p.setColor(new Color(0.02f, 0.1f, 0.25f, 0.95f));
+        fillRoundedRect(p, 5, 5, w - 10, h - 10, r - 5);
+
+        // Fixed: Header properly placed at the top
+        p.setColor(new Color(0.05f, 0.2f, 0.5f, 1f));
+        fillRoundedRect(p, 5, 5, w - 10, 80, r - 5); 
+        p.fillRectangle(5, 25, w - 10, 60);          
+
+        p.setColor(borderColor);
+        p.fillRectangle(5, 85, w - 10, 4);
+
+        Texture tex = new Texture(p);
+        p.dispose();
+        return new TextureRegionDrawable(new TextureRegion(tex));
+    }
+
+    private void fillRoundedRect(Pixmap p, int x, int y, int width, int height, int radius) {
+        p.fillRectangle(x + radius, y, width - 2 * radius, height);
+        p.fillRectangle(x, y + radius, width, height - 2 * radius);
+        p.fillCircle(x + radius, y + radius, radius);
+        p.fillCircle(x + width - radius, y + radius, radius);
+        p.fillCircle(x + radius, y + height - radius, radius);
+        p.fillCircle(x + width - radius, y + height - radius, radius);
     }
 
     public void setScore(int current, int max) {
