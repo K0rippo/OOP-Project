@@ -44,6 +44,7 @@ public class GameMaster extends ApplicationAdapter {
 
         // ONLY GameScene gets the gameEngine injected now!
         sceneManager.addScene("MENU",     new MenuScene    ("MENU",     sceneManager, uiButtonTexture));
+        sceneManager.addScene("INSTRUCTIONS", new InstructionsScene("INSTRUCTIONS", sceneManager, uiButtonTexture));
         sceneManager.addScene("GAME",     new GameScene    ("GAME",     sceneManager, gameEngine, questionProvider));
         sceneManager.addScene("SETTINGS", new SettingsScene("SETTINGS", sceneManager, uiButtonTexture));
         sceneManager.addScene("RESULT",   new ResultScene  ("RESULT",   sceneManager, uiButtonTexture));
