@@ -32,22 +32,20 @@ public class MenuScene extends Scene {
         buttonFont.getData().setScale(1.5f);
 
         BitmapFont titleFont = new BitmapFont();
-        titleFont.getData().setScale(2.8f); // Scaled to fit nicely in the panel header
+        titleFont.getData().setScale(2.8f); 
 
-        // 1. Space Background
+        // 1. Programmatic Space Background Restored!
         TextureRegionDrawable baseDrawable = new TextureRegionDrawable(new TextureRegion(buttonTexture));
         Image bgImage = new Image(baseDrawable);
         bgImage.setColor(new Color(0.05f, 0.08f, 0.15f, 1f)); 
         bgImage.setFillParent(true);
         stage.addActor(bgImage);
 
-        // --- DEFINING THE COLORS ---
         Color cyanBorder  = new Color(0.0f, 0.8f, 1.0f, 1f);     
         Color yellowBorder = new Color(1.0f, 0.8f, 0.1f, 1f); 
         Color coreBlue    = new Color(0.15f, 0.35f, 0.65f, 1f); 
         Color hoverBlue   = new Color(0.25f, 0.50f, 0.85f, 1f); 
 
-        // 2. Setup Button Styles
         TextButton.TextButtonStyle cyanStyle = new TextButton.TextButtonStyle();
         cyanStyle.font = buttonFont; 
         cyanStyle.fontColor = Color.WHITE; 
@@ -62,36 +60,26 @@ public class MenuScene extends Scene {
         yellowStyle.over = createPillButtonDrawable(hoverBlue, yellowBorder); 
         yellowStyle.down = createPillButtonDrawable(yellowBorder, Color.WHITE); 
 
-        // 3. Create the Main Panel Background
         TextureRegionDrawable panelBackground = createPanelDrawable(cyanBorder);
 
-        // 4. Game Title Text
         Label.LabelStyle titleStyle = new Label.LabelStyle(titleFont, Color.WHITE); 
         Label titleLabel = new Label("MATH RUN", titleStyle);
         titleLabel.setAlignment(Align.center);
 
-        // 5. Instantiate Buttons
         TextButton btnPlay = new TextButton("PLAY", cyanStyle);
         TextButton btnSettings = new TextButton("SYSTEM SETTINGS", yellowStyle); 
         TextButton btnQuit = new TextButton("EXIT DESKTOP", cyanStyle);
 
-        // 6. Layout within the Panel
         Table panelTable = new Table();
         panelTable.setBackground(panelBackground);
-        panelTable.setSize(500, 550); // Panel size to perfectly fit 3 buttons
+        panelTable.setSize(500, 550); 
         
-        // Add Header
         panelTable.add(titleLabel).width(500).padTop(25).padBottom(50).row();
-        
-        // Add Body Elements
         panelTable.add(btnPlay).size(350, 65).padBottom(20).row();
         panelTable.add(btnSettings).size(350, 65).padBottom(20).row();
         panelTable.add(btnQuit).size(350, 65);
-        
-        // Push everything up slightly
         panelTable.add().expandY().fillY(); 
 
-        // 7. Master Table Layout
         Table masterTable = new Table();
         masterTable.setFillParent(true);
         masterTable.center();
@@ -99,11 +87,9 @@ public class MenuScene extends Scene {
 
         stage.addActor(masterTable);
 
-        // --- Listeners ---
         btnPlay.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                // Routes to your new Instructions Scene!
                 sceneNavigator.goToScene("INSTRUCTIONS");
             }
         });
@@ -158,14 +144,31 @@ public class MenuScene extends Scene {
         p.setColor(borderColor);
         fillRoundedRect(p, 0, 0, w, h, r);
 
-        // 2. Inner Dark Body (Fills the whole panel)
+        // 2. Inner Dark Body 
         p.setColor(new Color(0.02f, 0.1f, 0.25f, 0.95f));
         fillRoundedRect(p, 5, 5, w - 10, h - 10, r - 5);
 
-        // 3. Lighter Header Bar (Fixed: Placed properly at the top)
-        p.setColor(new Color(0.05f, 0.2f, 0.5f, 1f));
-        fillRoundedRect(p, 5, 5, w - 10, 80, r - 5); // Draws with rounded top corners
-        p.fillRectangle(5, 25, w - 10, 60);          // Squares off the bottom of the header
+        // --- 3. NEW SCI-FI SPACESHIP HEADER ---
+        // Base metallic blue/grey header
+        p.setColor(new Color(0.08f, 0.18f, 0.38f, 1f)); 
+        fillRoundedRect(p, 5, 5, w - 10, 80, r - 5); 
+        p.fillRectangle(5, 25, w - 10, 60);          
+
+        // Horizontal armored plating grooves
+        p.setColor(new Color(0.03f, 0.1f, 0.25f, 1f));
+        for (int y = 15; y < 75; y += 12) {
+            p.fillRectangle(15, y, w - 30, 4);
+        }
+
+        // Glowing cyan rivets bolted to the sides
+        p.setColor(new Color(0.0f, 0.8f, 1.0f, 0.8f));
+        p.fillCircle(25, 45, 6); // Left rivet
+        p.fillCircle(w - 25, 45, 6); // Right rivet
+
+        // Inner top-edge glass/metal reflection
+        p.setColor(new Color(1f, 1f, 1f, 0.15f));
+        p.fillRectangle(15, 8, w - 30, 5);
+        // --------------------------------------
 
         // 4. Header Divider Line
         p.setColor(borderColor);

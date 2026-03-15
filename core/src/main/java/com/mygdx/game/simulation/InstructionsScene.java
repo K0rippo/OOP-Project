@@ -137,7 +137,7 @@ public class InstructionsScene extends Scene {
     }
 
     private TextureRegionDrawable createPanelDrawable(Color borderColor) {
-        int w = 600; // Wider panel
+        int w = 600; 
         int h = 600; 
         int r = 20; 
         Pixmap p = new Pixmap(w, h, Pixmap.Format.RGBA8888);
@@ -148,10 +148,23 @@ public class InstructionsScene extends Scene {
         p.setColor(new Color(0.02f, 0.1f, 0.25f, 0.95f));
         fillRoundedRect(p, 5, 5, w - 10, h - 10, r - 5);
 
-        // Fixed: Header properly placed at the top
-        p.setColor(new Color(0.05f, 0.2f, 0.5f, 1f));
+        // --- NEW SCI-FI SPACESHIP HEADER ---
+        p.setColor(new Color(0.08f, 0.18f, 0.38f, 1f)); 
         fillRoundedRect(p, 5, 5, w - 10, 80, r - 5); 
         p.fillRectangle(5, 25, w - 10, 60);          
+
+        p.setColor(new Color(0.03f, 0.1f, 0.25f, 1f));
+        for (int y = 15; y < 75; y += 12) {
+            p.fillRectangle(15, y, w - 30, 4);
+        }
+
+        p.setColor(new Color(0.0f, 0.8f, 1.0f, 0.8f));
+        p.fillCircle(25, 45, 6); 
+        p.fillCircle(w - 25, 45, 6); 
+
+        p.setColor(new Color(1f, 1f, 1f, 0.15f));
+        p.fillRectangle(15, 8, w - 30, 5);
+        // --------------------------------------
 
         p.setColor(borderColor);
         p.fillRectangle(5, 85, w - 10, 4);

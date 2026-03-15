@@ -41,20 +41,17 @@ public class SettingsScene extends Scene {
         BitmapFont titleFont = new BitmapFont();
         titleFont.getData().setScale(2.5f);
 
-        // 1. Space Background
         TextureRegionDrawable baseDrawable = new TextureRegionDrawable(new TextureRegion(buttonTexture));
         Image bgImage = new Image(baseDrawable);
         bgImage.setColor(new Color(0.05f, 0.08f, 0.15f, 1f)); 
         bgImage.setFillParent(true);
         stage.addActor(bgImage);
 
-        // --- DEFINING THE COLORS ---
         Color cyanBorder  = new Color(0.0f, 0.8f, 1.0f, 1f);     
         Color redBorder   = new Color(1.0f, 0.2f, 0.2f, 1f); 
         Color coreBlue    = new Color(0.15f, 0.35f, 0.65f, 1f); 
         Color hoverBlue   = new Color(0.25f, 0.50f, 0.85f, 1f); 
 
-        // 2. Setup Button Styles
         audioActiveStyle = new TextButton.TextButtonStyle();
         audioActiveStyle.font = buttonFont;
         audioActiveStyle.fontColor = Color.WHITE; 
@@ -69,15 +66,12 @@ public class SettingsScene extends Scene {
         audioMutedStyle.over = createPillButtonDrawable(hoverBlue, redBorder); 
         audioMutedStyle.down = createPillButtonDrawable(redBorder, Color.WHITE); 
 
-        // 3. Create the Main Panel Background
         TextureRegionDrawable panelBackground = createPanelDrawable(cyanBorder);
 
-        // 4. Instantiate Buttons
         btnMute = new TextButton("AUDIO: ACTIVE", audioActiveStyle);
         btnBack = new TextButton("RESUME", audioActiveStyle);
         btnExitMenu = new TextButton("ABORT MISSION", audioActiveStyle);
 
-        // 5. Layout
         Label.LabelStyle titleStyle = new Label.LabelStyle(titleFont, Color.WHITE); 
         Label titleLabel = new Label("OPTIONS", titleStyle);
         titleLabel.setAlignment(Align.center);
@@ -99,7 +93,6 @@ public class SettingsScene extends Scene {
 
         stage.addActor(masterTable);
 
-        // --- Listeners ---
         btnMute.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -157,10 +150,23 @@ public class SettingsScene extends Scene {
         p.setColor(new Color(0.02f, 0.1f, 0.25f, 0.95f));
         fillRoundedRect(p, 5, 5, w - 10, h - 10, r - 5);
 
-        // Fixed: Header properly placed at the top
-        p.setColor(new Color(0.05f, 0.2f, 0.5f, 1f));
+        // --- NEW SCI-FI SPACESHIP HEADER ---
+        p.setColor(new Color(0.08f, 0.18f, 0.38f, 1f)); 
         fillRoundedRect(p, 5, 5, w - 10, 80, r - 5); 
         p.fillRectangle(5, 25, w - 10, 60);          
+
+        p.setColor(new Color(0.03f, 0.1f, 0.25f, 1f));
+        for (int y = 15; y < 75; y += 12) {
+            p.fillRectangle(15, y, w - 30, 4);
+        }
+
+        p.setColor(new Color(0.0f, 0.8f, 1.0f, 0.8f));
+        p.fillCircle(25, 45, 6); 
+        p.fillCircle(w - 25, 45, 6); 
+
+        p.setColor(new Color(1f, 1f, 1f, 0.15f));
+        p.fillRectangle(15, 8, w - 30, 5);
+        // --------------------------------------
 
         p.setColor(borderColor);
         p.fillRectangle(5, 85, w - 10, 4);
