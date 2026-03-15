@@ -38,8 +38,8 @@ public class GameUIManager {
         Label.LabelStyle hpStyle       = new Label.LabelStyle(hpFont, new Color(1f, 0.85f, 0.3f, 1f));
 
         questionLabel = new Label("", questionStyle);
-        questionLabel.setFontScale(1.35f);
-        questionLabel.setPosition(24, WORLD_HEIGHT - 55);
+        questionLabel.setFontScale(1.8f);
+        questionLabel.setPosition(24, WORLD_HEIGHT - 60);
         stage.addActor(questionLabel);
 
         for (int i = 0; i < MAX_ANSWER_LABELS; i++) {
@@ -78,18 +78,8 @@ public class GameUIManager {
     }
 
     public void syncBarrierHp(Array<BreakableBarrier> barriers) {
+        // Hide all HP labels - texture changes show health state instead
         for (int i = 0; i < 3; i++) {
-            if (barriers != null && i < barriers.size) {
-                BreakableBarrier b = barriers.get(i);
-                if (b != null && b.isActive() && !b.isBroken()) {
-                    barrierHpLabels[i].setText(String.valueOf(b.getHitPoints()));
-                    barrierHpLabels[i].setVisible(true);
-                    barrierHpLabels[i].setPosition(
-                            b.getPosition().x + 2f,
-                            b.getPosition().y + b.getHeight() / 2f - 8f);
-                    continue;
-                }
-            }
             barrierHpLabels[i].setVisible(false);
         }
     }

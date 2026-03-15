@@ -121,6 +121,11 @@ public class GameScene extends Scene {
         clearDynamicEntities();
         wallGroups.clear();
 
+        // Shuffle questions for a fresh game experience
+        if (questionProvider instanceof CsvQuestionProvider) {
+            ((CsvQuestionProvider) questionProvider).shuffleForNewGame();
+        }
+
         if (player == null) {
             player = new PlayerCharacter(1, new Vector2(PLAYER_X, WORLD_HEIGHT / 2f), 25f);
             player.setCollisionLayer(LAYER_PLAYER);
@@ -202,7 +207,7 @@ public class GameScene extends Scene {
             BreakableBarrier barrier = new BreakableBarrier(
                     200 + segId * 10 + i,
                     new Vector2(spawnX, sectionH * (2 - i)),
-                    12f, sectionH, 3, (i == correctIndex));
+                    20f, sectionH, 3, (i == correctIndex));
             barrier.getVelocity().x = -SCROLL_SPEED;
             barrier.setCollisionLayer(LAYER_GATE);
             barrier.setCollisionMask(LAYER_PLAYER);
@@ -256,6 +261,38 @@ public class GameScene extends Scene {
         }
     }
 
+    // ── Input ────────────────────────────────────────────────────────────────
+
+    private void initializeInput() {
+        engine.getIOManager().bindKeyContinuous(com.badlogic.gdx.Input.Keys.UP, () -> {
+            if (player != null && player.getPosition().y + player.getRadius() < WORLD_HEIGHT - 5)
+                player.getVelocity().y = 250;
+        });
+        engine.getIOManager().bindKeyContinuous(com.badlogic.gdx.Input.Keys.DOWN, () -> {
+            if (player != null && player.getPosition().y - player.getRadius() > 5)
+                player.getVelocity().y = -250;
+        });
+        engine.getIOManager().bindKeyContinuous(com.badlogic.gdx.Input.Keys.LEFT, () -> {
+            if (player != null && player.getPosition().x - player.getRadius() > 5)
+                player.getVelocity().x = -250;
+        });
+        engine.getIOManager().bindKeyContinuous(com.badlogic.gdx.Input.Keys.RIGHT, () -> {
+            if (player != null && player.getPosition().x + player.getRadius() < WORLD_WIDTH - 5)
+                player.getVelocity().x = 250;
+        });
+        engine.getIOManager().bindKeyJustPressed(com.badlogic.gdx.Input.Keys.SPACE, () -> {
+            if (player != null) player.requestShoot();
+        });
+        // ESC opens settings without losing game state
+        engine.getIOManager().bindKeyJustPressed(com.badlogic.gdx.Input.Keys.ESCAPE, () -> {
+            SettingsScene settings = (SettingsScene) sceneNavigator.getScene("SETTINGS");
+            if (settings != null) settings.setPreviousScene("GAME");
+            sceneNavigator.goToScene("SETTINGS");
+        });
+    }
+
+    // ── Update ───────────────────────────────────────────────────────────────
+
     @Override
     public void update(float deltaTime) {
         if (!isActive() || paused) return;
@@ -269,6 +306,7 @@ public class GameScene extends Scene {
 
         if (player != null) {
             player.getVelocity().y *= 0.85f;
+            player.getVelocity().x *= 0.85f;
 
             if (player.hasTakenDamage()) {
                 gameState.loseLife();
@@ -363,6 +401,7 @@ public class GameScene extends Scene {
         if (!batch.isDrawing()) batch.begin();
     }
 
+    // RESOLVED CONFLICT HERE: Kept the new layer-based logic!
     private void clearDynamicEntities() {
         for (Entity e : engine.getEntitiesByLayer(LAYER_GATE)) {
             removeEntity(e);
@@ -391,5 +430,6 @@ public class GameScene extends Scene {
         if (player       != null) player.dispose();
         if (uiManager    != null) uiManager.dispose();
         background.dispose();
+        BreakableBarrier.disposeTextures(); // Kept this from the main branch
     }
 }
