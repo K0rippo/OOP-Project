@@ -18,13 +18,9 @@ public class GameMaster extends ApplicationAdapter {
 
     private static boolean muted = false;
 
-    // Returns true when the game audio is muted
     public static boolean isMuted() { return muted; }
-
-    // Toggles or sets the global mute state
     public static void setMuted(boolean value) { muted = value; }
 
-    // Initializes the game components and injects dependencies
     @Override
     public void create() {
         batch        = new SpriteBatch();
@@ -46,16 +42,16 @@ public class GameMaster extends ApplicationAdapter {
 
         IQuestionProvider questionProvider = new DefaultQuestionProvider();
 
-        sceneManager.addScene("MENU",     new MenuScene    ("MENU",     sceneManager, gameEngine, uiButtonTexture));
+        // ONLY GameScene gets the gameEngine injected now!
+        sceneManager.addScene("MENU",     new MenuScene    ("MENU",     sceneManager, uiButtonTexture));
         sceneManager.addScene("GAME",     new GameScene    ("GAME",     sceneManager, gameEngine, questionProvider));
-        sceneManager.addScene("SETTINGS", new SettingsScene("SETTINGS", sceneManager, gameEngine, uiButtonTexture));
-        sceneManager.addScene("RESULT",   new ResultScene  ("RESULT",   sceneManager, gameEngine, uiButtonTexture));
+        sceneManager.addScene("SETTINGS", new SettingsScene("SETTINGS", sceneManager, uiButtonTexture));
+        sceneManager.addScene("RESULT",   new ResultScene  ("RESULT",   sceneManager, uiButtonTexture));
 
         sceneManager.setActiveScene("MENU");
         resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
     }
 
-    // Renders the active game scene
     @Override
     public void render() {
         ScreenUtils.clear(0.1f, 0.1f, 0.2f, 1f);
@@ -66,13 +62,11 @@ public class GameMaster extends ApplicationAdapter {
         batch.end();
     }
 
-    // Resizes the application viewport
     @Override
     public void resize(int width, int height) {
         sceneManager.resize(width, height);
     }
 
-    // Frees allocated memory
     @Override
     public void dispose() {
         batch.dispose();

@@ -24,6 +24,7 @@ public class GameScene extends Scene {
     private static final float SHOOT_INTERVAL      = 0.25f;
     private static final float HUD_SWITCH_DISTANCE = WORLD_WIDTH;
 
+    private final IGameEngine         engine; // <-- Local engine reference
     private final ISceneNavigator     sceneNavigator;
     private final ObstacleFactory     obstacleFactory;
     private final GameStateManager    gameState;
@@ -52,40 +53,27 @@ public class GameScene extends Scene {
         private boolean                      hudShown        = false;
         private boolean                      passed          = false;
 
-        // Initializes the wall group with the question and answers
         WallGroup(int questionIndex, String[] shuffledAnswers) {
             this.questionIndex   = questionIndex;
             this.shuffledAnswers = shuffledAnswers;
         }
 
-        // Retrieves the index of the question
         int getQuestionIndex() { return questionIndex; }
-
-        // Checks if the HUD currently shows this question
         boolean isHudShown() { return hudShown; }
-
-        // Checks if the player passed the wall group
         boolean isPassed() { return passed; }
-
-        // Marks the HUD as shown for this group
         void markHudShown() { hudShown = true; }
-
-        // Adds a wall entity to the group
         void addWall(RectangleEntity wall) { walls.add(wall); }
 
-        // Gets the X position of the first wall
         float leadingWallX() {
             return walls.isEmpty() ? Float.MAX_VALUE : walls.first().getPosition().x;
         }
 
-        // Checks the player position and marks the group as passed if cleared
         void checkAndMarkPassed(float playerX) {
             if (passed || walls.isEmpty()) return;
             RectangleEntity first = walls.first();
             if (first.getPosition().x + first.getWidth() < playerX) passed = true;
         }
 
-        // Populates arrays with answer data for rendering
         int fillAnswerData(String[] texts, float[] xs, float[] ys,
                            float[] heights, int offset) {
             if (passed) return offset;
@@ -103,10 +91,10 @@ public class GameScene extends Scene {
 
     private final Array<WallGroup> wallGroups = new Array<>();
 
-    // Initializes the main gameplay scene
     public GameScene(String id, ISceneNavigator sceneNavigator, IGameEngine engine,
                      IQuestionProvider questionProvider) {
-        super(id, engine);
+        super(id);
+        this.engine           = engine;
         this.sceneNavigator   = sceneNavigator;
         this.questionProvider = questionProvider;
         this.obstacleFactory  = new ObstacleFactory();
@@ -121,7 +109,10 @@ public class GameScene extends Scene {
         startLevel();
     }
 
-    // Resets the level state and clears entities
+    // Engine Wrappers
+    private void addEntity(Entity e) { engine.addEntity(e); }
+    private void removeEntity(Entity e) { engine.removeEntity(e); }
+
     private void startLevel() {
         gameState.resetState();
         scrolledDistance = 0f;
@@ -146,14 +137,13 @@ public class GameScene extends Scene {
         levelSpawner = new ContinuousLevelSpawner(questionProvider, FIRST_SEGMENT_X, this::spawnSegment);
     }
 
-    // Flags the scene to restart on the next show
     public void requestRestart() {
         pendingRestart = true;
     }
 
-    // Restores speed and starts level when the scene becomes active
     @Override
     public void show() {
+        super.show();
         paused = false;
         engine.setSpeedMultiplier(1f);
         if (pendingRestart) {
@@ -162,14 +152,13 @@ public class GameScene extends Scene {
         }
     }
 
-    // Pauses game elements when the scene becomes inactive
     @Override
     public void hide() {
+        super.hide();
         paused = true;
         engine.setSpeedMultiplier(0f);
     }
 
-    // Creates a new segment with questions, gates, and barriers
     private void spawnSegment(LevelSegment segment) {
         int qi     = segment.getQuestionIndex();
         Question q = questionProvider.getQuestion(qi);
@@ -193,7 +182,6 @@ public class GameScene extends Scene {
         }
     }
 
-    // Generates the answer gate walls
     private void spawnAnswerGates(float spawnX, float sectionH, int correctIndex,
                                    int segId, WallGroup group) {
         for (int i = 0; i < 3; i++) {
@@ -209,7 +197,6 @@ public class GameScene extends Scene {
         }
     }
 
-    // Generates breakable barriers in front of the gates
     private void spawnBarriers(float spawnX, float sectionH, int correctIndex, int segId) {
         for (int i = 0; i < 3; i++) {
             BreakableBarrier barrier = new BreakableBarrier(
@@ -223,7 +210,6 @@ public class GameScene extends Scene {
         }
     }
 
-    // Updates the UI with the specified question and theme
     private void showQuestionOnHud(int qi) {
         Question q = questionProvider.getQuestion(qi);
         if (q == null) return;
@@ -231,7 +217,6 @@ public class GameScene extends Scene {
         uiManager.updateQuestion(q);
     }
 
-    // Checks distance and updates the HUD for upcoming questions
     private void updateHudForApproachingSegments() {
         for (WallGroup group : wallGroups) {
             if (!group.isHudShown()) {
@@ -243,7 +228,6 @@ public class GameScene extends Scene {
         }
     }
 
-    // Synchronizes physical wall positions with UI labels
     private void syncAnswerLabelsToUI() {
         int max = wallGroups.size * 3;
         if (max == 0) {
@@ -261,23 +245,20 @@ public class GameScene extends Scene {
         uiManager.syncAnswerLabels(texts, xs, ys, heights, count);
     }
 
-    // Determines if all spawned level segments are passed
     private boolean allSegmentsCompleted() {
         if (!levelSpawner.allSegmentsSpawned()) return false;
         return wallGroups.isEmpty();
     }
 
-    // Removes wall groups that the player has bypassed
     private void prunePassedGroups() {
         for (int i = wallGroups.size - 1; i >= 0; i--) {
             if (wallGroups.get(i).isPassed()) wallGroups.removeIndex(i);
         }
     }
 
-    // Processes logic for each frame
     @Override
     public void update(float deltaTime) {
-        if (paused) return;
+        if (!isActive() || paused) return;
 
         scrolledDistance += SCROLL_SPEED * deltaTime;
         background.update(deltaTime, SCROLL_SPEED);
@@ -305,7 +286,7 @@ public class GameScene extends Scene {
             }
         }
 
-        super.update(deltaTime);
+        engine.update(deltaTime);
         cleanupOffScreen();
 
         for (WallGroup g : wallGroups) g.checkAndMarkPassed(PLAYER_X);
@@ -332,7 +313,6 @@ public class GameScene extends Scene {
         if (shootCooldown > 0) shootCooldown -= deltaTime;
     }
 
-    // Removes entities that have completely scrolled off the screen
     private void cleanupOffScreen() {
         for (Entity e : engine.getEntitiesByLayer(LAYER_GATE)) {
             if (e.getPosition().x < -200f) {
@@ -346,7 +326,6 @@ public class GameScene extends Scene {
         }
     }
 
-    // Triggers bullet creation based on player input
     private void updatePlayerShooting() {
         if (player != null && player.isShootRequested() && shootCooldown <= 0f) {
             PlayerBullet bullet = new PlayerBullet(
@@ -360,19 +339,21 @@ public class GameScene extends Scene {
         }
     }
 
-    // Draws the background and game stage
     @Override
     public void render(SpriteBatch batch) {
+        if (!isActive()) return;
+        
         Gdx.gl.glClearColor(0.03f, 0.04f, 0.08f, 1f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         stage.getViewport().apply();
         batch.setProjectionMatrix(stage.getCamera().combined);
         background.render(batch, currentBGColor);
-        super.render(batch);
+        
+        engine.render(batch);
+        
         renderUI(batch);
     }
 
-    // Draws the player lives
     private void renderUI(SpriteBatch batch) {
         for (int i = 0; i < gameState.getLives(); i++) {
             batch.draw(heartTexture, WORLD_WIDTH - 50 - (i * 40), WORLD_HEIGHT - 50, 30, 30);
@@ -382,7 +363,6 @@ public class GameScene extends Scene {
         if (!batch.isDrawing()) batch.begin();
     }
 
-    // Removes specific entities from the engine
     private void clearDynamicEntities() {
         for (Entity e : engine.getEntitiesByLayer(LAYER_GATE)) {
             removeEntity(e);
@@ -394,7 +374,6 @@ public class GameScene extends Scene {
         }
     }
 
-    // Switches view to the result scene
     private void transitionToResult() {
         ResultScene result = (ResultScene) sceneNavigator.getScene("RESULT");
         if (result != null) result.setScore(score, gameState.getTotalQuestions());
@@ -402,13 +381,11 @@ public class GameScene extends Scene {
         sceneNavigator.goToScene("RESULT");
     }
 
-    // Adjusts viewport elements to screen size
     @Override
     public void resize(int width, int height) {
         stage.getViewport().update(width, height, true);
     }
 
-    // Frees memory
     public void dispose() {
         if (heartTexture != null) heartTexture.dispose();
         if (player       != null) player.dispose();
