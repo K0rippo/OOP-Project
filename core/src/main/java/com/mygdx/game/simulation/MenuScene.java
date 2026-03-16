@@ -43,6 +43,7 @@ public class MenuScene extends Scene {
 
         Color cyanBorder  = new Color(0.0f, 0.8f, 1.0f, 1f);     
         Color yellowBorder = new Color(1.0f, 0.8f, 0.1f, 1f); 
+        Color redBorder   = new Color(1.0f, 0.2f, 0.2f, 1f); // Added Red Border color
         Color coreBlue    = new Color(0.15f, 0.35f, 0.65f, 1f); 
         Color hoverBlue   = new Color(0.25f, 0.50f, 0.85f, 1f); 
 
@@ -60,15 +61,24 @@ public class MenuScene extends Scene {
         yellowStyle.over = createPillButtonDrawable(hoverBlue, yellowBorder); 
         yellowStyle.down = createPillButtonDrawable(yellowBorder, Color.WHITE); 
 
+        // Added Red Button Style for the Exit button
+        TextButton.TextButtonStyle redStyle = new TextButton.TextButtonStyle();
+        redStyle.font = buttonFont; 
+        redStyle.fontColor = Color.WHITE; 
+        redStyle.up = createPillButtonDrawable(coreBlue, redBorder);     
+        redStyle.over = createPillButtonDrawable(hoverBlue, redBorder); 
+        redStyle.down = createPillButtonDrawable(redBorder, Color.WHITE); 
+
         TextureRegionDrawable panelBackground = createPanelDrawable(cyanBorder);
 
         Label.LabelStyle titleStyle = new Label.LabelStyle(titleFont, Color.WHITE); 
         Label titleLabel = new Label("MATH RUN", titleStyle);
         titleLabel.setAlignment(Align.center);
 
+        // Updated button texts and applied the redStyle to the Quit button
         TextButton btnPlay = new TextButton("PLAY", cyanStyle);
-        TextButton btnSettings = new TextButton("SYSTEM SETTINGS", yellowStyle); 
-        TextButton btnQuit = new TextButton("EXIT DESKTOP", cyanStyle);
+        TextButton btnSettings = new TextButton("SYSTEM SETTINGS", cyanStyle); 
+        TextButton btnQuit = new TextButton("EXIT", redStyle);
 
         Table panelTable = new Table();
         panelTable.setBackground(panelBackground);

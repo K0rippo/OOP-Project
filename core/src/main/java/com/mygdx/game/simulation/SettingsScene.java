@@ -47,11 +47,14 @@ public class SettingsScene extends Scene {
         bgImage.setFillParent(true);
         stage.addActor(bgImage);
 
-        Color cyanBorder  = new Color(0.0f, 0.8f, 1.0f, 1f);     
-        Color redBorder   = new Color(1.0f, 0.2f, 0.2f, 1f); 
-        Color coreBlue    = new Color(0.15f, 0.35f, 0.65f, 1f); 
-        Color hoverBlue   = new Color(0.25f, 0.50f, 0.85f, 1f); 
+        // --- DEFINING THE COLORS ---
+        Color cyanBorder   = new Color(0.0f, 0.8f, 1.0f, 1f);     
+        Color redBorder    = new Color(1.0f, 0.2f, 0.2f, 1f); 
+        Color yellowBorder = new Color(1.0f, 0.8f, 0.1f, 1f); // Added Yellow Border
+        Color coreBlue     = new Color(0.15f, 0.35f, 0.65f, 1f); 
+        Color hoverBlue    = new Color(0.25f, 0.50f, 0.85f, 1f); 
 
+        // --- BUTTON STYLES ---
         audioActiveStyle = new TextButton.TextButtonStyle();
         audioActiveStyle.font = buttonFont;
         audioActiveStyle.fontColor = Color.WHITE; 
@@ -66,16 +69,26 @@ public class SettingsScene extends Scene {
         audioMutedStyle.over = createPillButtonDrawable(hoverBlue, redBorder); 
         audioMutedStyle.down = createPillButtonDrawable(redBorder, Color.WHITE); 
 
+        // Added Yellow Style for the navigation buttons
+        TextButton.TextButtonStyle yellowStyle = new TextButton.TextButtonStyle();
+        yellowStyle.font = buttonFont;
+        yellowStyle.fontColor = Color.WHITE; 
+        yellowStyle.up = createPillButtonDrawable(coreBlue, yellowBorder);     
+        yellowStyle.over = createPillButtonDrawable(hoverBlue, yellowBorder); 
+        yellowStyle.down = createPillButtonDrawable(yellowBorder, Color.WHITE); 
+
         TextureRegionDrawable panelBackground = createPanelDrawable(cyanBorder);
 
+        // --- INSTANTIATE BUTTONS ---
         btnMute = new TextButton("AUDIO: ACTIVE", audioActiveStyle);
-        btnBack = new TextButton("RESUME", audioActiveStyle);
-        btnExitMenu = new TextButton("ABORT MISSION", audioActiveStyle);
+        btnBack = new TextButton("RESUME", yellowStyle); // Now uses yellowStyle
+        btnExitMenu = new TextButton("ABORT MISSION", yellowStyle); // Now uses yellowStyle
 
         Label.LabelStyle titleStyle = new Label.LabelStyle(titleFont, Color.WHITE); 
         Label titleLabel = new Label("OPTIONS", titleStyle);
         titleLabel.setAlignment(Align.center);
 
+        // --- LAYOUT ---
         Table panelTable = new Table();
         panelTable.setBackground(panelBackground);
         panelTable.setSize(500, 600); 
@@ -93,6 +106,7 @@ public class SettingsScene extends Scene {
 
         stage.addActor(masterTable);
 
+        // --- LISTENERS ---
         btnMute.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {

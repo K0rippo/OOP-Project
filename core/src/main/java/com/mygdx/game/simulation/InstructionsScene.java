@@ -69,7 +69,8 @@ public class InstructionsScene extends Scene {
         titleLabel.setAlignment(Align.center);
 
         Label.LabelStyle textStyle = new Label.LabelStyle(textFont, Color.WHITE);
-        String instructions = "UP / DOWN ARROWS to move.\n\n" +
+        String instructions = "UP / DOWN ARROWS to move up and down.\n\n" +
+        					  "LEFT / RIGHT to move left and right.\n\n" +
                               "SPACEBAR to shoot barriers.\n\n" +
                               "Read the question, destroy the correct\n" +
                               "barrier, and fly through the gate!";

@@ -7,25 +7,15 @@ import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.engine.Circle;
 import com.mygdx.game.engine.Entity;
 
-/**
- * PlayerCharacter — the player-controlled entity.
- *
- * Encapsulation: all state flags are private; external code reads state via
- * query methods (hasTakenDamage, hasReachedGate, isShootRequested) and
- * consumes it via consume* methods. No public mutable fields are exposed.
- */
-
-/**
- * PlayerCharacter — the player-controlled entity.
- */
 public class PlayerCharacter extends Circle {
 
-	private static final float WORLD_HEIGHT         = 720f;
-	private static final float WORLD_WIDTH          = 1280f;
+    private static final float WORLD_HEIGHT         = 720f;
+    private static final float WORLD_WIDTH          = 1280f;
     private static final float INVULNERABILITY_TIME = 3.0f;
     private static final float GATE_COOLDOWN_TIME   = 2.0f;
-    private static final float BOUNCE_BACK_SPEED    = -140f;
-    private static final float BOUNCE_RECOVERY      = 220f;
+    
+    // Increased bounce-back speed so it's noticeable when you hit a wall
+    private static final float BOUNCE_BACK_SPEED    = -600f; 
 
     private final Texture texture;
 
@@ -54,6 +44,7 @@ public class PlayerCharacter extends Circle {
         float rightLimit  = WORLD_WIDTH - radius;
         float leftLimit   = radius;
 
+        // --- Screen Boundaries ---
         if (getPosition().y > topLimit) {
             getPosition().y = topLimit;
             getVelocity().y = 0;
@@ -70,10 +61,7 @@ public class PlayerCharacter extends Circle {
             getVelocity().x = 0;
         }
 
-        if (getVelocity().x < 0) {
-            getVelocity().x += BOUNCE_RECOVERY * deltaTime;
-            if (getVelocity().x > 0) getVelocity().x = 0;
-        }
+        // DELETED: The old Bounce Recovery code that broke left movement is gone!
     }
 
     @Override
@@ -108,13 +96,11 @@ public class PlayerCharacter extends Circle {
             return;
         }
 
-        // New: enemy bullets damage the player
         if (name.equals("EnemyBullet")) {
             applyDamage();
             return;
         }
 
-        // Optional contact damage if you later enable enemy ship collision
         if (name.equals("EnemyShip")) {
             applyDamage();
         }
