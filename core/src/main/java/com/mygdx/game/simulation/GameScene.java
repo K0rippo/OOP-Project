@@ -39,11 +39,11 @@ public class GameScene extends Scene {
     private final EnemyWaveFactory    enemyWaveFactory;
     private ContinuousLevelSpawner    levelSpawner;
     private final GameInputHandler    inputHandler;
+    private final AudioManager        audioManager;
 
     private PlayerCharacter player;
     private Texture         heartTexture;
 
-    // State array for enemy waves (Waves are abstract concepts, not physical entities)
     private final Array<EnemyWave> enemyWaves = new Array<>();
 
     // ── State ───────────────────────────────────────────────────────────────
@@ -111,11 +111,12 @@ public class GameScene extends Scene {
     private final Array<WallGroup> wallGroups = new Array<>();
 
     public GameScene(String id, ISceneNavigator sceneNavigator, IGameEngine engine,
-                     IQuestionProvider questionProvider) {
+                     IQuestionProvider questionProvider, AudioManager audioManager) {
         super(id);
         this.engine           = engine;
         this.sceneNavigator   = sceneNavigator;
         this.questionProvider = questionProvider;
+        this.audioManager     = audioManager; // Assigning it here
         this.obstacleFactory  = new ObstacleFactory();
         this.gameState        = new GameStateManager(questionProvider);
         this.stage            = new Stage(new StretchViewport(WORLD_WIDTH, WORLD_HEIGHT));
@@ -129,11 +130,8 @@ public class GameScene extends Scene {
         startLevel();
     }
 
-    // Engine Wrappers
     private void addEntity(Entity e) { engine.addEntity(e); }
     private void removeEntity(Entity e) { engine.removeEntity(e); }
-
-    // ── Level init ──────────────────────────────────────────────────────────
 
     private void startLevel() {
         gameState.resetState();
@@ -180,6 +178,11 @@ public class GameScene extends Scene {
         super.show();
         paused = false;
         engine.setSpeedMultiplier(1f);
+        
+        // Play music when scene shows
+        if (audioManager != null) {
+            audioManager.playMusic();
+        }
 
         if (pendingRestart) {
             pendingRestart = false;
@@ -192,9 +195,12 @@ public class GameScene extends Scene {
         super.hide();
         paused = true;
         engine.setSpeedMultiplier(0f);
+        
+        // Pause music when navigating away
+        if (audioManager != null) {
+            audioManager.pauseMusic();
+        }
     }
-
-    // ── Segment spawning ────────────────────────────────────────────────────
 
     private void spawnSegment(LevelSegment segment) {
         int questionIndex = segment.getQuestionIndex();
@@ -235,7 +241,7 @@ public class GameScene extends Scene {
 
         for (EnemyShip ship : wave.getShips()) {
             ship.setCollisionLayer(LAYER_ENEMY);
-            ship.setCollisionMask(0); // Enemies don't care about hitting things, only player bullets hit them
+            ship.setCollisionMask(0); 
             addEntity(ship);
         }
 
@@ -277,11 +283,16 @@ public class GameScene extends Scene {
             barrier.setCollisionLayer(LAYER_GATE);
             barrier.setCollisionMask(LAYER_PLAYER);
 
+            // Set the callback to play sound via the AudioManager
+            barrier.setOnBreakCallback(() -> {
+                if (audioManager != null) {
+                    audioManager.playBreakSound();
+                }
+            });
+
             addEntity(barrier);
         }
     }
-
-    // ── HUD helpers ─────────────────────────────────────────────────────────
 
     private void showQuestionOnHud(int questionIndex) {
         Question question = questionProvider.getQuestion(questionIndex);
@@ -323,8 +334,6 @@ public class GameScene extends Scene {
         uiManager.syncAnswerLabels(texts, xs, ys, heights, count);
     }
 
-    // ── Wave activation ─────────────────────────────────────────────────────
-
     private void activateWaveForQuestion(int questionIndex) {
         for (EnemyWave wave : enemyWaves) {
             if (wave.getTriggerQuestionIndex() == questionIndex && !wave.isActivated()) {
@@ -343,8 +352,6 @@ public class GameScene extends Scene {
         }
     }
 
-    // ── Level completion ────────────────────────────────────────────────────
-
     private boolean allSegmentsCompleted() {
         if (!levelSpawner.allSegmentsSpawned()) return false;
         return wallGroups.isEmpty();
@@ -357,8 +364,6 @@ public class GameScene extends Scene {
             }
         }
     }
-
-    // ── Update ──────────────────────────────────────────────────────────────
 
     @Override
     public void update(float deltaTime) {
@@ -426,8 +431,6 @@ public class GameScene extends Scene {
         }
     }
 
-    // ── Shooting ────────────────────────────────────────────────────────────
-
     private void updatePlayerShooting() {
         if (player != null && player.isShootRequested() && shootCooldown <= 0f) {
             PlayerBullet bullet = new PlayerBullet(
@@ -440,11 +443,15 @@ public class GameScene extends Scene {
             addEntity(bullet);
             player.consumeShoot();
             shootCooldown = SHOOT_INTERVAL;
+            
+            // Play Laser sound
+            if (audioManager != null) {
+                audioManager.playLaserSound();
+            }
         }
     }
 
     private void updateEnemyShooting() {
-        // Query the engine dynamically instead of using a manual list
         for (Entity e : engine.getEntitiesByLayer(LAYER_ENEMY)) {
             if (e instanceof EnemyShip) {
                 EnemyShip ship = (EnemyShip) e;
@@ -466,8 +473,6 @@ public class GameScene extends Scene {
             }
         }
     }
-
-    // ── Render ──────────────────────────────────────────────────────────────
 
     @Override
     public void render(SpriteBatch batch) {
@@ -495,8 +500,6 @@ public class GameScene extends Scene {
         stage.draw();
         if (!batch.isDrawing()) batch.begin();
     }
-
-    // ── Cleanup ─────────────────────────────────────────────────────────────
 
     private void clearDynamicEntities() {
         for (Entity e : engine.getEntitiesByLayer(LAYER_GATE)) {
@@ -532,8 +535,6 @@ public class GameScene extends Scene {
         }
     }
 
-    // ── Result ──────────────────────────────────────────────────────────────
-
     private void transitionToResult() {
         ResultScene result = (ResultScene) sceneNavigator.getScene("RESULT");
         if (result != null) {
@@ -543,8 +544,6 @@ public class GameScene extends Scene {
         pendingRestart = true;
         sceneNavigator.goToScene("RESULT");
     }
-
-    // ── Lifecycle ───────────────────────────────────────────────────────────
 
     @Override
     public void resize(int width, int height) {

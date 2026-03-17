@@ -15,7 +15,8 @@ public class GameMaster extends ApplicationAdapter {
     private SceneManager sceneManager;
     private IGameEngine  gameEngine;
     private Texture      uiButtonTexture;
-
+    private AudioManager audioManager;
+    
     private static boolean muted = false;
 
     public static boolean isMuted() { return muted; }
@@ -41,13 +42,19 @@ public class GameMaster extends ApplicationAdapter {
         pixmap.dispose();
 
         // Load questions from CSV file (assets/questions.csv)
-        // Falls back to default questions if CSV is not found
         IQuestionProvider questionProvider = new CsvQuestionProvider();
+
+        // Initialize the AudioManager
+        audioManager = new AudioManager();
+        audioManager.loadAssets();
 
         // ONLY GameScene gets the gameEngine injected now!
         sceneManager.addScene("MENU",     new MenuScene    ("MENU",     sceneManager, uiButtonTexture));
         sceneManager.addScene("INSTRUCTIONS", new InstructionsScene("INSTRUCTIONS", sceneManager, uiButtonTexture));
-        sceneManager.addScene("GAME",     new GameScene    ("GAME",     sceneManager, gameEngine, questionProvider));
+        
+        // Pass the AudioManager into the GameScene constructor
+        sceneManager.addScene("GAME",     new GameScene    ("GAME",     sceneManager, gameEngine, questionProvider, audioManager));
+        
         sceneManager.addScene("SETTINGS", new SettingsScene("SETTINGS", sceneManager, uiButtonTexture));
         sceneManager.addScene("RESULT",   new ResultScene  ("RESULT",   sceneManager, uiButtonTexture));
 
@@ -75,5 +82,10 @@ public class GameMaster extends ApplicationAdapter {
         batch.dispose();
         uiButtonTexture.dispose();
         gameEngine.dispose();
+        
+        // Clean up audio resources
+        if (audioManager != null) {
+            audioManager.dispose();
+        }
     }
 }
