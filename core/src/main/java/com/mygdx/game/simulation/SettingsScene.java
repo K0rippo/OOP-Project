@@ -17,10 +17,11 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
+import com.mygdx.game.engine.ISettingsScene;
 import com.mygdx.game.engine.ISceneNavigator;
 import com.mygdx.game.engine.Scene;
 
-public class SettingsScene extends Scene {
+public class SettingsScene extends Scene implements ISettingsScene {
 
     private Stage stage;
     private TextButton btnMute;

@@ -38,8 +38,13 @@ public abstract class Entity implements ICollidable, IRenderable {
     public int getId() { return id; }
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
-    public Vector2 getPosition() { return getOrientate().getPosition(); }
-    public void setPosition(Vector2 position) { orientate.setPosition(position); }
+    public Vector2 getPosition() { return new Vector2(getOrientate().getPosition()); }
+    public void setPosition(Vector2 position) { orientate.setPosition(new Vector2(position)); }
+    public void setPosition(float x, float y) { orientate.getPosition().set(x, y); }
+    public float getX() { return orientate.getPosition().x; }
+    public float getY() { return orientate.getPosition().y; }
+    public void setX(float x) { orientate.getPosition().x = x; }
+    public void setY(float y) { orientate.getPosition().y = y; }
     public boolean isActive() { return isActive; }
     public void setActive(boolean active) { this.isActive = active; }
     public Orientate getOrientate() { return orientate; }

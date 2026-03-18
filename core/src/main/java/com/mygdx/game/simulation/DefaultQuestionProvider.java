@@ -53,7 +53,7 @@ public class DefaultQuestionProvider implements IQuestionProvider {
 
     @Override
     public Array<Question> getQuestions() {
-        return questions;
+        return new Array<>(questions);
     }
 
     @Override
@@ -67,5 +67,10 @@ public class DefaultQuestionProvider implements IQuestionProvider {
     @Override
     public int getTotalQuestions() {
         return questions.size;
+    }
+
+    @Override
+    public void shuffleForNewGame() {
+        questions.shuffle();
     }
 }

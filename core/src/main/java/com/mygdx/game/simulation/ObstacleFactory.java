@@ -10,7 +10,7 @@ import com.mygdx.game.engine.RectangleEntity;
 public class ObstacleFactory {
 
     public RectangleEntity createWall(WallType type, int id, float x, float y, float width, float height) {
-        return new RectangleEntity(id, type.name, new Vector2(x, y), width, height, type.color);
+        return new AnswerGate(id, type, new Vector2(x, y), width, height, type.color);
     }
 
     public RectangleEntity createCorrectWall(int id, float x, float y, float width, float height) {

@@ -177,7 +177,7 @@ public class CsvQuestionProvider implements IQuestionProvider {
 
     @Override
     public Array<Question> getQuestions() {
-        return questions;
+        return new Array<>(questions);
     }
 
     @Override
@@ -197,6 +197,7 @@ public class CsvQuestionProvider implements IQuestionProvider {
      * Reshuffle questions for a new game.
      * Call this when starting a new game to ensure different question order.
      */
+    @Override
     public void shuffleForNewGame() {
         questions.shuffle();
         System.out.println("✓ Questions reshuffled for new game");

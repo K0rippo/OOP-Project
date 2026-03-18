@@ -17,7 +17,7 @@ public class Orientate {
     }
 
     public void setPosition(Vector2 position) {
-        this.position = position;
+        this.position = new Vector2(position);
     }
 
     public float getRotationDegrees() {

@@ -2,7 +2,9 @@ package com.mygdx.game.simulation;
 
 import com.badlogic.gdx.Input;
 import com.mygdx.game.engine.IGameEngine;
+import com.mygdx.game.engine.ISettingsScene;
 import com.mygdx.game.engine.ISceneNavigator;
+import com.mygdx.game.engine.Scene;
 
 public class GameInputHandler {
     private final IGameEngine engine;
@@ -26,24 +28,24 @@ public class GameInputHandler {
     // Binds keyboard input to game actions
     public void initializeInput() {
         engine.bindKeyContinuous(Input.Keys.UP, () -> {
-            if (player != null && player.getPosition().y + player.getRadius() < worldHeight - 5)
-                player.getVelocity().y = 250;
+            if (player != null && player.getY() + player.getRadius() < worldHeight - 5)
+                player.setVelocityY(250f);
         });
         
         engine.bindKeyContinuous(Input.Keys.DOWN, () -> {
-            if (player != null && player.getPosition().y - player.getRadius() > 5)
-                player.getVelocity().y = -250;
+            if (player != null && player.getY() - player.getRadius() > 5)
+                player.setVelocityY(-250f);
         });
         
         // --- ADDED LEFT AND RIGHT CONTROLS ---
         engine.bindKeyContinuous(Input.Keys.LEFT, () -> {
-            if (player != null && player.getPosition().x - player.getRadius() > 5)
-                player.getVelocity().x = -250;
+            if (player != null && player.getX() - player.getRadius() > 5)
+                player.setVelocityX(-250f);
         });
         
         engine.bindKeyContinuous(Input.Keys.RIGHT, () -> {
-            if (player != null && player.getPosition().x + player.getRadius() < worldWidth - 5)
-                player.getVelocity().x = 250;
+            if (player != null && player.getX() + player.getRadius() < worldWidth - 5)
+                player.setVelocityX(250f);
         });
         // -------------------------------------
 
@@ -52,8 +54,11 @@ public class GameInputHandler {
         });
         
         engine.bindKeyJustPressed(Input.Keys.ESCAPE, () -> {
-            SettingsScene settings = (SettingsScene) sceneNavigator.getScene("SETTINGS");
-            if (settings != null) settings.setPreviousScene("GAME");
+            Scene settingsScene = sceneNavigator.getScene("SETTINGS");
+            if (settingsScene instanceof ISettingsScene) {
+                ISettingsScene settings = (ISettingsScene) settingsScene;
+                settings.setPreviousScene("GAME");
+            }
             sceneNavigator.goToScene("SETTINGS");
         });
     }

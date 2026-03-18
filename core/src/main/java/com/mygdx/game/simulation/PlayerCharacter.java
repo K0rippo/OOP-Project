@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.engine.Circle;
 import com.mygdx.game.engine.Entity;
+import com.mygdx.game.engine.RectangleEntity;
 
 public class PlayerCharacter extends Circle {
 
@@ -29,7 +30,7 @@ public class PlayerCharacter extends Circle {
     public PlayerCharacter(int id, Vector2 position, float radius) {
         super(id, "Player", position, radius, Color.CLEAR);
         this.texture = new Texture("spaceship.png");
-        getVelocity().x = 0;
+        setVelocityX(0f);
     }
 
     @Override
@@ -45,20 +46,20 @@ public class PlayerCharacter extends Circle {
         float leftLimit   = radius;
 
         // --- Screen Boundaries ---
-        if (getPosition().y > topLimit) {
-            getPosition().y = topLimit;
-            getVelocity().y = 0;
-        } else if (getPosition().y < bottomLimit) {
-            getPosition().y = bottomLimit;
-            getVelocity().y = 0;
+        if (getY() > topLimit) {
+            setY(topLimit);
+            setVelocityY(0f);
+        } else if (getY() < bottomLimit) {
+            setY(bottomLimit);
+            setVelocityY(0f);
         }
 
-        if (getPosition().x > rightLimit) {
-            getPosition().x = rightLimit;
-            getVelocity().x = 0;
-        } else if (getPosition().x < leftLimit) {
-            getPosition().x = leftLimit;
-            getVelocity().x = 0;
+        if (getX() > rightLimit) {
+            setX(rightLimit);
+            setVelocityX(0f);
+        } else if (getX() < leftLimit) {
+            setX(leftLimit);
+            setVelocityX(0f);
         }
 
         // DELETED: The old Bounce Recovery code that broke left movement is gone!
@@ -69,39 +70,31 @@ public class PlayerCharacter extends Circle {
         if (invulnerabilityTimer > 0 && ((int) (invulnerabilityTimer * 12) % 2 == 0)) return;
 
         float size = radius * 2f;
-        batch.draw(texture, getPosition().x - radius, getPosition().y - radius, size, size);
+        batch.draw(texture, getX() - radius, getY() - radius, size, size);
     }
 
     @Override
     public void onCollision(Entity other) {
-        String name = other.getName();
-
-        if (name.equals("CorrectWall")) {
+        if (other instanceof AnswerGate) {
+            AnswerGate gate = (AnswerGate) other;
             if (!reachedGate && gateCooldown <= 0f) {
-                reachedGate  = true;
-                gateCooldown = GATE_COOLDOWN_TIME;
+                if (gate.isCorrectLane()) {
+                    reachedGate  = true;
+                    gateCooldown = GATE_COOLDOWN_TIME;
+                } else if (isPlayerCentreInsideWall(gate)) {
+                    applyDamage();
+                }
             }
             return;
         }
 
-        if (name.equals("CorrectBarrier") || name.equals("WrongBarrier")) {
+        if (other instanceof BreakableBarrier) {
             if (!isPlayerCentreInsideWall(other)) return;
             applyDamage();
             return;
         }
 
-        if (name.equals("WrongWall")) {
-            if (!isPlayerCentreInsideWall(other)) return;
-            applyDamage();
-            return;
-        }
-
-        if (name.equals("EnemyBullet")) {
-            applyDamage();
-            return;
-        }
-
-        if (name.equals("EnemyShip")) {
+        if (other instanceof EnemyBullet || other instanceof EnemyShip || other instanceof BulletProjectile) {
             applyDamage();
         }
     }
@@ -135,11 +128,10 @@ public class PlayerCharacter extends Circle {
     }
 
     private boolean isPlayerCentreInsideWall(Entity other) {
-        if (!(other instanceof com.mygdx.game.engine.RectangleEntity)) return true;
-
-        com.mygdx.game.engine.RectangleEntity rect = (com.mygdx.game.engine.RectangleEntity) other;
-        float playerY = getPosition().y;
-        float bottom  = rect.getPosition().y;
+        if (!(other instanceof RectangleEntity)) return true;
+        RectangleEntity rect = (RectangleEntity) other;
+        float playerY = getY();
+        float bottom  = rect.getY();
         float height  = rect.getHeight();
         float margin  = height * 0.10f;
 
@@ -150,7 +142,7 @@ public class PlayerCharacter extends Circle {
         if (invulnerabilityTimer <= 0f) {
             tookDamage           = true;
             invulnerabilityTimer = INVULNERABILITY_TIME;
-            getVelocity().x      = BOUNCE_BACK_SPEED;
+            setVelocityX(BOUNCE_BACK_SPEED);
         }
     }
 

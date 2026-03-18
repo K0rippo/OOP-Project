@@ -57,20 +57,20 @@ public class EnemyShip extends RectangleEntity {
 
         this.texture = new Texture("enemyspaceship.png");
 
-        getVelocity().x = -inactiveMoveSpeed;
-        getVelocity().y = 0f;
+        setVelocityX(-inactiveMoveSpeed);
+        setVelocityY(0f);
     }
 
     public void setWaveActive(boolean active) {
         waveActive = active;
 
         if (active) {
-            getVelocity().x = -activeMoveSpeed;
+            setVelocityX(-activeMoveSpeed);
             fireTimer = 0f;
             shotsFired = 0;
             hasEnteredScreen = false;
         } else {
-            getVelocity().x = -inactiveMoveSpeed;
+            setVelocityX(-inactiveMoveSpeed);
         }
     }
 
@@ -83,9 +83,9 @@ public class EnemyShip extends RectangleEntity {
         super.update(deltaTime);
 
         bobTime += deltaTime;
-        getPosition().y = baseY + MathUtils.sin(bobTime * bobSpeed) * bobAmplitude;
+        setY(baseY + MathUtils.sin(bobTime * bobSpeed) * bobAmplitude);
 
-        if (!hasEnteredScreen && getPosition().x < SCREEN_WIDTH) {
+        if (!hasEnteredScreen && getX() < SCREEN_WIDTH) {
             hasEnteredScreen = true;
             fireTimer = 0f;
         }
@@ -94,7 +94,7 @@ public class EnemyShip extends RectangleEntity {
             fireTimer += deltaTime;
         }
 
-        if (getPosition().x + getWidth() < -80f) {
+        if (getX() + getWidth() < -80f) {
             setActive(false);
         }
     }
@@ -125,8 +125,8 @@ public class EnemyShip extends RectangleEntity {
     public void render(SpriteBatch batch) {
         batch.draw(
                 texture,
-                getPosition().x,
-                getPosition().y,
+                getX(),
+                getY(),
                 getWidth(),
                 getHeight()
         );

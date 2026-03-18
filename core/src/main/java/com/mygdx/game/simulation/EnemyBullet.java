@@ -20,8 +20,8 @@ public class EnemyBullet extends RectangleEntity {
                        float velocityX,
                        float velocityY) {
         super(id, "EnemyBullet", position, 12f, 12f, new Color(1f, 0.35f, 0.25f, 1f));
-        getVelocity().x = velocityX;
-        getVelocity().y = velocityY;
+        setVelocityX(velocityX);
+        setVelocityY(velocityY);
     }
 
     @Override
@@ -35,10 +35,10 @@ public class EnemyBullet extends RectangleEntity {
             return;
         }
 
-        if (getPosition().x < WORLD_MIN_X ||
-            getPosition().x > WORLD_MAX_X ||
-            getPosition().y < WORLD_MIN_Y ||
-            getPosition().y > WORLD_MAX_Y) {
+        if (getX() < WORLD_MIN_X ||
+            getX() > WORLD_MAX_X ||
+            getY() < WORLD_MIN_Y ||
+            getY() > WORLD_MAX_Y) {
             setActive(false);
         }
     }

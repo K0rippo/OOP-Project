@@ -14,10 +14,18 @@ public abstract class MovableEntity extends Entity implements iMovable {
     }
     
     @Override
-    public Vector2 getVelocity() { return velocity; }
+    public Vector2 getVelocity() { return new Vector2(velocity); }
     
     @Override
-    public void setVelocity(Vector2 velocity) { this.velocity = velocity; }
+    public void setVelocity(Vector2 velocity) {
+        if (velocity != null) {
+            this.velocity.set(velocity);
+        }
+    }
+
+    public void setVelocityX(float x) { velocity.x = x; }
+    public void setVelocityY(float y) { velocity.y = y; }
+    public void scaleVelocity(float factor) { velocity.scl(factor); }
 
     /**
      * Injects new movement logic at runtime using a lambda or method reference

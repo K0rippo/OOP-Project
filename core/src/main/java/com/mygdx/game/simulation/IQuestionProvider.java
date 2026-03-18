@@ -10,4 +10,8 @@ public interface IQuestionProvider {
     Array<Question> getQuestions();
     Question getQuestion(int index);
     int getTotalQuestions();
+
+    default void shuffleForNewGame() {
+        // Optional hook for providers that support deterministic reshuffle.
+    }
 }
