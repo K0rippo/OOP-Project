@@ -14,14 +14,17 @@ public class PlayerCharacter extends Circle {
     private static final float WORLD_WIDTH          = 1280f;
     private static final float INVULNERABILITY_TIME = 3.0f;
     private static final float GATE_COOLDOWN_TIME   = 2.0f;
+    // Duration where input is ignored after a bounce
+    private static final float BOUNCE_LOCK_TIME     = 0.35f;
     
     // Increased bounce-back speed so it's noticeable when you hit a wall
-    private static final float BOUNCE_BACK_SPEED    = -600f; 
+    private static final float BOUNCE_BACK_SPEED    = -1200f; 
 
     private final Texture texture;
 
     private float invulnerabilityTimer = 0f;
     private float gateCooldown         = 0f;
+    private float controlLockTimer     = 0f;
 
     private boolean tookDamage     = false;
     private boolean reachedGate    = false;
@@ -39,6 +42,7 @@ public class PlayerCharacter extends Circle {
 
         if (invulnerabilityTimer > 0) invulnerabilityTimer -= deltaTime;
         if (gateCooldown > 0) gateCooldown -= deltaTime;
+        if (controlLockTimer > 0) controlLockTimer -= deltaTime;
 
         float topLimit    = WORLD_HEIGHT - radius;
         float bottomLimit = radius;
@@ -111,6 +115,10 @@ public class PlayerCharacter extends Circle {
         return shootRequested;
     }
 
+    public boolean isControlsLocked() {
+        return controlLockTimer > 0f;
+    }
+
     public void consumeDamage() {
         tookDamage = false;
     }
@@ -142,6 +150,7 @@ public class PlayerCharacter extends Circle {
         if (invulnerabilityTimer <= 0f) {
             tookDamage           = true;
             invulnerabilityTimer = INVULNERABILITY_TIME;
+            controlLockTimer     = BOUNCE_LOCK_TIME;
             setVelocityX(BOUNCE_BACK_SPEED);
         }
     }

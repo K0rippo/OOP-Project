@@ -28,23 +28,23 @@ public class GameInputHandler {
     // Binds keyboard input to game actions
     public void initializeInput() {
         engine.bindKeyContinuous(Input.Keys.UP, () -> {
-            if (player != null && player.getY() + player.getRadius() < worldHeight - 5)
+            if (player != null && !player.isControlsLocked() && player.getY() + player.getRadius() < worldHeight - 5)
                 player.setVelocityY(250f);
         });
         
         engine.bindKeyContinuous(Input.Keys.DOWN, () -> {
-            if (player != null && player.getY() - player.getRadius() > 5)
+            if (player != null && !player.isControlsLocked() && player.getY() - player.getRadius() > 5)
                 player.setVelocityY(-250f);
         });
         
         // --- ADDED LEFT AND RIGHT CONTROLS ---
         engine.bindKeyContinuous(Input.Keys.LEFT, () -> {
-            if (player != null && player.getX() - player.getRadius() > 5)
+            if (player != null && !player.isControlsLocked() && player.getX() - player.getRadius() > 5)
                 player.setVelocityX(-250f);
         });
         
         engine.bindKeyContinuous(Input.Keys.RIGHT, () -> {
-            if (player != null && player.getX() + player.getRadius() < worldWidth - 5)
+            if (player != null && !player.isControlsLocked() && player.getX() + player.getRadius() < worldWidth - 5)
                 player.setVelocityX(250f);
         });
         // -------------------------------------
