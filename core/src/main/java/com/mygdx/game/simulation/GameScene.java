@@ -44,6 +44,7 @@ public class GameScene extends Scene {
 
     private PlayerCharacter player;
     private Texture         heartTexture;
+    private Texture         damagedHeartTexture;
 
     private final Array<EnemyWave> enemyWaves = new Array<>();
 
@@ -69,7 +70,10 @@ public class GameScene extends Scene {
         this.gameState        = new GameStateManager(questionProvider);
         this.stage            = new Stage(new StretchViewport(WORLD_WIDTH, WORLD_HEIGHT));
         this.uiManager        = new GameUIManager(stage, WORLD_HEIGHT);
+        
         this.heartTexture     = new Texture("heart.png");
+        this.damagedHeartTexture = new Texture("damaged_heart.png");
+        
         this.background       = new ScrollingBackground(WORLD_WIDTH, WORLD_HEIGHT);
         this.inputHandler     = new GameInputHandler(engine, sceneNavigator, WORLD_HEIGHT);
         EnemyWaveFactory enemyWaveFactory = new EnemyWaveFactory();
@@ -217,13 +221,17 @@ public class GameScene extends Scene {
             return;
         }
 
+        // --- FIXED: Properly casting the entity to set its Y position in the physics engine ---
         if (score > oldScore) {
             for (Entity e : engine.getEntitiesByLayer(LAYER_GATE)) {
                 if (e.getPosition().x < player.getPosition().x + 600f) {
-                    e.getPosition().x = -2000f;
+                    if (e instanceof RectangleEntity) {
+                        ((RectangleEntity) e).setY(-2000f); // Drops it instantly off the bottom of the screen!
+                    }
                 }
             }
         }
+        // --------------------------------------------------------------------------------------
 
         engine.update(deltaTime);
         cleanupOffScreen();
@@ -261,8 +269,12 @@ public class GameScene extends Scene {
     }
 
     private void renderUI(SpriteBatch batch) {
-        for (int i = 0; i < gameState.getLives(); i++) {
-            batch.draw(heartTexture, WORLD_WIDTH - 50 - (i * 40), WORLD_HEIGHT - 50, 30, 30);
+        int maxLives = gameState.getMaxLives();
+        int currentLives = gameState.getLives();
+        
+        for (int i = 0; i < maxLives; i++) {
+            Texture textureToDraw = (i < currentLives) ? heartTexture : damagedHeartTexture;
+            batch.draw(textureToDraw, WORLD_WIDTH - 50 - (i * 40), WORLD_HEIGHT - 50, 30, 30);
         }
 
         if (batch.isDrawing()) batch.end();
@@ -283,7 +295,6 @@ public class GameScene extends Scene {
         resultTransitionService.transition(score, gameState.getTotalQuestions(), isSuccess);
         pendingRestart = true;
     }
-    // ----------------------------------------------------------------
 
     @Override
     public void resize(int width, int height) {
@@ -292,6 +303,7 @@ public class GameScene extends Scene {
 
     public void dispose() {
         if (heartTexture != null) heartTexture.dispose();
+        if (damagedHeartTexture != null) damagedHeartTexture.dispose(); 
         if (player != null) player.dispose();
         if (uiManager != null) uiManager.dispose();
         background.dispose();

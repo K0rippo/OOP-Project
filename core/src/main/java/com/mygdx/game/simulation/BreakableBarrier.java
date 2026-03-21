@@ -12,9 +12,7 @@ public class BreakableBarrier extends RectangleEntity {
 
     private static final Color BARRIER_COLOR = new Color(0.45f, 0.55f, 0.75f, 1f);
 
-    private static Texture fullWallTexture;
-    private static Texture semiWallTexture;
-    private static Texture badWallTexture;
+    private static Texture lockedGateTexture;
     private static boolean texturesLoaded = false;
 
     private int           hitPoints;
@@ -34,16 +32,13 @@ public class BreakableBarrier extends RectangleEntity {
         );
         this.hitPoints      = hitPoints;
 
-        //load textures once on first barrier creation
         if (!texturesLoaded) {
             try {
-                fullWallTexture = new Texture("fullwall.png");
-                semiWallTexture = new Texture("semiwall.png");
-                badWallTexture  = new Texture("badwall.png");
+                lockedGateTexture = new Texture("locked_gate.png");
                 texturesLoaded = true;
             } catch (Exception e) {
                 texturesLoaded = false;
-                System.err.println("failed to load barrier textures");
+                System.err.println("failed to load locked_gate.png");
             }
         }
     }
@@ -58,7 +53,7 @@ public class BreakableBarrier extends RectangleEntity {
 
         if (other.getName().equals("PlayerBullet") && other.isActive()) {
             hitPoints--;
-            other.setActive(false); // consume the bullet here
+            other.setActive(false); 
 
             if (hitPoints <= 0) {
                 broken = true;
@@ -75,28 +70,34 @@ public class BreakableBarrier extends RectangleEntity {
     public void render(SpriteBatch batch) {
         if (!isActive() || broken) return;
 
-        Texture textureToUse;
-        if (hitPoints >= 3) {
-            textureToUse = fullWallTexture;
-        } else if (hitPoints == 2) {
-            textureToUse = semiWallTexture;
-        } else {
-            textureToUse = badWallTexture;
-        }
-
-        if (textureToUse != null) {
-            batch.draw(textureToUse, getPosition().x, getPosition().y, getWidth(), getHeight());
+        if (lockedGateTexture != null) {
+            if (hitPoints == 3) {
+                batch.setColor(1f, 1f, 1f, 1f); // Normal
+            } else if (hitPoints == 2) {
+                batch.setColor(1f, 0.6f, 0.6f, 1f); // Slightly red
+            } else {
+                batch.setColor(1f, 0.3f, 0.3f, 1f); // Very red
+            }
+            
+            batch.draw(lockedGateTexture, getPosition().x, getPosition().y, getWidth(), getHeight());
+            
+            // Reset color so it doesn't tint everything else
+            batch.setColor(1f, 1f, 1f, 1f); 
+            // ------------------------------------------------------------
         }
     }
 
     @Override
     public void renderShape(ShapeRenderer shapeRenderer) {
+        // Only draw primitive fallback if texture failed to load
+        if (lockedGateTexture == null) {
+            shapeRenderer.setColor(hitPoints == 3 ? BARRIER_COLOR : Color.RED);
+            shapeRenderer.rect(getPosition().x, getPosition().y, getWidth(), getHeight());
+        }
     }
 
     public static void disposeTextures() {
-        if (fullWallTexture != null) fullWallTexture.dispose();
-        if (semiWallTexture != null) semiWallTexture.dispose();
-        if (badWallTexture != null)  badWallTexture.dispose();
+        if (lockedGateTexture != null) lockedGateTexture.dispose();
         texturesLoaded = false;
     }
 }

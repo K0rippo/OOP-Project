@@ -93,8 +93,21 @@ class SegmentSpawnService {
 
         for (EnemyShip ship : wave.getShips()) {
             ship.setCollisionLayer(enemyLayer);
-            // --- FIXED: Allowed the ship to detect collisions with player and bullets ---
             ship.setCollisionMask(playerLayer);
+            
+            ship.setOnDamageCallback(() -> {
+                if (audioManager != null) {
+                    audioManager.playShipDamageSound();
+                }
+            });
+
+            ship.setOnDeathCallback(() -> {
+                if (audioManager != null) {
+                    audioManager.playBreakSound();
+                }
+            });
+            // ----------------------------------------------------------------
+            
             engine.addEntity(ship);
         }
 

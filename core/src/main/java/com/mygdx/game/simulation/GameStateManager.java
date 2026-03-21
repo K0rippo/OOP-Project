@@ -31,8 +31,12 @@ public class GameStateManager {
         return lives;
     }
 
+    public int getMaxLives() {
+        return initialLives;
+    }
+    // ---------------------------------------------------------
+
     public int getTotalQuestions() {
         return questionProvider.getTotalQuestions();
     }
-
 }

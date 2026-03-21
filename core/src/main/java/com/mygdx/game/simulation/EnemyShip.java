@@ -34,8 +34,19 @@ public class EnemyShip extends RectangleEntity {
     private boolean hasEnteredScreen = false;
     private int shotsFired = 0;
     
-    // --- NEW: Enemy Health ---
     private int hitPoints = 3;
+
+    private Runnable onDamageCallback;
+    private Runnable onDeathCallback;
+
+    public void setOnDamageCallback(Runnable callback) {
+        this.onDamageCallback = callback;
+    }
+
+    // --- NEW: Setter for the death callback ---
+    public void setOnDeathCallback(Runnable callback) {
+        this.onDeathCallback = callback;
+    }
 
     public EnemyShip(int id,
                      Vector2 position,
@@ -122,10 +133,19 @@ public class EnemyShip extends RectangleEntity {
 
         if (other instanceof PlayerBullet && other.isActive()) {
             hitPoints--;
-            other.setActive(false); // Consume the bullet so it doesn't pierce through
+            other.setActive(false); 
+            
+            if (onDamageCallback != null) {
+                onDamageCallback.run();
+            }
 
             if (hitPoints <= 0) {
-                setActive(false); // Destroy this ship
+                setActive(false); 
+                
+                if (onDeathCallback != null) {
+                    onDeathCallback.run();
+                }
+                // --------------------------------------------
             }
         }
     }

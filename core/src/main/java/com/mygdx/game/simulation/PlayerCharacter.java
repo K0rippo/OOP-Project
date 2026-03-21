@@ -29,7 +29,6 @@ public class PlayerCharacter extends Circle {
     private boolean reachedGate    = false;
     private boolean shootRequested = false;
 
-    // --- NEW SOUND CALLBACKS ---
     private Runnable onDamageCallback;
     private Runnable onGateCallback;
 
@@ -37,7 +36,6 @@ public class PlayerCharacter extends Circle {
         this.onDamageCallback = onDamage;
         this.onGateCallback = onGate;
     }
-    // ---------------------------
 
     public PlayerCharacter(int id, Vector2 position, float radius) {
         super(id, "Player", position, radius, Color.CLEAR);
@@ -58,7 +56,6 @@ public class PlayerCharacter extends Circle {
         float rightLimit  = WORLD_WIDTH - radius;
         float leftLimit   = radius;
 
-        //clamp player inside world bounds
         if (getY() > topLimit) {
             setY(topLimit);
             setVelocityY(0f);
@@ -102,6 +99,9 @@ public class PlayerCharacter extends Circle {
         }
 
         if (other instanceof BreakableBarrier) {
+            if (reachedGate) return; 
+            // -------------------------------------------------------------------------
+
             if (!isPlayerCentreInsideWall(other)) return;
             applyWallBounce((RectangleEntity) other);
             applyDamage();
