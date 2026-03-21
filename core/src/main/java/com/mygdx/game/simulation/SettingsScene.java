@@ -42,7 +42,7 @@ public class SettingsScene extends Scene implements ISettingsScene {
     private String previousSceneId = "MENU"; 
     private AudioManager audioManager;
 
-    public SettingsScene(String id, final ISceneNavigator sceneNavigator, Texture buttonTexture, AudioManager audioManager) {
+    public SettingsScene(String id, final ISceneNavigator sceneNavigator, Texture buttonTexture, final AudioManager audioManager) {
         super(id);
         this.audioManager = audioManager;
         this.stage = new Stage(new StretchViewport(1280, 720));
@@ -67,7 +67,6 @@ public class SettingsScene extends Scene implements ISettingsScene {
         Color coreBlue     = new Color(0.15f, 0.35f, 0.65f, 1f);
         Color hoverBlue    = new Color(0.25f, 0.50f, 0.85f, 1f);
 
-        // --- STYLES ---
         TextButton.TextButtonStyle cyanStyle = new TextButton.TextButtonStyle();
         cyanStyle.font = buttonFont;
         cyanStyle.fontColor = Color.WHITE;
@@ -83,13 +82,11 @@ public class SettingsScene extends Scene implements ISettingsScene {
         yellowStyle.down = createPillButtonDrawable(yellowBorder, Color.WHITE);
         
         Slider.SliderStyle sliderStyle = new Slider.SliderStyle();
-        // Updated to use the new Pill-styled Sliders!
         sliderStyle.background = createSliderBg(cyanBorder);
         sliderStyle.knob = createSliderKnob(coreBlue, cyanBorder);
 
         TextureRegionDrawable panelBackground = createPanelDrawable(cyanBorder);
 
-        // --- UI ELEMENTS ---
         Label.LabelStyle titleStyle = new Label.LabelStyle(titleFont, Color.WHITE);
         titleLabel = new Label("SYSTEM OPTIONS", titleStyle);
         titleLabel.setAlignment(Align.center);
@@ -104,12 +101,10 @@ public class SettingsScene extends Scene implements ISettingsScene {
         sfxSlider = new Slider(0f, 1f, 0.05f, false, sliderStyle);
         sfxSlider.setValue(GameMaster.getSfxVolume());
 
-        // Renamed ARROWS to ARROW KEYS
         btnControls = new TextButton("CONTROLS: " + (GameMaster.isUseWASD() ? "WASD" : "ARROW KEYS"), cyanStyle);
         btnBack = new TextButton("RETURN TO MENU", yellowStyle);
         btnExitMenu = new TextButton("ABORT MISSION", yellowStyle);
 
-        // --- BASE LAYOUT SETUP ---
         panelTable = new Table();
         panelTable.setBackground(panelBackground);
         panelTable.setSize(600, 700); 
@@ -123,7 +118,6 @@ public class SettingsScene extends Scene implements ISettingsScene {
         
         rebuildLayout(false);
 
-        // --- LISTENERS ---
         musicSlider.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -144,8 +138,8 @@ public class SettingsScene extends Scene implements ISettingsScene {
         btnControls.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                if (audioManager != null) audioManager.playMenuButtonSound();
                 GameMaster.setUseWASD(!GameMaster.isUseWASD());
-                // Renamed ARROWS to ARROW KEYS
                 btnControls.setText("CONTROLS: " + (GameMaster.isUseWASD() ? "WASD" : "ARROW KEYS"));
             }
         });
@@ -153,6 +147,7 @@ public class SettingsScene extends Scene implements ISettingsScene {
         btnBack.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                if (audioManager != null) audioManager.playMenuButtonSound();
                 sceneNavigator.goToScene(previousSceneId);
             }
         });
@@ -160,12 +155,12 @@ public class SettingsScene extends Scene implements ISettingsScene {
         btnExitMenu.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                if (audioManager != null) audioManager.playMenuButtonSound();
                 sceneNavigator.goToScene("MENU");
             }
         });
     }
     
-    // --- DYNAMIC LAYOUT BUILDER ---
     private void rebuildLayout(boolean fromGame) {
         panelTable.clearChildren();
         panelTable.add(titleLabel).width(600).padTop(25).padBottom(40).row();
@@ -208,12 +203,9 @@ public class SettingsScene extends Scene implements ISettingsScene {
         }
     }
 
-    // --- PROGRAMMATIC UI GENERATORS ---
-
-    // UPGRADED: Slider Background now uses the Pill Style
     private TextureRegionDrawable createSliderBg(Color borderColor) {
         int w = 400;
-        int h = 24; // Thicker track
+        int h = 24; 
         int r = h / 2;
         Pixmap p = new Pixmap(w, h, Pixmap.Format.RGBA8888);
 
@@ -229,7 +221,6 @@ public class SettingsScene extends Scene implements ISettingsScene {
         return new TextureRegionDrawable(new TextureRegion(tex));
     }
 
-    // UPGRADED: Slider Knob now uses the Pill Style
     private TextureRegionDrawable createSliderKnob(Color coreColor, Color borderColor) {
         int w = 24;
         int h = 40;

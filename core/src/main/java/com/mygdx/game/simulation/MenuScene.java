@@ -24,7 +24,7 @@ public class MenuScene extends Scene {
 
     private Stage stage;
 
-    public MenuScene(String id, final ISceneNavigator sceneNavigator, Texture buttonTexture) {
+    public MenuScene(String id, final ISceneNavigator sceneNavigator, Texture buttonTexture, final AudioManager audioManager) {
         super(id);
         this.stage = new Stage(new StretchViewport(1280, 720));
 
@@ -97,6 +97,7 @@ public class MenuScene extends Scene {
         btnPlay.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                if (audioManager != null) audioManager.playMenuButtonSound();
                 sceneNavigator.goToScene("INSTRUCTIONS");
             }
         });
@@ -104,6 +105,7 @@ public class MenuScene extends Scene {
         btnSettings.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                if (audioManager != null) audioManager.playMenuButtonSound();
                 SettingsScene settings = (SettingsScene) sceneNavigator.getScene("SETTINGS");
                 if (settings != null) settings.setPreviousScene("MENU");
                 sceneNavigator.goToScene("SETTINGS");
@@ -113,6 +115,7 @@ public class MenuScene extends Scene {
         btnQuit.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                if (audioManager != null) audioManager.playMenuButtonSound();
                 Gdx.app.exit();
             }
         });

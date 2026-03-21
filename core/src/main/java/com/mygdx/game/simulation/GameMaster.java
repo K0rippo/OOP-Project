@@ -17,9 +17,9 @@ public class GameMaster extends ApplicationAdapter {
     private Texture      uiButtonTexture;
     private AudioManager audioManager;
     
-    // --- NEW GLOBAL SETTINGS ---
-    private static float musicVolume = 0.5f;
-    private static float sfxVolume = 0.8f;
+    // --- GLOBAL SETTINGS (Updated to start at 100% volume) ---
+    private static float musicVolume = 1.0f;
+    private static float sfxVolume = 1.0f;
     private static boolean useWASD = false;
 
     public static float getMusicVolume() { return musicVolume; }
@@ -30,7 +30,7 @@ public class GameMaster extends ApplicationAdapter {
     
     public static boolean isUseWASD() { return useWASD; }
     public static void setUseWASD(boolean v) { useWASD = v; }
-    // ---------------------------
+    // ----------------------------------------------------------
 
     @Override
     public void create() {
@@ -56,14 +56,11 @@ public class GameMaster extends ApplicationAdapter {
         audioManager = new AudioManager();
         audioManager.loadAssets();
 
-        sceneManager.addScene("MENU",     new MenuScene    ("MENU",     sceneManager, uiButtonTexture));
-        sceneManager.addScene("INSTRUCTIONS", new InstructionsScene("INSTRUCTIONS", sceneManager, uiButtonTexture));
-        sceneManager.addScene("GAME",     new GameScene    ("GAME",     sceneManager, gameEngine, questionProvider, audioManager));
-        
-        // Pass audioManager to SettingsScene so sliders update music in real-time
-        sceneManager.addScene("SETTINGS", new SettingsScene("SETTINGS", sceneManager, uiButtonTexture, audioManager));
-        
-        sceneManager.addScene("RESULT",   new ResultScene  ("RESULT",   sceneManager, uiButtonTexture));
+        sceneManager.addScene("MENU",         new MenuScene        ("MENU",         sceneManager, uiButtonTexture, audioManager));
+        sceneManager.addScene("INSTRUCTIONS", new InstructionsScene("INSTRUCTIONS", sceneManager, uiButtonTexture, audioManager));
+        sceneManager.addScene("GAME",         new GameScene        ("GAME",         sceneManager, gameEngine, questionProvider, audioManager));
+        sceneManager.addScene("SETTINGS",     new SettingsScene    ("SETTINGS",     sceneManager, uiButtonTexture, audioManager));
+        sceneManager.addScene("RESULT",       new ResultScene      ("RESULT",       sceneManager, uiButtonTexture, audioManager));
 
         sceneManager.setActiveScene("MENU");
         resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());

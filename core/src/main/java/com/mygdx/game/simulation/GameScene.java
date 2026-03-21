@@ -117,6 +117,14 @@ public class GameScene extends Scene {
 
         if (player == null) {
             player = new PlayerCharacter(1, new Vector2(PLAYER_X, WORLD_HEIGHT / 2f), 25f);
+            
+            // --- NEW: Attach the sound callbacks! ---
+            player.setSoundCallbacks(
+                () -> { if (audioManager != null) audioManager.playShipDamageSound(); },
+                () -> { if (audioManager != null) audioManager.playCorrectGateSound(); }
+            );
+            // ----------------------------------------
+            
             engine.addEntity(player);
         } else {
             player.setPosition(PLAYER_X, WORLD_HEIGHT / 2f);
@@ -134,7 +142,6 @@ public class GameScene extends Scene {
 
     private void configurePlayerCollision() {
         player.setCollisionLayer(LAYER_PLAYER);
-        // --- FIXED: Added LAYER_ENEMY so crashing into ships damages the player ---
         player.setCollisionMask(LAYER_GATE | LAYER_ENEMY_BULLET | LAYER_ENEMY);
     }
 

@@ -25,7 +25,7 @@ public class ResultScene extends Scene {
     private Stage stage;
     private Label scoreLabel;
 
-    public ResultScene(String id, final ISceneNavigator sceneNavigator, Texture buttonTexture) {
+    public ResultScene(String id, final ISceneNavigator sceneNavigator, Texture buttonTexture, final AudioManager audioManager) {
         super(id);
         this.stage = new Stage(new StretchViewport(1280, 720));
 
@@ -96,6 +96,7 @@ public class ResultScene extends Scene {
         btnRestart.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                if (audioManager != null) audioManager.playMenuButtonSound();
                 GameScene gameScene = (GameScene) sceneNavigator.getScene("GAME");
                 if (gameScene != null) gameScene.requestRestart();
                 sceneNavigator.goToScene("GAME");
@@ -105,6 +106,7 @@ public class ResultScene extends Scene {
         btnMenu.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                if (audioManager != null) audioManager.playMenuButtonSound();
                 sceneNavigator.goToScene("MENU");
             }
         });

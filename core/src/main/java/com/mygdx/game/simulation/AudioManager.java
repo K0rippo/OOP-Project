@@ -8,6 +8,11 @@ public class AudioManager {
     private Music bgMusic;
     private Sound laserSound;
     private Sound breakSound;
+    
+    // --- NEW SOUNDS ---
+    private Sound damageSound;
+    private Sound clickSound;
+    private Sound correctSound;
 
     public void loadAssets() {
         bgMusic = Gdx.audio.newMusic(Gdx.files.internal("Game Music.mp3"));
@@ -15,6 +20,9 @@ public class AudioManager {
 
         laserSound = Gdx.audio.newSound(Gdx.files.internal("laser.mp3"));
         breakSound = Gdx.audio.newSound(Gdx.files.internal("break.mp3"));
+        damageSound = Gdx.audio.newSound(Gdx.files.internal("damage.mp3"));
+        clickSound = Gdx.audio.newSound(Gdx.files.internal("click.mp3"));
+        correctSound = Gdx.audio.newSound(Gdx.files.internal("correct.mp3"));
     }
 
     public void playMusic() {
@@ -49,9 +57,32 @@ public class AudioManager {
         }
     }
 
+    // --- UPDATED DEDICATED SOUNDS ---
+    public void playShipDamageSound() {
+        if (GameMaster.getSfxVolume() > 0f && damageSound != null) {
+            damageSound.play(GameMaster.getSfxVolume()); 
+        }
+    }
+
+    public void playCorrectGateSound() {
+        if (GameMaster.getSfxVolume() > 0f && correctSound != null) {
+            correctSound.play(GameMaster.getSfxVolume()); 
+        }
+    }
+
+    public void playMenuButtonSound() {
+        if (GameMaster.getSfxVolume() > 0f && clickSound != null) {
+            clickSound.play(GameMaster.getSfxVolume()); 
+        }
+    }
+    // --------------------------------
+
     public void dispose() {
         if (bgMusic != null) bgMusic.dispose();
         if (laserSound != null) laserSound.dispose();
         if (breakSound != null) breakSound.dispose();
+        if (damageSound != null) damageSound.dispose();
+        if (clickSound != null) clickSound.dispose();
+        if (correctSound != null) correctSound.dispose();
     }
 }

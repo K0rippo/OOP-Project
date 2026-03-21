@@ -29,6 +29,16 @@ public class PlayerCharacter extends Circle {
     private boolean reachedGate    = false;
     private boolean shootRequested = false;
 
+    // --- NEW SOUND CALLBACKS ---
+    private Runnable onDamageCallback;
+    private Runnable onGateCallback;
+
+    public void setSoundCallbacks(Runnable onDamage, Runnable onGate) {
+        this.onDamageCallback = onDamage;
+        this.onGateCallback = onGate;
+    }
+    // ---------------------------
+
     public PlayerCharacter(int id, Vector2 position, float radius) {
         super(id, "Player", position, radius, Color.CLEAR);
         this.texture = new Texture("spaceship.png");
@@ -82,6 +92,7 @@ public class PlayerCharacter extends Circle {
                 if (gate.isCorrectLane()) {
                     reachedGate  = true;
                     gateCooldown = GATE_COOLDOWN_TIME;
+                    if (onGateCallback != null) onGateCallback.run(); // Play gate sound!
                 } else if (isPlayerCentreInsideWall(gate)) {
                     applyWallBounce(gate);
                     applyDamage();
@@ -150,6 +161,7 @@ public class PlayerCharacter extends Circle {
             tookDamage           = true;
             invulnerabilityTimer = INVULNERABILITY_TIME;
             applyKnockback();
+            if (onDamageCallback != null) onDamageCallback.run(); // Play damage sound!
         }
     }
 

@@ -25,14 +25,13 @@ public class InstructionsScene extends Scene {
     private Stage stage;
     private Label instructionsLabel;
     
-    // Labels inside the visual keycap boxes
     private Label keyUp;
     private Label keyLeft;
     private Label keyDown;
     private Label keyRight;
     private Label keySpacebar;
 
-    public InstructionsScene(String id, final ISceneNavigator sceneNavigator, Texture buttonTexture) {
+    public InstructionsScene(String id, final ISceneNavigator sceneNavigator, Texture buttonTexture, final AudioManager audioManager) {
         super(id);
         this.stage = new Stage(new StretchViewport(1280, 720));
 
@@ -83,7 +82,6 @@ public class InstructionsScene extends Scene {
         instructionsLabel = new Label("", textStyle);
         instructionsLabel.setAlignment(Align.center);
         
-        // --- VISUAL KEYBOARD UI (SQUARE KEYS) ---
         Label.LabelStyle keyStyle = new Label.LabelStyle(keyFont, Color.WHITE);
         keyStyle.background = createKeycapDrawable(coreBlue, cyanBorder, 60, 60);
         
@@ -110,9 +108,8 @@ public class InstructionsScene extends Scene {
         Label moveTextLabel = new Label("to move your ship.", textStyle);
         moveRow.add(moveTextLabel).align(Align.left);
 
-        // --- VISUAL SPACEBAR UI ---
         Label.LabelStyle spacebarStyle = new Label.LabelStyle(keyFont, Color.WHITE);
-        spacebarStyle.background = createKeycapDrawable(coreBlue, cyanBorder, 200, 60); // Wider background
+        spacebarStyle.background = createKeycapDrawable(coreBlue, cyanBorder, 200, 60);
         
         keySpacebar = new Label("SPACE", spacebarStyle);
         keySpacebar.setAlignment(Align.center);
@@ -122,18 +119,16 @@ public class InstructionsScene extends Scene {
         Label shootTextLabel = new Label("to shoot barriers.", textStyle);
         shootRow.add(shootTextLabel).align(Align.left);
 
-        // --- BUTTONS ---
-        TextButton btnStart = new TextButton("START MISSION", cyanStyle); // Renamed!
+        TextButton btnStart = new TextButton("START MISSION", cyanStyle); 
         TextButton btnBack = new TextButton("RETURN TO MENU", yellowStyle);
 
-        // --- MASTER LAYOUT ---
         Table panelTable = new Table();
         panelTable.setBackground(panelBackground);
         panelTable.setSize(650, 600);
 
         panelTable.add(titleLabel).width(650).padTop(25).padBottom(20).row();
         panelTable.add(moveRow).padBottom(15).row(); 
-        panelTable.add(shootRow).padBottom(25).row(); // Injected Spacebar Row
+        panelTable.add(shootRow).padBottom(25).row(); 
         panelTable.add(instructionsLabel).padBottom(35).row();
         panelTable.add(btnStart).size(350, 65).padBottom(15).row();
         panelTable.add(btnBack).size(350, 65);
@@ -149,6 +144,7 @@ public class InstructionsScene extends Scene {
         btnStart.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                if (audioManager != null) audioManager.playMenuButtonSound();
                 GameScene gameScene = (GameScene) sceneNavigator.getScene("GAME");
                 if (gameScene != null) gameScene.requestRestart();
                 sceneNavigator.goToScene("GAME");
@@ -158,12 +154,12 @@ public class InstructionsScene extends Scene {
         btnBack.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                if (audioManager != null) audioManager.playMenuButtonSound();
                 sceneNavigator.goToScene("MENU");
             }
         });
     }
 
-    // Dynamic width and height generator
     private TextureRegionDrawable createKeycapDrawable(Color coreColor, Color borderColor, int width, int height) {
         int r = 10;
         Pixmap p = new Pixmap(width, height, Pixmap.Format.RGBA8888);
