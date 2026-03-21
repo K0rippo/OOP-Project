@@ -10,7 +10,6 @@ public class AudioManager {
     private Sound breakSound;
 
     public void loadAssets() {
-        //load music and effects once during startup
         bgMusic = Gdx.audio.newMusic(Gdx.files.internal("Game Music.mp3"));
         bgMusic.setLooping(true);
 
@@ -19,7 +18,8 @@ public class AudioManager {
     }
 
     public void playMusic() {
-        if (!GameMaster.isMuted() && !bgMusic.isPlaying()) {
+        if (!bgMusic.isPlaying()) {
+            bgMusic.setVolume(GameMaster.getMusicVolume());
             bgMusic.play();
         }
     }
@@ -29,16 +29,23 @@ public class AudioManager {
             bgMusic.pause();
         }
     }
+    
+    // Live-updates the music volume from the Settings slider
+    public void setMusicVolume(float volume) {
+        if (bgMusic != null) {
+            bgMusic.setVolume(volume);
+        }
+    }
 
     public void playLaserSound() {
-        if (!GameMaster.isMuted()) {
-            laserSound.play(0.5f);
+        if (GameMaster.getSfxVolume() > 0f) {
+            laserSound.play(GameMaster.getSfxVolume());
         }
     }
 
     public void playBreakSound() {
-        if (!GameMaster.isMuted()) {
-            breakSound.play(0.8f);
+        if (GameMaster.getSfxVolume() > 0f) {
+            breakSound.play(GameMaster.getSfxVolume());
         }
     }
 

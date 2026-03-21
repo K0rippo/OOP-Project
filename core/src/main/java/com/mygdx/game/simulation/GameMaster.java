@@ -17,17 +17,26 @@ public class GameMaster extends ApplicationAdapter {
     private Texture      uiButtonTexture;
     private AudioManager audioManager;
     
-    private static boolean muted = false;
+    // --- NEW GLOBAL SETTINGS ---
+    private static float musicVolume = 0.5f;
+    private static float sfxVolume = 0.8f;
+    private static boolean useWASD = false;
 
-    public static boolean isMuted() { return muted; }
-    public static void setMuted(boolean value) { muted = value; }
+    public static float getMusicVolume() { return musicVolume; }
+    public static void setMusicVolume(float v) { musicVolume = v; }
+    
+    public static float getSfxVolume() { return sfxVolume; }
+    public static void setSfxVolume(float v) { sfxVolume = v; }
+    
+    public static boolean isUseWASD() { return useWASD; }
+    public static void setUseWASD(boolean v) { useWASD = v; }
+    // ---------------------------
 
     @Override
     public void create() {
         batch        = new SpriteBatch();
         sceneManager = new SceneManager();
 
-        //compose core managers before creating scenes
         EntityManager entityManager = new EntityManager();
         CollisionManager collisionManager = new CollisionManager(1280f, 720f);
         IOManager ioManager = new IOManager();
@@ -47,13 +56,13 @@ public class GameMaster extends ApplicationAdapter {
         audioManager = new AudioManager();
         audioManager.loadAssets();
 
-        //inject engine only into gameplay scene
         sceneManager.addScene("MENU",     new MenuScene    ("MENU",     sceneManager, uiButtonTexture));
         sceneManager.addScene("INSTRUCTIONS", new InstructionsScene("INSTRUCTIONS", sceneManager, uiButtonTexture));
-
         sceneManager.addScene("GAME",     new GameScene    ("GAME",     sceneManager, gameEngine, questionProvider, audioManager));
-
-        sceneManager.addScene("SETTINGS", new SettingsScene("SETTINGS", sceneManager, uiButtonTexture));
+        
+        // Pass audioManager to SettingsScene so sliders update music in real-time
+        sceneManager.addScene("SETTINGS", new SettingsScene("SETTINGS", sceneManager, uiButtonTexture, audioManager));
+        
         sceneManager.addScene("RESULT",   new ResultScene  ("RESULT",   sceneManager, uiButtonTexture));
 
         sceneManager.setActiveScene("MENU");

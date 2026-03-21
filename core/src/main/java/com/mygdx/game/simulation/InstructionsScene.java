@@ -23,6 +23,14 @@ import com.mygdx.game.engine.Scene;
 public class InstructionsScene extends Scene {
 
     private Stage stage;
+    private Label instructionsLabel;
+    
+    // Labels inside the visual keycap boxes
+    private Label keyUp;
+    private Label keyLeft;
+    private Label keyDown;
+    private Label keyRight;
+    private Label keySpacebar;
 
     public InstructionsScene(String id, final ISceneNavigator sceneNavigator, Texture buttonTexture) {
         super(id);
@@ -32,10 +40,13 @@ public class InstructionsScene extends Scene {
         buttonFont.getData().setScale(1.5f);
         
         BitmapFont textFont = new BitmapFont();
-        textFont.getData().setScale(1.5f);
+        textFont.getData().setScale(1.3f);
 
         BitmapFont titleFont = new BitmapFont();
         titleFont.getData().setScale(2.5f);
+        
+        BitmapFont keyFont = new BitmapFont();
+        keyFont.getData().setScale(1.6f);
 
         TextureRegionDrawable baseDrawable = new TextureRegionDrawable(new TextureRegion(buttonTexture));
         Image bgImage = new Image(baseDrawable);
@@ -43,10 +54,10 @@ public class InstructionsScene extends Scene {
         bgImage.setFillParent(true);
         stage.addActor(bgImage);
 
-        Color cyanBorder  = new Color(0.0f, 0.8f, 1.0f, 1f);
+        Color cyanBorder   = new Color(0.0f, 0.8f, 1.0f, 1f);
         Color yellowBorder = new Color(1.0f, 0.8f, 0.1f, 1f);
-        Color coreBlue    = new Color(0.15f, 0.35f, 0.65f, 1f);
-        Color hoverBlue   = new Color(0.25f, 0.50f, 0.85f, 1f);
+        Color coreBlue     = new Color(0.15f, 0.35f, 0.65f, 1f);
+        Color hoverBlue    = new Color(0.25f, 0.50f, 0.85f, 1f);
 
         TextButton.TextButtonStyle cyanStyle = new TextButton.TextButtonStyle();
         cyanStyle.font = buttonFont;
@@ -69,31 +80,69 @@ public class InstructionsScene extends Scene {
         titleLabel.setAlignment(Align.center);
 
         Label.LabelStyle textStyle = new Label.LabelStyle(textFont, Color.WHITE);
-        String instructions = "UP / DOWN ARROWS to move up and down.\n\n" +
-        					  "LEFT / RIGHT to move left and right.\n\n" +
-                              "SPACEBAR to shoot barriers.\n\n" +
-                              "Read the question, destroy the correct\n" +
-                              "barrier, and fly through the gate!";
-        Label instructionsLabel = new Label(instructions, textStyle);
+        instructionsLabel = new Label("", textStyle);
         instructionsLabel.setAlignment(Align.center);
+        
+        // --- VISUAL KEYBOARD UI (SQUARE KEYS) ---
+        Label.LabelStyle keyStyle = new Label.LabelStyle(keyFont, Color.WHITE);
+        keyStyle.background = createKeycapDrawable(coreBlue, cyanBorder, 60, 60);
+        
+        keyUp = new Label("", keyStyle);
+        keyUp.setAlignment(Align.center);
+        
+        keyLeft = new Label("", keyStyle);
+        keyLeft.setAlignment(Align.center);
+        
+        keyDown = new Label("", keyStyle);
+        keyDown.setAlignment(Align.center);
+        
+        keyRight = new Label("", keyStyle);
+        keyRight.setAlignment(Align.center);
+        
+        Table keysTable = new Table();
+        keysTable.add(keyUp).size(60, 60).padBottom(5).colspan(3).align(Align.center).row();
+        keysTable.add(keyLeft).size(60, 60).padRight(5);
+        keysTable.add(keyDown).size(60, 60).padRight(5);
+        keysTable.add(keyRight).size(60, 60);
 
-        TextButton btnStart = new TextButton("START RUN", cyanStyle);
+        Table moveRow = new Table();
+        moveRow.add(keysTable).padRight(20);
+        Label moveTextLabel = new Label("to move your ship.", textStyle);
+        moveRow.add(moveTextLabel).align(Align.left);
+
+        // --- VISUAL SPACEBAR UI ---
+        Label.LabelStyle spacebarStyle = new Label.LabelStyle(keyFont, Color.WHITE);
+        spacebarStyle.background = createKeycapDrawable(coreBlue, cyanBorder, 200, 60); // Wider background
+        
+        keySpacebar = new Label("SPACE", spacebarStyle);
+        keySpacebar.setAlignment(Align.center);
+
+        Table shootRow = new Table();
+        shootRow.add(keySpacebar).size(200, 60).padRight(20);
+        Label shootTextLabel = new Label("to shoot barriers.", textStyle);
+        shootRow.add(shootTextLabel).align(Align.left);
+
+        // --- BUTTONS ---
+        TextButton btnStart = new TextButton("START MISSION", cyanStyle); // Renamed!
         TextButton btnBack = new TextButton("RETURN TO MENU", yellowStyle);
 
+        // --- MASTER LAYOUT ---
         Table panelTable = new Table();
         panelTable.setBackground(panelBackground);
-        panelTable.setSize(600, 600);
+        panelTable.setSize(650, 600);
 
-        panelTable.add(titleLabel).width(600).padTop(25).padBottom(40).row();
-        panelTable.add(instructionsLabel).padBottom(50).row();
-        panelTable.add(btnStart).size(350, 65).padBottom(20).row();
+        panelTable.add(titleLabel).width(650).padTop(25).padBottom(20).row();
+        panelTable.add(moveRow).padBottom(15).row(); 
+        panelTable.add(shootRow).padBottom(25).row(); // Injected Spacebar Row
+        panelTable.add(instructionsLabel).padBottom(35).row();
+        panelTable.add(btnStart).size(350, 65).padBottom(15).row();
         panelTable.add(btnBack).size(350, 65);
         panelTable.add().expandY().fillY();
 
         Table masterTable = new Table();
         masterTable.setFillParent(true);
         masterTable.center();
-        masterTable.add(panelTable).size(600, 600);
+        masterTable.add(panelTable).size(650, 600);
 
         stage.addActor(masterTable);
 
@@ -114,6 +163,25 @@ public class InstructionsScene extends Scene {
         });
     }
 
+    // Dynamic width and height generator
+    private TextureRegionDrawable createKeycapDrawable(Color coreColor, Color borderColor, int width, int height) {
+        int r = 10;
+        Pixmap p = new Pixmap(width, height, Pixmap.Format.RGBA8888);
+
+        p.setColor(borderColor);
+        fillRoundedRect(p, 0, 0, width, height, r);
+        p.setColor(new Color(0.02f, 0.1f, 0.25f, 1f));
+        fillRoundedRect(p, 2, 2, width - 4, height - 4, r - 2);
+        p.setColor(coreColor);
+        fillRoundedRect(p, 4, 4, width - 8, height - 8, r - 4);
+        p.setColor(new Color(1f, 1f, 1f, 0.15f));
+        p.fillRectangle(r, 4, width - 2 * r, (height - 8) / 2);
+
+        Texture tex = new Texture(p);
+        p.dispose();
+        return new TextureRegionDrawable(new TextureRegion(tex));
+    }
+
     private TextureRegionDrawable createPillButtonDrawable(Color coreColor, Color borderColor) {
         int w = 350;
         int h = 65;
@@ -122,13 +190,10 @@ public class InstructionsScene extends Scene {
 
         p.setColor(borderColor);
         fillRoundedRect(p, 0, 0, w, h, r);
-
         p.setColor(new Color(0.02f, 0.1f, 0.25f, 1f));
         fillRoundedRect(p, 3, 3, w - 6, h - 6, r - 3);
-
         p.setColor(coreColor);
         fillRoundedRect(p, 6, 6, w - 12, h - 12, r - 6);
-
         p.setColor(new Color(1f, 1f, 1f, 0.15f));
         p.fillRectangle(r, 6, w - 2 * r, (h - 12) / 2);
 
@@ -138,17 +203,15 @@ public class InstructionsScene extends Scene {
     }
 
     private TextureRegionDrawable createPanelDrawable(Color borderColor) {
-        int w = 600; 
+        int w = 650; 
         int h = 600;
         int r = 20;
         Pixmap p = new Pixmap(w, h, Pixmap.Format.RGBA8888);
 
         p.setColor(borderColor);
         fillRoundedRect(p, 0, 0, w, h, r);
-
         p.setColor(new Color(0.02f, 0.1f, 0.25f, 0.95f));
         fillRoundedRect(p, 5, 5, w - 10, h - 10, r - 5);
-
         p.setColor(new Color(0.08f, 0.18f, 0.38f, 1f));
         fillRoundedRect(p, 5, 5, w - 10, 80, r - 5);
         p.fillRectangle(5, 25, w - 10, 60);
@@ -190,6 +253,20 @@ public class InstructionsScene extends Scene {
     public void show() { 
         super.show();
         Gdx.input.setInputProcessor(stage);
+        
+        if (GameMaster.isUseWASD()) {
+            keyUp.setText("W");
+            keyLeft.setText("A");
+            keyDown.setText("S");
+            keyRight.setText("D");
+        } else {
+            keyUp.setText("^"); 
+            keyLeft.setText("<");
+            keyDown.setText("v"); 
+            keyRight.setText(">");
+        }
+            
+        instructionsLabel.setText("Read the question, destroy the correct\nbarrier, and fly through the gate!");
     }
 
     @Override
