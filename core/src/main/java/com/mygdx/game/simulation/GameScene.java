@@ -36,12 +36,6 @@ public class GameScene extends Scene {
     private static final float FIRST_SEGMENT_X  = WORLD_WIDTH + 200f;
     private static final float SHOOT_INTERVAL   = 0.25f;
 
-    /**
-     * Distance (world units) at which the HUD switches to a segment's question.
-     * 2.5 × WORLD_WIDTH gives ~20 s reading time at SCROLL_SPEED = 100.
-     */
-    private static final float HUD_SWITCH_DISTANCE = WORLD_WIDTH * 2.5f;
-
     // ── Dependencies ────────────────────────────────────────────────────────
     private final ISceneNavigator     sceneNavigator;
     private final ObstacleFactory     obstacleFactory;
@@ -82,7 +76,6 @@ public class GameScene extends Scene {
         final int                    questionIndex;
         final Array<RectangleEntity> walls          = new Array<>();
         final String[]               shuffledAnswers;
-        boolean                      hudShown       = false;
         boolean                      passed         = false; // set once walls cross player X
 
         WallGroup(int questionIndex, String[] shuffledAnswers) {
@@ -151,7 +144,7 @@ public class GameScene extends Scene {
         wallGroups.clear();
 
         if (player == null) {
-            player = new PlayerCharacter(1, new Vector2(PLAYER_X, WORLD_HEIGHT / 2f), 25f);
+            player = new PlayerCharacter(1, new Vector2(PLAYER_X, WORLD_HEIGHT / 2f), 14f);
             player.setCollisionLayer(LAYER_PLAYER);
             player.setCollisionMask(LAYER_GATE | LAYER_HAZARD);
             addEntity(player);
@@ -163,31 +156,35 @@ public class GameScene extends Scene {
         }
 
         levelSpawner = new ContinuousLevelSpawner(questionProvider, FIRST_SEGMENT_X, this::spawnSegment);
-
-        // Prime the HUD with the first question
-        showQuestionOnHud(0);
+        // Spawn the first segment and show its question immediately
+        levelSpawner.spawnFirst();
     }
 
     // ── Segment spawn callback (ISegmentSpawnDelegate) ───────────────────────
 
     private void spawnSegment(LevelSegment segment) {
-        int qi      = segment.getQuestionIndex();
-        Question q  = questionProvider.getQuestion(qi);
+        int qi     = segment.getQuestionIndex();
+        Question q = questionProvider.getQuestion(qi);
         if (q == null) return;
 
-        // Shuffle answers; record where the correct one ended up
-        Array<String> shuffled     = new Array<>(q.getAnswers());
+        // Place this segment just beyond the right edge of the screen
+        float spawnX = scrolledDistance + WORLD_WIDTH + 300f;
+
+        Array<String> shuffled = new Array<>(q.getAnswers());
         shuffled.shuffle();
-        int correctIndex           = shuffled.indexOf(q.getAnswers()[0], false);
-        String[] shuffledArr       = shuffled.toArray(String.class);
+        int correctIndex  = shuffled.indexOf(q.getAnswers()[0], false);
+        String[] shuffledArr = shuffled.toArray(String.class);
 
         float sectionH = WORLD_HEIGHT / 3f;
 
         WallGroup group = new WallGroup(qi, shuffledArr);
-        spawnAnswerGates(segment.gateX(),    sectionH, correctIndex, qi, group);
-        spawnBarriers   (segment.barrierX(), sectionH, correctIndex, qi);
-        spawnCannons    (segment.cannonX(),  sectionH, correctIndex, qi);
+        spawnAnswerGates(spawnX + LevelSegment.GATE_OFFSET,    sectionH, correctIndex, qi, group);
+        spawnBarriers   (spawnX + LevelSegment.BARRIER_OFFSET, sectionH, correctIndex, qi);
+        spawnCannons    (spawnX + LevelSegment.CANNON_OFFSET,  sectionH, correctIndex, qi);
         wallGroups.add(group);
+
+        // Show this question on the HUD immediately when its segment spawns
+        showQuestionOnHud(qi);
     }
 
     // ── Spawning helpers ─────────────────────────────────────────────────────
@@ -250,22 +247,6 @@ public class GameScene extends Scene {
         uiManager.updateQuestion(q);
     }
 
-    /**
-     * Switches the question label when a group's gate wall enters HUD range.
-     * Also prunes groups that have completely passed the player.
-     */
-    private void updateHudAndPruneGroups() {
-        for (WallGroup group : wallGroups) {
-            if (!group.hudShown && !group.walls.isEmpty()) {
-                float dist = group.walls.first().getPosition().x - PLAYER_X;
-                if (dist <= HUD_SWITCH_DISTANCE) {
-                    group.hudShown = true;
-                    showQuestionOnHud(group.questionIndex);
-                }
-            }
-        }
-    }
-
     /** Collects answer label data from all active wall groups into parallel arrays. */
     private void syncAnswerLabelsToUI() {
         int max = wallGroups.size * 3;
@@ -322,8 +303,6 @@ public class GameScene extends Scene {
         scrolledDistance += SCROLL_SPEED * deltaTime;
         background.update(deltaTime, SCROLL_SPEED);
 
-        levelSpawner.update(scrolledDistance + WORLD_WIDTH);
-
         updatePlayerShooting();
         updateCannons(deltaTime);
 
@@ -343,24 +322,21 @@ public class GameScene extends Scene {
                 player.consumeGoal();
                 score++;
                 gameState.advanceQuestion();
+                // Spawn the next question's segment now that this gate is passed
+                levelSpawner.spawnNext();
             }
         }
 
         super.update(deltaTime);
 
-        // Mark groups whose walls have crossed the player
         for (WallGroup g : wallGroups) g.checkAndMarkPassed(PLAYER_X);
-
-        // Prune wall groups that have fully passed the player
         prunePassedGroups();
 
-        // End game once all groups have passed
         if (allSegmentsCompleted()) {
             transitionToResult();
             return;
         }
 
-        updateHudAndPruneGroups();
         syncAnswerLabelsToUI();
         uiManager.syncBarrierHp(barriers);
         uiManager.act(deltaTime);
