@@ -33,6 +33,9 @@ public class EnemyShip extends RectangleEntity {
     private boolean waveActive = false;
     private boolean hasEnteredScreen = false;
     private int shotsFired = 0;
+    
+    // --- NEW: Enemy Health ---
+    private int hitPoints = 3;
 
     public EnemyShip(int id,
                      Vector2 position,
@@ -115,10 +118,22 @@ public class EnemyShip extends RectangleEntity {
 
     @Override
     public void onCollision(Entity other) {
+        if (!isActive()) return;
+
+        // --- NEW: Take damage from player bullets ---
+        if (other instanceof PlayerBullet && other.isActive()) {
+            hitPoints--;
+            other.setActive(false); // Consume the bullet so it doesn't pierce through
+
+            if (hitPoints <= 0) {
+                setActive(false); // Destroy this ship
+            }
+        }
     }
 
     @Override
     public void render(SpriteBatch batch) {
+        if (!isActive()) return;
         batch.draw(
                 texture,
                 getX(),

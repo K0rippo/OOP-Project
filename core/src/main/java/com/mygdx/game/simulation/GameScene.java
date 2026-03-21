@@ -94,7 +94,7 @@ public class GameScene extends Scene {
                 LAYER_GATE,
                 LAYER_ENEMY
         );
-            this.progressionService = new GameProgressionService();
+        this.progressionService = new GameProgressionService();
 
         this.inputHandler.initializeInput();
         startLevel();
@@ -134,7 +134,8 @@ public class GameScene extends Scene {
 
     private void configurePlayerCollision() {
         player.setCollisionLayer(LAYER_PLAYER);
-        player.setCollisionMask(LAYER_GATE | LAYER_ENEMY_BULLET);
+        // --- FIXED: Added LAYER_ENEMY so crashing into ships damages the player ---
+        player.setCollisionMask(LAYER_GATE | LAYER_ENEMY_BULLET | LAYER_ENEMY);
     }
 
     public void requestRestart() {
@@ -190,7 +191,6 @@ public class GameScene extends Scene {
 
         levelSpawner.update(scrolledDistance + WORLD_WIDTH);
 
-        //combat update returns cooldown and bullet id state
         CombatDirector.CombatState combatState = combatDirector.update(
             player,
             shootCooldown,
@@ -202,12 +202,22 @@ public class GameScene extends Scene {
         nextPlayerBulletId = combatState.getNextPlayerBulletId();
         nextEnemyBulletId = combatState.getNextEnemyBulletId();
 
+        int oldScore = score;
+        
         GameProgressionService.ProgressionResult progressionResult =
                 progressionService.update(player, gameState, score);
         score = progressionResult.getScore();
         if (progressionResult.shouldTransitionToResult()) {
             transitionToResult();
             return;
+        }
+
+        if (score > oldScore) {
+            for (Entity e : engine.getEntitiesByLayer(LAYER_GATE)) {
+                if (e.getPosition().x < player.getPosition().x + 600f) {
+                    e.getPosition().x = -2000f;
+                }
+            }
         }
 
         engine.update(deltaTime);
@@ -226,7 +236,6 @@ public class GameScene extends Scene {
         wallHudCoordinator.syncAnswerLabelsToUI(uiManager);
 
         uiManager.act(deltaTime);
-
     }
 
     @Override
