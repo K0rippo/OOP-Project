@@ -14,7 +14,8 @@ public class PlayerCharacter extends Circle {
     private static final float WORLD_WIDTH          = 1280f;
     private static final float INVULNERABILITY_TIME = 3.0f;
     private static final float GATE_COOLDOWN_TIME   = 2.0f;
-    private static final float BOUNCE_LOCK_TIME     = 0.35f;
+    
+    private static final float BOUNCE_LOCK_TIME     = 0.2f;
 
     private static final float BOUNCE_BACK_SPEED    = -1200f;
 
