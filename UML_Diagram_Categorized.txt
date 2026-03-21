@@ -1,0 +1,908 @@
+@startuml OOP_Project_Categorized_Detailed
+' Source-synchronized categorized UML
+
+top to bottom direction
+skinparam linetype ortho
+skinparam packageStyle rectangle
+skinparam classAttributeIconSize 0
+skinparam ranksep 40
+skinparam nodesep 24
+skinparam classFontSize 11
+
+package "Core Contracts" #E8F4FD {
+  interface IGameEngine {
+    + void update(float deltaTime)
+    + void render(SpriteBatch batch)
+    + void dispose()
+    + void addEntity(Entity e)
+    + void removeEntity(Entity e)
+    + List<Entity> getEntitiesByLayer(int layer)
+    + void bindKeyContinuous(int keycode, Runnable action)
+    + void bindKeyJustPressed(int keycode, Runnable action)
+    + void setSpeedMultiplier(float multiplier)
+  }
+
+  interface ISceneNavigator {
+    + void goToScene(String sceneId)
+    + Scene getScene(String id)
+  }
+
+  interface ICollidable {
+    + Rectangle getBounds()
+    + void onCollision(Entity other)
+  }
+
+  interface IRenderable {
+    + void render(SpriteBatch batch)
+    + void renderShape(ShapeRenderer shapeRenderer)
+  }
+
+  interface ISettingsScene {
+    + void setPreviousScene(String id)
+  }
+
+  interface iMovable {
+    + void applyMovement(float deltaTime)
+    + Orientate getOrientate()
+    + Vector2 getVelocity()
+    + void setVelocity(Vector2 velocity)
+    + void setMovementLogic(MovementLogic logic)
+  }
+
+  interface IQuestionProvider {
+    + Array<Question> getQuestions()
+    + Question getQuestion(int index)
+    + int getTotalQuestions()
+    + void shuffleForNewGame()
+  }
+
+  interface BulletPattern {
+    + Array<EnemyBullet> fire(EnemyShip ship, int firstBulletId, int bulletLayer, int bulletMask)
+  }
+}
+
+package "Scene Flow" #EAF7E8 {
+  class GameMaster {
+    - SpriteBatch batch
+    - SceneManager sceneManager
+    - IGameEngine gameEngine
+    - Texture uiButtonTexture
+    - AudioManager audioManager
+    {static} - boolean muted = false
+    --
+    {static} + boolean isMuted()
+    {static} + void setMuted(boolean value)
+    + void create()
+    + void render()
+    + void resize(int width, int height)
+    + void dispose()
+  }
+
+  abstract class Scene {
+    - final String id
+    - boolean isActive
+    --
+    + Scene(String id)
+    + String getId()
+    + void show()
+    + void hide()
+    + boolean isActive()
+    {abstract} + void update(float deltaTime)
+    {abstract} + void render(SpriteBatch batch)
+    {abstract} + void resize(int width, int height)
+  }
+
+  class SceneManager {
+    - Map<String, Scene> scenes
+    - Scene activeScene
+    --
+    + SceneManager()
+    + void addScene(String id, Scene scene)
+    + Scene getScene(String id)
+    + void setActiveScene(String id)
+    + void goToScene(String sceneId)
+    + void updateActiveScene(float deltaTime)
+    + void renderActiveScene(SpriteBatch batch)
+    + void resize(int width, int height)
+  }
+
+  class MenuScene {
+    - Stage stage
+    --
+    + MenuScene(String id, final ISceneNavigator sceneNavigator, Texture buttonTexture)
+    - TextureRegionDrawable createPillButtonDrawable(Color coreColor, Color borderColor)
+    - TextureRegionDrawable createPanelDrawable(Color borderColor)
+    - void fillRoundedRect(Pixmap p, int x, int y, int width, int height, int radius)
+    + void resize(int width, int height)
+    + void show()
+    + void hide()
+    + void update(float deltaTime)
+    + void render(SpriteBatch batch)
+  }
+
+  class InstructionsScene {
+    - Stage stage
+    --
+    + InstructionsScene(String id, final ISceneNavigator sceneNavigator, Texture buttonTexture)
+    - TextureRegionDrawable createPillButtonDrawable(Color coreColor, Color borderColor)
+    - TextureRegionDrawable createPanelDrawable(Color borderColor)
+    - void fillRoundedRect(Pixmap p, int x, int y, int width, int height, int radius)
+    + void resize(int width, int height)
+    + void show()
+    + void hide()
+    + void update(float deltaTime)
+    + void render(SpriteBatch batch)
+  }
+
+  class GameScene {
+    {static} + final int LAYER_PLAYER = 1
+    {static} + final int LAYER_GATE = 2
+    {static} + final int LAYER_ENEMY = 4
+    {static} + final int LAYER_ENEMY_BULLET = 8
+    {static} - final float WORLD_WIDTH = 1280f
+    {static} - final float WORLD_HEIGHT = 720f
+    {static} - final float PLAYER_X = 140f
+    {static} - final float SCROLL_SPEED = 100f
+    {static} - final float FIRST_SEGMENT_X = WORLD_WIDTH + 200f
+    {static} - final float SHOOT_INTERVAL = 0.25f
+    {static} - final float HUD_SWITCH_DISTANCE = WORLD_WIDTH
+    - final IGameEngine engine
+    - final GameStateManager gameState
+    - final GameUIManager uiManager
+    - final Stage stage
+    - final ScrollingBackground background
+    - final IQuestionProvider questionProvider
+    - ContinuousLevelSpawner levelSpawner
+    - final GameInputHandler inputHandler
+    - final AudioManager audioManager
+    - final CombatDirector combatDirector
+    - final EntityCullingService cullingService
+    - final ResultTransitionService resultTransitionService
+    - final WallHudCoordinator wallHudCoordinator
+    - final SegmentSpawnService segmentSpawnService
+    - final GameProgressionService progressionService
+    - PlayerCharacter player
+    - Texture heartTexture
+    - final Array<EnemyWave> enemyWaves = new Array<>()
+    - Color currentBGColor = new Color(0.08f, 0.10f, 0.18f, 1f)
+    - int nextPlayerBulletId = 1000
+    - int nextEnemyBulletId = 3000
+    - float shootCooldown = 0f
+    - float scrolledDistance = 0f
+    - int score = 0
+    - boolean paused = false
+    - boolean pendingRestart = true
+    --
+    + GameScene(String id, ISceneNavigator sceneNavigator, IGameEngine engine, IQuestionProvider questionProvider, AudioManager audioManager)
+    - void startLevel()
+    - void configurePlayerCollision()
+    + void requestRestart()
+    + void show()
+    + void hide()
+    - void showQuestionOnHud(int questionIndex)
+    - boolean allSegmentsCompleted()
+    + void update(float deltaTime)
+    + void render(SpriteBatch batch)
+    - void renderUI(SpriteBatch batch)
+    - void clearDynamicEntities()
+    - void cleanupOffScreen()
+    - void transitionToResult()
+    + void resize(int width, int height)
+    + void dispose()
+  }
+
+  class SettingsScene {
+    - Stage stage
+    - TextButton btnMute
+    - TextButton btnBack
+    - TextButton btnExitMenu
+    - String previousSceneId = "MENU"
+    - TextButton.TextButtonStyle audioActiveStyle
+    - TextButton.TextButtonStyle audioMutedStyle
+    --
+    + SettingsScene(String id, final ISceneNavigator sceneNavigator, Texture buttonTexture)
+    - TextureRegionDrawable createPillButtonDrawable(Color coreColor, Color borderColor)
+    - TextureRegionDrawable createPanelDrawable(Color borderColor)
+    - void fillRoundedRect(Pixmap p, int x, int y, int width, int height, int radius)
+    + void setPreviousScene(String id)
+    - void toggleMute()
+    - void updateButtonText()
+    + void resize(int width, int height)
+    + void show()
+    + void hide()
+    + void update(float deltaTime)
+    + void render(SpriteBatch batch)
+  }
+
+  class ResultScene {
+    - Stage stage
+    - Label scoreLabel
+    --
+    + ResultScene(String id, final ISceneNavigator sceneNavigator, Texture buttonTexture)
+    - TextureRegionDrawable createPillButtonDrawable(Color coreColor, Color borderColor)
+    - TextureRegionDrawable createPanelDrawable(Color borderColor)
+    - void fillRoundedRect(Pixmap p, int x, int y, int width, int height, int radius)
+    + void setScore(int current, int max)
+    + void resize(int width, int height)
+    + void show()
+    + void hide()
+    + void update(float deltaTime)
+    + void render(SpriteBatch batch)
+  }
+}
+
+package "Engine Runtime" #FFF4E6 {
+  class Engine {
+    - final EntityManager entityManager
+    - final CollisionManager collisionManager
+    - final IOManager ioManager
+    - final MovementManager movementManager
+    - final RenderManager renderManager
+    --
+    + Engine(EntityManager entityManager, CollisionManager collisionManager, IOManager ioManager, MovementManager movementManager, RenderManager renderManager)
+    + void update(float deltaTime)
+    + void render(SpriteBatch batch)
+    + void addEntity(Entity e)
+    + void removeEntity(Entity e)
+    + List<Entity> getEntitiesByLayer(int layer)
+    + void bindKeyContinuous(int keycode, Runnable action)
+    + void bindKeyJustPressed(int keycode, Runnable action)
+    + void setSpeedMultiplier(float multiplier)
+    + void dispose()
+  }
+
+  class EntityManager {
+    - final List<Entity> entities
+    - MovementManager movementManager
+    --
+    + EntityManager()
+    + void linkManagers(MovementManager movementManager)
+    + void addEntity(Entity e)
+    + void removeEntity(Entity e)
+    + List<Entity> getEntities()
+    + List<Entity> getEntitiesByLayer(int layer)
+    + void updateAll(float deltaTime)
+    + void clear()
+  }
+
+  class CollisionManager {
+    - Quadtree quadtree
+    - HashSet<Long> processedPairs
+    --
+    + CollisionManager(float worldWidth, float worldHeight)
+    + void checkCollisions(List<Entity> entities)
+  }
+
+  class MovementManager {
+    - float globalSpeedMultiplier = 1.0f
+    - final List<iMovable> movables = new ArrayList<>()
+    --
+    + void registerMovable(iMovable m)
+    + void unregisterMovable(iMovable m)
+    + void update(float deltaTime)
+    + void setSpeedMultiplier(float value)
+  }
+
+  class RenderManager {
+    - final ShapeRenderer shapeRenderer
+    --
+    + RenderManager()
+    + void render(SpriteBatch batch, List<Entity> entities)
+    + void dispose()
+  }
+
+  class IOManager {
+    - Map<Integer, Runnable> justPressedBindings
+    - Map<Integer, Runnable> continuousBindings
+    --
+    + IOManager()
+    + void bindKeyJustPressed(int keyCode, Runnable command)
+    + void bindKeyContinuous(int keyCode, Runnable command)
+    + void handleInput()
+  }
+
+  class Orientate {
+    - Vector2 position
+    --
+    + Orientate()
+    + Vector2 getPosition()
+    + void setPosition(Vector2 position)
+  }
+
+  class Rectangle {
+    - float x, y, width, height
+    --
+    + Rectangle(float x, float y, float width, float height)
+    + boolean intersects(Rectangle other)
+    + float getX()
+    + float getY()
+    + float getWidth()
+    + float getHeight()
+  }
+
+  class Quadtree {
+    - final int MAX_OBJECTS = 5
+    - final int MAX_LEVELS = 5
+    - int level
+    - List<Entity> objects
+    - Rectangle bounds
+    - Quadtree[] nodes
+    --
+    + Quadtree(int pLevel, Rectangle pBounds)
+    + void clear()
+    - void split()
+    - int getIndex(Entity pEntity)
+    + void insert(Entity pEntity)
+    + List<Entity> retrieve(List<Entity> returnObjects, Entity pEntity)
+  }
+}
+
+package "Entities and Combat" #FDECEC {
+  abstract class Entity {
+    - int id
+    - boolean isActive
+    - String name
+    - final Orientate orientate
+    - int collisionLayer = 1
+    - int collisionMask = -1
+    --
+    + Entity(int id, String name, Vector2 position)
+    + void update(float deltaTime)
+    {abstract} + Rectangle getBounds()
+    {abstract} + void onCollision(Entity other)
+    {abstract} + void render(SpriteBatch batch)
+    + void renderShape(ShapeRenderer shapeRenderer)
+    + int getId()
+    + String getName()
+    + Vector2 getPosition()
+    + void setPosition(Vector2 position)
+    + void setPosition(float x, float y)
+    + float getX()
+    + float getY()
+    + void setX(float x)
+    + void setY(float y)
+    + boolean isActive()
+    + void setActive(boolean active)
+    + Orientate getOrientate()
+    + int getCollisionLayer()
+    + void setCollisionLayer(int layer)
+    + int getCollisionMask()
+    + void setCollisionMask(int mask)
+    + boolean canCollideWith(Entity other)
+  }
+
+  abstract class MovableEntity {
+    - Vector2 velocity = new Vector2(0f, 0f)
+    - MovementLogic movementLogic = (orientate, vel, dt) -> orientate.getPosition().add(vel.x * dt, vel.y * dt)
+    + MovableEntity(int id, String name, Vector2 position)
+    + Vector2 getVelocity()
+    + void setVelocity(Vector2 velocity)
+    + void setVelocityX(float x)
+    + void setVelocityY(float y)
+    + void scaleVelocity(float factor)
+    + void setMovementLogic(MovementLogic logic)
+    + void applyMovement(float deltaTime)
+  }
+
+  abstract class Circle {
+    # float radius
+    # Color color
+    --
+    + Circle(int id, String name, Vector2 position, float radius, Color color)
+    + Rectangle getBounds()
+    + void render(SpriteBatch batch)
+    + float getRadius()
+  }
+
+  class RectangleEntity {
+    - float width
+    - float height
+    - Color color
+    --
+    + RectangleEntity(int id, String name, Vector2 position, float width, float height, Color color)
+    + Rectangle getBounds()
+    + void onCollision(Entity other)
+    + void render(SpriteBatch batch)
+    + void renderShape(ShapeRenderer shapeRenderer)
+    + void update(float deltaTime)
+    + float getWidth()
+    + float getHeight()
+  }
+  class AnswerGate {
+    - final boolean correctLane
+    --
+    + AnswerGate(int id, WallType type, Vector2 position, float width, float height, Color color)
+    + boolean isCorrectLane()
+  }
+
+  class PlayerCharacter {
+    {static} - final float WORLD_HEIGHT = 720f
+    {static} - final float WORLD_WIDTH = 1280f
+    {static} - final float INVULNERABILITY_TIME = 3.0f
+    {static} - final float GATE_COOLDOWN_TIME = 2.0f
+    {static} - final float BOUNCE_LOCK_TIME = 0.35f
+    {static} - final float BOUNCE_BACK_SPEED = -1200f
+    - final Texture texture
+    - float invulnerabilityTimer = 0f
+    - float gateCooldown = 0f
+    - float controlLockTimer = 0f
+    - boolean tookDamage = false
+    - boolean reachedGate = false
+    - boolean shootRequested = false
+    --
+    + PlayerCharacter(int id, Vector2 position, float radius)
+    + void update(float deltaTime)
+    + void render(SpriteBatch batch)
+    + void onCollision(Entity other)
+    + boolean hasTakenDamage()
+    + boolean hasReachedGate()
+    + boolean isShootRequested()
+    + boolean isControlsLocked()
+    + void consumeDamage()
+    + void consumeGoal()
+    + void consumeShoot()
+    + void requestShoot()
+    - boolean isPlayerCentreInsideWall(Entity other)
+    - void applyDamage()
+    - void applyWallBounce(RectangleEntity wall)
+    - void applyKnockback()
+    + void dispose()
+  }
+
+  class PlayerBullet {
+    {static} - final float MAX_X = 1400f
+    --
+    + PlayerBullet(int id, Vector2 position)
+    + void update(float deltaTime)
+    + void onCollision(Entity other)
+  }
+
+  class EnemyShip {
+    + void setWaveActive(boolean active)
+    + void update(float deltaTime)
+    + boolean shouldFire()
+    + Array<EnemyBullet> fire(int firstBulletId, int bulletLayer, int bulletMask)
+    + void onCollision(Entity other)
+    + void render(SpriteBatch batch)
+    + void renderShape(ShapeRenderer shapeRenderer)
+    + void dispose()
+  }
+
+  class EnemyBullet {
+    {static} - final float WORLD_MIN_X = -80f
+    {static} - final float WORLD_MAX_X = 1400f
+    {static} - final float WORLD_MIN_Y = -80f
+    {static} - final float WORLD_MAX_Y = 800f
+    {static} - final float BULLET_LIFETIME = 9.0f
+    - float lifeTimer = 0f
+    --
+    + EnemyBullet(int id, Vector2 position, float velocityX, float velocityY)
+    + void update(float deltaTime)
+    + void onCollision(Entity other)
+  }
+
+  class BulletProjectile {
+    + BulletProjectile(int id, Vector2 position, float speedX)
+    + void update(float deltaTime)
+    + void onCollision(Entity other)
+  }
+
+  class BreakableBarrier {
+    {static} - Texture fullWallTexture
+    {static} - Texture semiWallTexture
+    {static} - Texture badWallTexture
+    {static} - boolean texturesLoaded = false
+    - int hitPoints
+    - boolean broken = false
+    - Runnable onBreakCallback
+    --
+    {static} - final Color BARRIER_COLOR = new Color(0.45f, 0.55f, 0.75f, 1f)
+    + BreakableBarrier(int id, Vector2 position, float width, float height, int hitPoints, boolean correctLane)
+    + void setOnBreakCallback(Runnable callback)
+    + void onCollision(Entity other)
+    + void render(SpriteBatch batch)
+    + void renderShape(ShapeRenderer shapeRenderer)
+    {static} + void disposeTextures()
+  }
+
+  class EnemyWave {
+    - final int triggerQuestionIndex
+    - final Array<EnemyShip> ships
+    - boolean activated
+    --
+    + EnemyWave(int triggerQuestionIndex)
+    + void addShip(EnemyShip ship)
+    + Array<EnemyShip> getShips()
+    + int getTriggerQuestionIndex()
+    + boolean isActivated()
+    + void activate()
+  }
+
+  class EnemyWaveFactory {
+    + EnemyWave createDefaultWave(int questionIndex, float sectionStartX, float worldHeight, float scrollSpeed, int firstShipId)
+    - Array<EnemyShipSpec> buildDefaultSpecs(float scrollSpeed)
+  }
+
+  class EnemyShipSpec {
+    - final float offsetX
+    - final float yRatio
+    - final float inactiveMoveSpeed
+    - final float activeMoveSpeed
+    - final float firstShotDelay
+    - final float fireInterval
+    - final float bobAmplitude
+    --
+    + EnemyShipSpec(float offsetX, float yRatio, float inactiveMoveSpeed, float activeMoveSpeed, float firstShotDelay, float fireInterval, float bobAmplitude)
+    + float getOffsetX()
+    + float getYRatio()
+    + float getInactiveMoveSpeed()
+    + float getActiveMoveSpeed()
+    + float getFirstShotDelay()
+    + float getFireInterval()
+    + float getBobAmplitude()
+  }
+
+  class CircleBulletPattern {
+    - final int bulletCount
+    - final float bulletSpeed
+    - final float bulletSpread
+    --
+    + CircleBulletPattern(int bulletCount, float bulletSpeed, float bulletSpread)
+    + Array<EnemyBullet> fire(EnemyShip ship, int firstBulletId, int bulletLayer, int bulletMask)
+  }
+
+  enum WallType {
+    + final String name
+    + final Color color
+  }
+
+  class ObstacleFactory {
+    + RectangleEntity createWall(WallType type, int id, float x, float y, float width, float height)
+  }
+}
+
+package "Gameplay Systems" #F3ECFD {
+  class GameInputHandler {
+    - final IGameEngine engine
+    - final ISceneNavigator sceneNavigator
+    - PlayerCharacter player
+    - final float worldHeight
+    - final float worldWidth = 1280f
+    --
+    + GameInputHandler(IGameEngine engine, ISceneNavigator sceneNavigator, float worldHeight)
+    + void setPlayer(PlayerCharacter player)
+    + void initializeInput()
+  }
+
+  class GameStateManager {
+    - int currentQuestionIndex = 0
+    - int lives = 3
+    - final int initialLives = 3
+    - IQuestionProvider questionProvider
+    --
+    + GameStateManager(IQuestionProvider questionProvider)
+    + void advanceQuestion()
+    + void loseLife()
+    + void resetState()
+    + boolean isGameOver()
+    + int getLives()
+    + int getTotalQuestions()
+  }
+
+  class GameUIManager {
+    {static} - final int MAX_ANSWER_LABELS = 15
+    - final Stage stage
+    - final Label questionLabel
+    - final BitmapFont questionFont
+    - final BitmapFont answerFont
+    - final Label[] answerLabelPool = new Label[MAX_ANSWER_LABELS]
+    --
+    + GameUIManager(Stage stage, float worldHeight)
+    + void updateQuestion(Question question)
+    + void syncAnswerLabels(String[] texts, float[] xs, float[] ys, float[] heights, int count)
+    + void act(float deltaTime)
+    + void dispose()
+  }
+
+  class AudioManager {
+    - Music bgMusic
+    - Sound laserSound
+    - Sound breakSound
+    --
+    + void loadAssets()
+    + void playMusic()
+    + void pauseMusic()
+    + void playLaserSound()
+    + void playBreakSound()
+    + void dispose()
+  }
+
+  class CombatDirector {
+    - final IGameEngine engine
+    - final AudioManager audioManager
+    - final float shootInterval
+    - final int playerLayer
+    - final int gateLayer
+    - final int enemyLayer
+    - final int enemyBulletLayer
+    --
+    + CombatDirector(IGameEngine engine, AudioManager audioManager, float shootInterval, int playerLayer, int gateLayer, int enemyLayer, int enemyBulletLayer)
+    + CombatState update(PlayerCharacter player, float shootCooldown, float deltaTime, int nextPlayerBulletId, int nextEnemyBulletId)
+  }
+
+  class CombatState {
+    - final float shootCooldown
+    - final int nextPlayerBulletId
+    - final int nextEnemyBulletId
+    --
+    + float getShootCooldown()
+    + int getNextPlayerBulletId()
+    + int getNextEnemyBulletId()
+  }
+
+  class EntityCullingService {
+    - final IGameEngine engine
+    - final float worldWidth
+    - final int playerLayer
+    - final int gateLayer
+    - final int enemyLayer
+    - final int enemyBulletLayer
+    --
+    + EntityCullingService(IGameEngine engine, float worldWidth, int playerLayer, int gateLayer, int enemyLayer, int enemyBulletLayer)
+    + void clearDynamicEntities(Entity persistentPlayer)
+    + void cleanupOffScreen(Entity persistentPlayer)
+    - void clearLayer(int layer, Entity except)
+  }
+
+  class ResultTransitionService {
+    - final ISceneNavigator sceneNavigator
+    --
+    + ResultTransitionService(ISceneNavigator sceneNavigator)
+    + void transition(int score, int totalQuestions)
+  }
+
+  class WallHudCoordinator {
+    - final Array<WallGroup> wallGroups = new Array<>()
+    --
+    + void clear()
+    + WallGroup createGroup(int questionIndex, String[] shuffledAnswers)
+    + boolean isFirstGroup(WallGroup group)
+    + void markPassedGroups(float playerX)
+    + void triggerUpcomingWaves(Array<EnemyWave> enemyWaves)
+    + void prunePassedGroups()
+    + boolean isEmpty()
+    + void updateHudForApproachingSegments(float playerX, float hudSwitchDistance, IntConsumer showQuestion)
+    + void syncAnswerLabelsToUI(GameUIManager uiManager)
+    - void activateWaveForQuestion(Array<EnemyWave> enemyWaves, int questionIndex)
+  }
+
+  class WallGroup {
+    - final int questionIndex
+    - final Array<RectangleEntity> walls = new Array<>()
+    - final String[] shuffledAnswers
+    - boolean hudShown = false
+    - boolean passed = false
+    - boolean nextWaveTriggered = false
+    --
+    + WallGroup(int questionIndex, String[] shuffledAnswers)
+    + int getQuestionIndex()
+    + boolean isHudShown()
+    + boolean isPassed()
+    + void markHudShown()
+    + void addWall(RectangleEntity wall)
+    + boolean isNextWaveTriggered()
+    + void markNextWaveTriggered()
+    + float leadingWallX()
+    + void checkAndMarkPassed(float playerX)
+    + int fillAnswerData(String[] texts, float[] xs, float[] ys, float[] heights, int offset)
+  }
+
+  class SegmentSpawnService {
+    - final IGameEngine engine
+    - final IQuestionProvider questionProvider
+    - final ObstacleFactory obstacleFactory
+    - final EnemyWaveFactory enemyWaveFactory
+    - final AudioManager audioManager
+    - final WallHudCoordinator wallHudCoordinator
+    - final Array<EnemyWave> enemyWaves
+    - final IntConsumer showQuestion
+    - final float worldHeight
+    - final float scrollSpeed
+    - final int playerLayer
+    - final int gateLayer
+    - final int enemyLayer
+    - int nextEnemyShipId = 2000
+    --
+    + SegmentSpawnService(IGameEngine engine, IQuestionProvider questionProvider, ObstacleFactory obstacleFactory, EnemyWaveFactory enemyWaveFactory, AudioManager audioManager, WallHudCoordinator wallHudCoordinator, Array<EnemyWave> enemyWaves, IntConsumer showQuestion, float worldHeight, float scrollSpeed, int playerLayer, int gateLayer, int enemyLayer)
+    + void reset()
+    + void spawnSegment(LevelSegment segment)
+    - void spawnEnemyWave(LevelSegment segment)
+    - void spawnAnswerGates(float spawnX, float sectionHeight, int correctIndex, int segmentId, WallHudCoordinator.WallGroup group)
+    - void spawnBarriers(float spawnX, float sectionHeight, int correctIndex, int segmentId)
+  }
+
+  class GameProgressionService {
+    + ProgressionResult update(PlayerCharacter player, GameStateManager gameState, int score)
+  }
+
+  class ProgressionResult {
+    - final int score
+    - final boolean shouldTransitionToResult
+    --
+    + int getScore()
+    + boolean shouldTransitionToResult()
+  }
+
+  class ScrollingBackground {
+    - final float worldWidth
+    - final float worldHeight
+    - final Texture pixel
+    - float totalDistance = 0f
+    - final Array<Vector2> stars = new Array<>()
+    --
+    + ScrollingBackground(float width, float height)
+    + void update(float delta, float scrollSpeed)
+    + void render(SpriteBatch batch, Color skyColor)
+    + void dispose()
+  }
+}
+
+package "Questions and Level" #FFFBE6 {
+  class Question {
+    - String text
+    - String[] answers
+    - Color themeColor
+    - float timeToReach
+    --
+    + Question(String text, String[] answers, Color themeColor, float timeToReach)
+    + String getText()
+    + Color getThemeColor()
+    + String[] getAnswers()
+  }
+
+  class CsvQuestionProvider {
+    - Array<Question> questions
+    {static} - final String CSV_FILE = "questions.csv"
+    --
+    + CsvQuestionProvider()
+    - void loadQuestionsFromCsv()
+    - Question parseQuestionFromCsvLine(String line)
+    - String[] parseCSVLine(String line)
+    - void loadDefaultQuestions()
+    + Array<Question> getQuestions()
+    + Question getQuestion(int index)
+    + int getTotalQuestions()
+    + void shuffleForNewGame()
+  }
+
+  class LevelSegment {
+    {static} + final float SEGMENT_WIDTH = 900f
+    {static} + final float GATE_OFFSET = 520f
+    {static} + final float BARRIER_OFFSET = GATE_OFFSET - 12f
+    - final int questionIndex
+    - final float startX
+    - boolean spawned = false
+    --
+    + LevelSegment(int questionIndex, float startX)
+    + int getQuestionIndex()
+    + float getStartX()
+    + boolean isSpawned()
+    + void markSpawned()
+    + float barrierX()
+    + float gateX()
+  }
+
+  class ContinuousLevelSpawner {
+    {static} - final float SPAWN_LOOKAHEAD = 250f
+    {static} - final float INTER_SEGMENT_GAP = 300f
+    - final Array<LevelSegment> segments = new Array<>()
+    - final ISegmentSpawnDelegate delegate
+    --
+    + ContinuousLevelSpawner(IQuestionProvider questionProvider, float stageStartX, ISegmentSpawnDelegate delegate)
+    + void update(float cameraRightEdge)
+    + boolean allSegmentsSpawned()
+  }
+
+  interface ISegmentSpawnDelegate {
+    + void onSpawnSegment(LevelSegment segment)
+  }
+}
+
+' layout anchors
+IGameEngine -[hidden]down-> GameMaster
+GameMaster -[hidden]down-> Engine
+Engine -[hidden]down-> Entity
+Entity -[hidden]down-> GameInputHandler
+GameInputHandler -[hidden]down-> Question
+
+' inheritance and realization
+Circle --|> MovableEntity
+Engine ..|> IGameEngine
+Entity ..|> ICollidable
+Entity ..|> IRenderable
+MovableEntity --|> Entity
+MovableEntity ..|> iMovable
+RectangleEntity --|> MovableEntity
+SceneManager ..|> ISceneNavigator
+BreakableBarrier --|> RectangleEntity
+AnswerGate --|> RectangleEntity
+BulletProjectile --|> RectangleEntity
+CircleBulletPattern ..|> BulletPattern
+CsvQuestionProvider ..|> IQuestionProvider
+EnemyBullet --|> RectangleEntity
+EnemyShip --|> RectangleEntity
+GameScene --|> Scene
+InstructionsScene --|> Scene
+MenuScene --|> Scene
+PlayerBullet --|> RectangleEntity
+PlayerCharacter --|> Circle
+ResultScene --|> Scene
+SettingsScene --|> Scene
+SettingsScene ..|> ISettingsScene
+
+' associations
+CollisionManager --> Quadtree
+Engine --> EntityManager
+Engine --> CollisionManager
+Engine --> IOManager
+Engine --> MovementManager
+Engine --> RenderManager
+Entity --> Orientate
+EntityManager --> Entity
+EntityManager --> MovementManager
+Quadtree --> Entity
+Quadtree --> Rectangle
+SceneManager --> Scene
+CsvQuestionProvider --> Question
+EnemyShip --> BulletPattern
+EnemyWave --> EnemyShip
+GameInputHandler --> IGameEngine
+GameInputHandler --> ISceneNavigator
+GameInputHandler --> ISettingsScene
+GameInputHandler --> PlayerCharacter
+GameMaster --> SceneManager
+GameMaster --> IGameEngine
+GameMaster --> AudioManager
+GameScene --> IGameEngine
+GameScene --> GameStateManager
+GameScene --> GameUIManager
+GameScene --> ScrollingBackground
+GameScene --> IQuestionProvider
+GameScene --> ContinuousLevelSpawner
+GameScene --> GameInputHandler
+GameScene --> AudioManager
+GameScene --> PlayerCharacter
+GameScene --> CombatDirector
+GameScene --> EntityCullingService
+GameScene --> ResultTransitionService
+GameScene --> WallHudCoordinator
+GameScene --> SegmentSpawnService
+GameScene --> GameProgressionService
+GameStateManager --> IQuestionProvider
+SegmentSpawnService --> ObstacleFactory
+SegmentSpawnService --> EnemyWaveFactory
+SegmentSpawnService --> WallHudCoordinator
+SegmentSpawnService --> EnemyWave
+SegmentSpawnService --> IQuestionProvider
+SegmentSpawnService --> AudioManager
+WallHudCoordinator --> WallGroup
+WallHudCoordinator --> EnemyWave
+WallHudCoordinator --> GameUIManager
+ResultTransitionService --> ISceneNavigator
+CombatDirector --> IGameEngine
+CombatDirector --> AudioManager
+CombatDirector --> CombatState
+EntityCullingService --> IGameEngine
+GameProgressionService --> ProgressionResult
+GameProgressionService --> PlayerCharacter
+GameProgressionService --> GameStateManager
+ContinuousLevelSpawner --> LevelSegment
+ContinuousLevelSpawner --> IQuestionProvider
+IQuestionProvider --> Question
+GameUIManager --> Question
+EnemyWaveFactory --> EnemyWave
+EnemyWaveFactory --> EnemyShipSpec
+ObstacleFactory --> WallType
+ObstacleFactory --> AnswerGate
+
+@enduml

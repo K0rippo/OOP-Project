@@ -10,11 +10,12 @@ public class AudioManager {
     private Sound breakSound;
 
     public void loadAssets() {
+        //load music and effects once during startup
         bgMusic = Gdx.audio.newMusic(Gdx.files.internal("Game Music.mp3"));
         bgMusic.setLooping(true);
-        
+
         laserSound = Gdx.audio.newSound(Gdx.files.internal("laser.mp3"));
-        breakSound = Gdx.audio.newSound(Gdx.files.internal("break.mp3")); 
+        breakSound = Gdx.audio.newSound(Gdx.files.internal("break.mp3"));
     }
 
     public void playMusic() {

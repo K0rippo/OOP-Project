@@ -74,10 +74,6 @@ public class EnemyShip extends RectangleEntity {
         }
     }
 
-    public boolean isWaveActive() {
-        return waveActive;
-    }
-
     @Override
     public void update(float deltaTime) {
         super.update(deltaTime);
@@ -134,7 +130,6 @@ public class EnemyShip extends RectangleEntity {
 
     @Override
     public void renderShape(ShapeRenderer shapeRenderer) {
-        // leave empty so the old rectangle ship is not drawn
     }
 
     public void dispose() {

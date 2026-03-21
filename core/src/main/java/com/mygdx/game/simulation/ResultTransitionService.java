@@ -2,9 +2,6 @@ package com.mygdx.game.simulation;
 
 import com.mygdx.game.engine.ISceneNavigator;
 
-/**
- * Encapsulates result scene transition policy.
- */
 class ResultTransitionService {
     private final ISceneNavigator sceneNavigator;
 

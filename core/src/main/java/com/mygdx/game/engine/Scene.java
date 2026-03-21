@@ -12,16 +12,14 @@ public abstract class Scene {
     }
 
     public String getId() { return id; }
-    
-    // Sets scene to active state
+
     public void show() { this.isActive = true; }
-    
-    // Sets scene to inactive state
+
     public void hide() { this.isActive = false; }
-    
+
     public boolean isActive() { return isActive; }
 
-    // Every scene MUST define how it updates, renders, and resizes itself
+    //each scene provides its own lifecycle behavior
     public abstract void update(float deltaTime);
     public abstract void render(SpriteBatch batch);
     public abstract void resize(int width, int height);

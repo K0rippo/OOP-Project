@@ -11,22 +11,20 @@ public class GameInputHandler {
     private final ISceneNavigator sceneNavigator;
     private PlayerCharacter player;
     private final float worldHeight;
-    private final float worldWidth = 1280f; // Added world width for right-side boundaries
+    private final float worldWidth = 1280f;
 
-    // Initializes the input handler with engine and navigation dependencies
     public GameInputHandler(IGameEngine engine, ISceneNavigator sceneNavigator, float worldHeight) {
         this.engine = engine;
         this.sceneNavigator = sceneNavigator;
         this.worldHeight = worldHeight;
     }
 
-    // Sets the active player character for input bindings
     public void setPlayer(PlayerCharacter player) {
         this.player = player;
     }
 
-    // Binds keyboard input to game actions
     public void initializeInput() {
+        //vertical movement with world bounds checks
         engine.bindKeyContinuous(Input.Keys.UP, () -> {
             if (player != null && !player.isControlsLocked() && player.getY() + player.getRadius() < worldHeight - 5)
                 player.setVelocityY(250f);
@@ -36,8 +34,8 @@ public class GameInputHandler {
             if (player != null && !player.isControlsLocked() && player.getY() - player.getRadius() > 5)
                 player.setVelocityY(-250f);
         });
-        
-        // --- ADDED LEFT AND RIGHT CONTROLS ---
+
+        //horizontal movement with world bounds checks
         engine.bindKeyContinuous(Input.Keys.LEFT, () -> {
             if (player != null && !player.isControlsLocked() && player.getX() - player.getRadius() > 5)
                 player.setVelocityX(-250f);
@@ -47,12 +45,12 @@ public class GameInputHandler {
             if (player != null && !player.isControlsLocked() && player.getX() + player.getRadius() < worldWidth - 5)
                 player.setVelocityX(250f);
         });
-        // -------------------------------------
 
         engine.bindKeyJustPressed(Input.Keys.SPACE, () -> {
             if (player != null) player.requestShoot();
         });
-        
+
+        //switch to settings and remember the return scene
         engine.bindKeyJustPressed(Input.Keys.ESCAPE, () -> {
             Scene settingsScene = sceneNavigator.getScene("SETTINGS");
             if (settingsScene instanceof ISettingsScene) {

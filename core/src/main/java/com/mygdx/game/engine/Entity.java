@@ -37,7 +37,6 @@ public abstract class Entity implements ICollidable, IRenderable {
 
     public int getId() { return id; }
     public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
     public Vector2 getPosition() { return new Vector2(getOrientate().getPosition()); }
     public void setPosition(Vector2 position) { orientate.setPosition(new Vector2(position)); }
     public void setPosition(float x, float y) { orientate.getPosition().set(x, y); }
@@ -55,6 +54,7 @@ public abstract class Entity implements ICollidable, IRenderable {
     public void setCollisionMask(int mask) { this.collisionMask = mask; }
 
     public boolean canCollideWith(Entity other) {
+        //collision requires both objects to include each other in masks
         return (this.collisionMask & other.getCollisionLayer()) != 0 &&
                (other.getCollisionMask() & this.collisionLayer) != 0;
     }

@@ -2,9 +2,6 @@ package com.mygdx.game.engine;
 
 import com.badlogic.gdx.math.Vector2;
 
-/**
- * Functional interface for movement logic to satisfy strategy injection
- */
 @FunctionalInterface
 interface MovementLogic {
     void move(Orientate orientate, Vector2 velocity, float deltaTime);
@@ -15,6 +12,6 @@ public interface iMovable {
     Orientate getOrientate();
     Vector2 getVelocity();
     void setVelocity(Vector2 velocity);
-    // Allow injecting logic as a lambda
+    //allow movement behavior injection at runtime
     void setMovementLogic(MovementLogic logic);
 }

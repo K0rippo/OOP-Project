@@ -3,9 +3,6 @@ package com.mygdx.game.simulation;
 import com.mygdx.game.engine.Entity;
 import com.mygdx.game.engine.IGameEngine;
 
-/**
- * Handles bulk entity cleanup and off-screen culling.
- */
 class EntityCullingService {
     private final IGameEngine engine;
     private final float worldWidth;
@@ -36,6 +33,7 @@ class EntityCullingService {
     }
 
     void cleanupOffScreen(Entity persistentPlayer) {
+        //remove entities that have moved far outside view bounds
         for (Entity entity : engine.getEntitiesByLayer(gateLayer)) {
             if (entity.getX() < -200f) engine.removeEntity(entity);
         }

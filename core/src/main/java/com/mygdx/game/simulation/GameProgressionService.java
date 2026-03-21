@@ -1,8 +1,5 @@
 package com.mygdx.game.simulation;
 
-/**
- * Handles gameplay progression tied to player events and game state.
- */
 class GameProgressionService {
 
     ProgressionResult update(PlayerCharacter player, GameStateManager gameState, int score) {

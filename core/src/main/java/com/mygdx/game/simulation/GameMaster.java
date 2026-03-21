@@ -26,13 +26,14 @@ public class GameMaster extends ApplicationAdapter {
     public void create() {
         batch        = new SpriteBatch();
         sceneManager = new SceneManager();
-        
+
+        //compose core managers before creating scenes
         EntityManager entityManager = new EntityManager();
         CollisionManager collisionManager = new CollisionManager(1280f, 720f);
         IOManager ioManager = new IOManager();
         MovementManager movementManager = new MovementManager();
         RenderManager renderManager = new RenderManager();
-        
+
         gameEngine   = new Engine(entityManager, collisionManager, ioManager, movementManager, renderManager);
 
         Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
@@ -41,20 +42,17 @@ public class GameMaster extends ApplicationAdapter {
         uiButtonTexture = new Texture(pixmap);
         pixmap.dispose();
 
-        // Load questions from CSV file (assets/questions.csv)
         IQuestionProvider questionProvider = new CsvQuestionProvider();
 
-        // Initialize the AudioManager
         audioManager = new AudioManager();
         audioManager.loadAssets();
 
-        // ONLY GameScene gets the gameEngine injected now!
+        //inject engine only into gameplay scene
         sceneManager.addScene("MENU",     new MenuScene    ("MENU",     sceneManager, uiButtonTexture));
         sceneManager.addScene("INSTRUCTIONS", new InstructionsScene("INSTRUCTIONS", sceneManager, uiButtonTexture));
-        
-        // Pass the AudioManager into the GameScene constructor
+
         sceneManager.addScene("GAME",     new GameScene    ("GAME",     sceneManager, gameEngine, questionProvider, audioManager));
-        
+
         sceneManager.addScene("SETTINGS", new SettingsScene("SETTINGS", sceneManager, uiButtonTexture));
         sceneManager.addScene("RESULT",   new ResultScene  ("RESULT",   sceneManager, uiButtonTexture));
 
@@ -82,8 +80,7 @@ public class GameMaster extends ApplicationAdapter {
         batch.dispose();
         uiButtonTexture.dispose();
         gameEngine.dispose();
-        
-        // Clean up audio resources
+
         if (audioManager != null) {
             audioManager.dispose();
         }

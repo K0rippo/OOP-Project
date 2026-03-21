@@ -80,6 +80,7 @@ public class Quadtree {
 
         if (objects.size() > MAX_OBJECTS && level < MAX_LEVELS) {
             if (nodes[0] == null) {
+                //split node once object capacity is exceeded
                 split();
             }
 
@@ -101,6 +102,7 @@ public class Quadtree {
             nodes[index].retrieve(returnObjects, pEntity);
         }
 
+        //include local objects that span multiple child regions
         returnObjects.addAll(objects);
         return returnObjects;
     }

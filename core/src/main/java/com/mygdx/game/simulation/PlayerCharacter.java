@@ -14,11 +14,9 @@ public class PlayerCharacter extends Circle {
     private static final float WORLD_WIDTH          = 1280f;
     private static final float INVULNERABILITY_TIME = 3.0f;
     private static final float GATE_COOLDOWN_TIME   = 2.0f;
-    // Duration where input is ignored after a bounce
     private static final float BOUNCE_LOCK_TIME     = 0.35f;
-    
-    // Increased bounce-back speed so it's noticeable when you hit a wall
-    private static final float BOUNCE_BACK_SPEED    = -1200f; 
+
+    private static final float BOUNCE_BACK_SPEED    = -1200f;
 
     private final Texture texture;
 
@@ -49,7 +47,7 @@ public class PlayerCharacter extends Circle {
         float rightLimit  = WORLD_WIDTH - radius;
         float leftLimit   = radius;
 
-        // --- Screen Boundaries ---
+        //clamp player inside world bounds
         if (getY() > topLimit) {
             setY(topLimit);
             setVelocityY(0f);
@@ -65,8 +63,6 @@ public class PlayerCharacter extends Circle {
             setX(leftLimit);
             setVelocityX(0f);
         }
-
-        // DELETED: The old Bounce Recovery code that broke left movement is gone!
     }
 
     @Override
@@ -86,6 +82,7 @@ public class PlayerCharacter extends Circle {
                     reachedGate  = true;
                     gateCooldown = GATE_COOLDOWN_TIME;
                 } else if (isPlayerCentreInsideWall(gate)) {
+                    applyWallBounce(gate);
                     applyDamage();
                 }
             }
@@ -94,6 +91,7 @@ public class PlayerCharacter extends Circle {
 
         if (other instanceof BreakableBarrier) {
             if (!isPlayerCentreInsideWall(other)) return;
+            applyWallBounce((RectangleEntity) other);
             applyDamage();
             return;
         }
@@ -150,9 +148,24 @@ public class PlayerCharacter extends Circle {
         if (invulnerabilityTimer <= 0f) {
             tookDamage           = true;
             invulnerabilityTimer = INVULNERABILITY_TIME;
-            controlLockTimer     = BOUNCE_LOCK_TIME;
-            setVelocityX(BOUNCE_BACK_SPEED);
+            applyKnockback();
         }
+    }
+
+    private void applyWallBounce(RectangleEntity wall) {
+        float maxAllowedX = wall.getX() - radius - 1f;
+        if (getX() > maxAllowedX) {
+            setX(maxAllowedX);
+        }
+
+        applyKnockback();
+    }
+
+    private void applyKnockback() {
+        if (controlLockTimer < BOUNCE_LOCK_TIME) {
+            controlLockTimer = BOUNCE_LOCK_TIME;
+        }
+        setVelocityX(BOUNCE_BACK_SPEED);
     }
 
     public void dispose() {

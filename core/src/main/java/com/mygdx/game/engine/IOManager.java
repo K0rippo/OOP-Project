@@ -7,27 +7,26 @@ import java.util.Map;
 
 public class IOManager implements InputProcessor {
 
-    // Map KeyCode (Integer) -> Function to run (Runnable)
-    private Map<Integer, Runnable> justPressedBindings; // For things like Jump (press once)
-    private Map<Integer, Runnable> continuousBindings;  // For things like Move (hold down)
+    private Map<Integer, Runnable> justPressedBindings;
+    private Map<Integer, Runnable> continuousBindings;
 
     public IOManager() {
         this.justPressedBindings = new HashMap<>();
         this.continuousBindings = new HashMap<>();
-        
+
     }
 
-    // Triggers only once when the key is first pressed. (Single Action)
     public void bindKeyJustPressed(int keyCode, Runnable command) {
         justPressedBindings.put(keyCode, command);
     }
 
-    // Triggers every frame while the key is held down. (Moving)
     public void bindKeyContinuous(int keyCode, Runnable command) {
         continuousBindings.put(keyCode, command);
     }
 
     public void handleInput() {
+
+        //run one-time actions before hold actions
 
         if (!justPressedBindings.isEmpty()) {
             for (Map.Entry<Integer, Runnable> entry : justPressedBindings.entrySet()) {
@@ -46,8 +45,6 @@ public class IOManager implements InputProcessor {
         }
     }
 
-    // --- InputProcessor Stubs (Required by LibGDX interface) ---
-    // We handle input via polling in handleInput(), so these can return false/empty.
     @Override public boolean keyDown(int keycode) { return false; }
     @Override public boolean keyUp(int keycode) { return false; }
     @Override public boolean keyTyped(char character) { return false; }

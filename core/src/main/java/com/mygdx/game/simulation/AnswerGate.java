@@ -4,9 +4,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.engine.RectangleEntity;
 
-/**
- * Typed gate entity to remove string-based gate logic from player collision handling.
- */
 public class AnswerGate extends RectangleEntity {
     private final boolean correctLane;
 

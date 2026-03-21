@@ -4,9 +4,6 @@ import com.mygdx.game.engine.RectangleEntity;
 import com.badlogic.gdx.utils.Array;
 import java.util.function.IntConsumer;
 
-/**
- * Owns wall-group state and HUD synchronization behavior.
- */
 class WallHudCoordinator {
     static class WallGroup {
         private final int questionIndex;
@@ -98,6 +95,7 @@ class WallHudCoordinator {
     }
 
     void triggerUpcomingWaves(Array<EnemyWave> enemyWaves) {
+        //activate next wave after its wall group has been passed
         for (WallGroup group : wallGroups) {
             if (group.isPassed() && !group.isNextWaveTriggered()) {
                 group.markNextWaveTriggered();
@@ -131,6 +129,7 @@ class WallHudCoordinator {
         int max = wallGroups.size * 3;
 
         if (max == 0) {
+            //clear hud labels when no active groups remain
             uiManager.syncAnswerLabels(new String[0], new float[0], new float[0], new float[0], 0);
             return;
         }

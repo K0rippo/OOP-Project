@@ -39,33 +39,33 @@ public class InstructionsScene extends Scene {
 
         TextureRegionDrawable baseDrawable = new TextureRegionDrawable(new TextureRegion(buttonTexture));
         Image bgImage = new Image(baseDrawable);
-        bgImage.setColor(new Color(0.05f, 0.08f, 0.15f, 1f)); 
+        bgImage.setColor(new Color(0.05f, 0.08f, 0.15f, 1f));
         bgImage.setFillParent(true);
         stage.addActor(bgImage);
 
-        Color cyanBorder  = new Color(0.0f, 0.8f, 1.0f, 1f);     
-        Color yellowBorder = new Color(1.0f, 0.8f, 0.1f, 1f); 
-        Color coreBlue    = new Color(0.15f, 0.35f, 0.65f, 1f); 
-        Color hoverBlue   = new Color(0.25f, 0.50f, 0.85f, 1f); 
+        Color cyanBorder  = new Color(0.0f, 0.8f, 1.0f, 1f);
+        Color yellowBorder = new Color(1.0f, 0.8f, 0.1f, 1f);
+        Color coreBlue    = new Color(0.15f, 0.35f, 0.65f, 1f);
+        Color hoverBlue   = new Color(0.25f, 0.50f, 0.85f, 1f);
 
         TextButton.TextButtonStyle cyanStyle = new TextButton.TextButtonStyle();
         cyanStyle.font = buttonFont;
-        cyanStyle.fontColor = Color.WHITE; 
-        cyanStyle.up = createPillButtonDrawable(coreBlue, cyanBorder);     
-        cyanStyle.over = createPillButtonDrawable(hoverBlue, cyanBorder); 
-        cyanStyle.down = createPillButtonDrawable(cyanBorder, Color.WHITE); 
+        cyanStyle.fontColor = Color.WHITE;
+        cyanStyle.up = createPillButtonDrawable(coreBlue, cyanBorder);
+        cyanStyle.over = createPillButtonDrawable(hoverBlue, cyanBorder);
+        cyanStyle.down = createPillButtonDrawable(cyanBorder, Color.WHITE);
 
         TextButton.TextButtonStyle yellowStyle = new TextButton.TextButtonStyle();
         yellowStyle.font = buttonFont;
-        yellowStyle.fontColor = Color.WHITE; 
-        yellowStyle.up = createPillButtonDrawable(coreBlue, yellowBorder);     
-        yellowStyle.over = createPillButtonDrawable(hoverBlue, yellowBorder); 
+        yellowStyle.fontColor = Color.WHITE;
+        yellowStyle.up = createPillButtonDrawable(coreBlue, yellowBorder);
+        yellowStyle.over = createPillButtonDrawable(hoverBlue, yellowBorder);
         yellowStyle.down = createPillButtonDrawable(yellowBorder, Color.WHITE);
 
         TextureRegionDrawable panelBackground = createPanelDrawable(cyanBorder);
 
-        Label.LabelStyle titleStyle = new Label.LabelStyle(titleFont, Color.WHITE); 
-        Label titleLabel = new Label("HOW TO PLAY", titleStyle); 
+        Label.LabelStyle titleStyle = new Label.LabelStyle(titleFont, Color.WHITE);
+        Label titleLabel = new Label("HOW TO PLAY", titleStyle);
         titleLabel.setAlignment(Align.center);
 
         Label.LabelStyle textStyle = new Label.LabelStyle(textFont, Color.WHITE);
@@ -82,13 +82,13 @@ public class InstructionsScene extends Scene {
 
         Table panelTable = new Table();
         panelTable.setBackground(panelBackground);
-        panelTable.setSize(600, 600); 
-        
+        panelTable.setSize(600, 600);
+
         panelTable.add(titleLabel).width(600).padTop(25).padBottom(40).row();
         panelTable.add(instructionsLabel).padBottom(50).row();
         panelTable.add(btnStart).size(350, 65).padBottom(20).row();
         panelTable.add(btnBack).size(350, 65);
-        panelTable.add().expandY().fillY(); 
+        panelTable.add().expandY().fillY();
 
         Table masterTable = new Table();
         masterTable.setFillParent(true);
@@ -128,7 +128,7 @@ public class InstructionsScene extends Scene {
 
         p.setColor(coreColor);
         fillRoundedRect(p, 6, 6, w - 12, h - 12, r - 6);
-        
+
         p.setColor(new Color(1f, 1f, 1f, 0.15f));
         p.fillRectangle(r, 6, w - 2 * r, (h - 12) / 2);
 
@@ -139,8 +139,8 @@ public class InstructionsScene extends Scene {
 
     private TextureRegionDrawable createPanelDrawable(Color borderColor) {
         int w = 600; 
-        int h = 600; 
-        int r = 20; 
+        int h = 600;
+        int r = 20;
         Pixmap p = new Pixmap(w, h, Pixmap.Format.RGBA8888);
 
         p.setColor(borderColor);
@@ -149,10 +149,9 @@ public class InstructionsScene extends Scene {
         p.setColor(new Color(0.02f, 0.1f, 0.25f, 0.95f));
         fillRoundedRect(p, 5, 5, w - 10, h - 10, r - 5);
 
-        // --- NEW SCI-FI SPACESHIP HEADER ---
-        p.setColor(new Color(0.08f, 0.18f, 0.38f, 1f)); 
-        fillRoundedRect(p, 5, 5, w - 10, 80, r - 5); 
-        p.fillRectangle(5, 25, w - 10, 60);          
+        p.setColor(new Color(0.08f, 0.18f, 0.38f, 1f));
+        fillRoundedRect(p, 5, 5, w - 10, 80, r - 5);
+        p.fillRectangle(5, 25, w - 10, 60);
 
         p.setColor(new Color(0.03f, 0.1f, 0.25f, 1f));
         for (int y = 15; y < 75; y += 12) {
@@ -160,13 +159,11 @@ public class InstructionsScene extends Scene {
         }
 
         p.setColor(new Color(0.0f, 0.8f, 1.0f, 0.8f));
-        p.fillCircle(25, 45, 6); 
-        p.fillCircle(w - 25, 45, 6); 
+        p.fillCircle(25, 45, 6);
+        p.fillCircle(w - 25, 45, 6);
 
         p.setColor(new Color(1f, 1f, 1f, 0.15f));
         p.fillRectangle(15, 8, w - 30, 5);
-        // --------------------------------------
-
         p.setColor(borderColor);
         p.fillRectangle(5, 85, w - 10, 4);
 
@@ -192,19 +189,19 @@ public class InstructionsScene extends Scene {
     @Override
     public void show() { 
         super.show();
-        Gdx.input.setInputProcessor(stage); 
+        Gdx.input.setInputProcessor(stage);
     }
 
     @Override
     public void hide() { 
         super.hide();
-        Gdx.input.setInputProcessor(null); 
+        Gdx.input.setInputProcessor(null);
     }
 
     @Override
     public void update(float deltaTime) { 
         if (!isActive()) return;
-        stage.act(deltaTime); 
+        stage.act(deltaTime);
     }
 
     @Override

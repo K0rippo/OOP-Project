@@ -13,13 +13,11 @@ import com.mygdx.game.engine.*;
 
 public class GameScene extends Scene {
 
-    // ── Collision layers ────────────────────────────────────────────────────
     public static final int LAYER_PLAYER       = 1;
     public static final int LAYER_GATE         = 2;
     public static final int LAYER_ENEMY        = 4;
     public static final int LAYER_ENEMY_BULLET = 8;
 
-    // ── World constants ─────────────────────────────────────────────────────
     private static final float WORLD_WIDTH         = 1280f;
     private static final float WORLD_HEIGHT        = 720f;
     private static final float PLAYER_X            = 140f;
@@ -49,7 +47,6 @@ public class GameScene extends Scene {
 
     private final Array<EnemyWave> enemyWaves = new Array<>();
 
-    // ── State ───────────────────────────────────────────────────────────────
     private Color currentBGColor = new Color(0.08f, 0.10f, 0.18f, 1f);
 
     private int nextPlayerBulletId = 1000;
@@ -67,7 +64,7 @@ public class GameScene extends Scene {
         super(id);
         this.engine           = engine;
         this.questionProvider = questionProvider;
-        this.audioManager     = audioManager; // Assigning it here
+        this.audioManager     = audioManager;
         ObstacleFactory obstacleFactory = new ObstacleFactory();
         this.gameState        = new GameStateManager(questionProvider);
         this.stage            = new Stage(new StretchViewport(WORLD_WIDTH, WORLD_HEIGHT));
@@ -120,8 +117,6 @@ public class GameScene extends Scene {
 
         if (player == null) {
             player = new PlayerCharacter(1, new Vector2(PLAYER_X, WORLD_HEIGHT / 2f), 25f);
-            player.setCollisionLayer(LAYER_PLAYER);
-            player.setCollisionMask(LAYER_GATE | LAYER_ENEMY_BULLET);
             engine.addEntity(player);
         } else {
             player.setPosition(PLAYER_X, WORLD_HEIGHT / 2f);
@@ -129,12 +124,17 @@ public class GameScene extends Scene {
             player.consumeDamage();
             player.consumeGoal();
             player.consumeShoot();
-            player.setCollisionLayer(LAYER_PLAYER);
-            player.setCollisionMask(LAYER_GATE | LAYER_ENEMY_BULLET);
         }
+
+        configurePlayerCollision();
 
         inputHandler.setPlayer(player);
         levelSpawner = new ContinuousLevelSpawner(questionProvider, FIRST_SEGMENT_X, segmentSpawnService::spawnSegment);
+    }
+
+    private void configurePlayerCollision() {
+        player.setCollisionLayer(LAYER_PLAYER);
+        player.setCollisionMask(LAYER_GATE | LAYER_ENEMY_BULLET);
     }
 
     public void requestRestart() {
@@ -146,8 +146,7 @@ public class GameScene extends Scene {
         super.show();
         paused = false;
         engine.setSpeedMultiplier(1f);
-        
-        // Play music when scene shows
+
         if (audioManager != null) {
             audioManager.playMusic();
         }
@@ -163,8 +162,7 @@ public class GameScene extends Scene {
         super.hide();
         paused = true;
         engine.setSpeedMultiplier(0f);
-        
-        // Pause music when navigating away
+
         if (audioManager != null) {
             audioManager.pauseMusic();
         }
@@ -192,6 +190,7 @@ public class GameScene extends Scene {
 
         levelSpawner.update(scrolledDistance + WORLD_WIDTH);
 
+        //combat update returns cooldown and bullet id state
         CombatDirector.CombatState combatState = combatDirector.update(
             player,
             shootCooldown,
@@ -225,15 +224,7 @@ public class GameScene extends Scene {
 
         wallHudCoordinator.updateHudForApproachingSegments(PLAYER_X, HUD_SWITCH_DISTANCE, this::showQuestionOnHud);
         wallHudCoordinator.syncAnswerLabelsToUI(uiManager);
-        
-        Array<BreakableBarrier> activeBarriers = new Array<>();
-        for (Entity e : engine.getEntitiesByLayer(LAYER_GATE)) {
-            if (e instanceof BreakableBarrier) {
-                activeBarriers.add((BreakableBarrier) e);
-            }
-        }
-        uiManager.syncBarrierHp(activeBarriers);
-        
+
         uiManager.act(deltaTime);
 
     }
@@ -249,9 +240,9 @@ public class GameScene extends Scene {
         batch.setProjectionMatrix(stage.getCamera().combined);
 
         background.render(batch, currentBGColor);
-        
+
         engine.render(batch);
-        
+
         renderUI(batch);
     }
 
@@ -288,6 +279,6 @@ public class GameScene extends Scene {
         if (player != null) player.dispose();
         if (uiManager != null) uiManager.dispose();
         background.dispose();
-        BreakableBarrier.disposeTextures(); 
+        BreakableBarrier.disposeTextures();
     }
 }

@@ -6,9 +6,6 @@ import com.mygdx.game.engine.IGameEngine;
 import com.mygdx.game.engine.RectangleEntity;
 import java.util.function.IntConsumer;
 
-/**
- * Handles segment content creation: waves, gates, and barriers.
- */
 class SegmentSpawnService {
     private final IGameEngine engine;
     private final IQuestionProvider questionProvider;
@@ -61,16 +58,19 @@ class SegmentSpawnService {
     void spawnSegment(LevelSegment segment) {
         int questionIndex = segment.getQuestionIndex();
         Question question = questionProvider.getQuestion(questionIndex);
+        //skip this segment if question data is missing
         if (question == null) return;
 
         Array<String> shuffled = new Array<>(question.getAnswers());
         shuffled.shuffle();
 
+        //the first answer in the source data is treated as correct
         int correctIndex = shuffled.indexOf(question.getAnswers()[0], false);
         String[] shuffledArr = shuffled.toArray(String.class);
 
         float sectionHeight = worldHeight / 3f;
 
+        //spawn wave first, then gates and barriers for the same segment
         spawnEnemyWave(segment);
 
         WallHudCoordinator.WallGroup group = wallHudCoordinator.createGroup(questionIndex, shuffledArr);
@@ -95,6 +95,7 @@ class SegmentSpawnService {
         nextEnemyShipId += wave.getShips().size;
 
         for (EnemyShip ship : wave.getShips()) {
+            //ships stay non-collidable until their wave gets activated
             ship.setCollisionLayer(enemyLayer);
             ship.setCollisionMask(0);
             engine.addEntity(ship);
@@ -141,6 +142,7 @@ class SegmentSpawnService {
             barrier.setCollisionLayer(gateLayer);
             barrier.setCollisionMask(playerLayer);
 
+            //play break feedback when a barrier is destroyed
             barrier.setOnBreakCallback(() -> {
                 if (audioManager != null) {
                     audioManager.playBreakSound();

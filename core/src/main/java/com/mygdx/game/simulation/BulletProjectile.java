@@ -16,6 +16,7 @@ public class BulletProjectile extends RectangleEntity {
     public void update(float deltaTime) {
         super.update(deltaTime);
 
+        //cull projectile once it is fully off the left side
         if (getX() + getWidth() < -30f) {
             setActive(false);
         }

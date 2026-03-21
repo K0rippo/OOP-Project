@@ -33,6 +33,7 @@ public class EnemyWave {
         if (activated) return;
         activated = true;
 
+        //flip each ship into active wave behavior
         for (EnemyShip ship : ships) {
             ship.setWaveActive(true);
         }

@@ -12,7 +12,7 @@ public class EnemyBullet extends RectangleEntity {
     private static final float WORLD_MIN_Y = -80f;
     private static final float WORLD_MAX_Y = 800f;
 
-    private static final float BULLET_LIFETIME = 9.0f; // seconds
+    private static final float BULLET_LIFETIME = 9.0f;
     private float lifeTimer = 0f;
 
     public EnemyBullet(int id,
@@ -28,6 +28,7 @@ public class EnemyBullet extends RectangleEntity {
     public void update(float deltaTime) {
         super.update(deltaTime);
 
+        //expire bullets even if they stay inside bounds
         lifeTimer += deltaTime;
 
         if (lifeTimer >= BULLET_LIFETIME) {

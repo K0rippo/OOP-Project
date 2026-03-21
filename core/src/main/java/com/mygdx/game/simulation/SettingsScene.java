@@ -48,57 +48,52 @@ public class SettingsScene extends Scene implements ISettingsScene {
         bgImage.setFillParent(true);
         stage.addActor(bgImage);
 
-        // --- DEFINING THE COLORS ---
-        Color cyanBorder   = new Color(0.0f, 0.8f, 1.0f, 1f);     
-        Color redBorder    = new Color(1.0f, 0.2f, 0.2f, 1f); 
-        Color yellowBorder = new Color(1.0f, 0.8f, 0.1f, 1f); // Added Yellow Border
-        Color coreBlue     = new Color(0.15f, 0.35f, 0.65f, 1f); 
-        Color hoverBlue    = new Color(0.25f, 0.50f, 0.85f, 1f); 
+        Color cyanBorder   = new Color(0.0f, 0.8f, 1.0f, 1f);
+        Color redBorder    = new Color(1.0f, 0.2f, 0.2f, 1f);
+        Color yellowBorder = new Color(1.0f, 0.8f, 0.1f, 1f);
+        Color coreBlue     = new Color(0.15f, 0.35f, 0.65f, 1f);
+        Color hoverBlue    = new Color(0.25f, 0.50f, 0.85f, 1f);
 
-        // --- BUTTON STYLES ---
         audioActiveStyle = new TextButton.TextButtonStyle();
         audioActiveStyle.font = buttonFont;
-        audioActiveStyle.fontColor = Color.WHITE; 
-        audioActiveStyle.up = createPillButtonDrawable(coreBlue, cyanBorder);     
-        audioActiveStyle.over = createPillButtonDrawable(hoverBlue, cyanBorder); 
-        audioActiveStyle.down = createPillButtonDrawable(cyanBorder, Color.WHITE); 
+        audioActiveStyle.fontColor = Color.WHITE;
+        audioActiveStyle.up = createPillButtonDrawable(coreBlue, cyanBorder);
+        audioActiveStyle.over = createPillButtonDrawable(hoverBlue, cyanBorder);
+        audioActiveStyle.down = createPillButtonDrawable(cyanBorder, Color.WHITE);
 
         audioMutedStyle = new TextButton.TextButtonStyle();
         audioMutedStyle.font = buttonFont;
-        audioMutedStyle.fontColor = Color.WHITE; 
-        audioMutedStyle.up = createPillButtonDrawable(coreBlue, redBorder);     
-        audioMutedStyle.over = createPillButtonDrawable(hoverBlue, redBorder); 
-        audioMutedStyle.down = createPillButtonDrawable(redBorder, Color.WHITE); 
+        audioMutedStyle.fontColor = Color.WHITE;
+        audioMutedStyle.up = createPillButtonDrawable(coreBlue, redBorder);
+        audioMutedStyle.over = createPillButtonDrawable(hoverBlue, redBorder);
+        audioMutedStyle.down = createPillButtonDrawable(redBorder, Color.WHITE);
 
-        // Added Yellow Style for the navigation buttons
         TextButton.TextButtonStyle yellowStyle = new TextButton.TextButtonStyle();
         yellowStyle.font = buttonFont;
-        yellowStyle.fontColor = Color.WHITE; 
-        yellowStyle.up = createPillButtonDrawable(coreBlue, yellowBorder);     
-        yellowStyle.over = createPillButtonDrawable(hoverBlue, yellowBorder); 
-        yellowStyle.down = createPillButtonDrawable(yellowBorder, Color.WHITE); 
+        yellowStyle.fontColor = Color.WHITE;
+        yellowStyle.up = createPillButtonDrawable(coreBlue, yellowBorder);
+        yellowStyle.over = createPillButtonDrawable(hoverBlue, yellowBorder);
+        yellowStyle.down = createPillButtonDrawable(yellowBorder, Color.WHITE);
 
         TextureRegionDrawable panelBackground = createPanelDrawable(cyanBorder);
 
-        // --- INSTANTIATE BUTTONS ---
         btnMute = new TextButton("AUDIO: ACTIVE", audioActiveStyle);
-        btnBack = new TextButton("RESUME", yellowStyle); // Now uses yellowStyle
-        btnExitMenu = new TextButton("ABORT MISSION", yellowStyle); // Now uses yellowStyle
+        btnBack = new TextButton("RESUME", yellowStyle);
+        btnExitMenu = new TextButton("ABORT MISSION", yellowStyle);
 
-        Label.LabelStyle titleStyle = new Label.LabelStyle(titleFont, Color.WHITE); 
+        Label.LabelStyle titleStyle = new Label.LabelStyle(titleFont, Color.WHITE);
         Label titleLabel = new Label("OPTIONS", titleStyle);
         titleLabel.setAlignment(Align.center);
 
-        // --- LAYOUT ---
         Table panelTable = new Table();
         panelTable.setBackground(panelBackground);
-        panelTable.setSize(500, 600); 
-        
+        panelTable.setSize(500, 600);
+
         panelTable.add(titleLabel).width(500).padTop(25).padBottom(60).row();
         panelTable.add(btnMute).size(350, 65).padBottom(20).row();
         panelTable.add(btnBack).size(350, 65).padBottom(20).row();
         panelTable.add(btnExitMenu).size(350, 65);
-        panelTable.add().expandY().fillY(); 
+        panelTable.add().expandY().fillY();
 
         Table masterTable = new Table();
         masterTable.setFillParent(true);
@@ -107,7 +102,6 @@ public class SettingsScene extends Scene implements ISettingsScene {
 
         stage.addActor(masterTable);
 
-        // --- LISTENERS ---
         btnMute.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -144,7 +138,7 @@ public class SettingsScene extends Scene implements ISettingsScene {
 
         p.setColor(coreColor);
         fillRoundedRect(p, 6, 6, w - 12, h - 12, r - 6);
-        
+
         p.setColor(new Color(1f, 1f, 1f, 0.15f));
         p.fillRectangle(r, 6, w - 2 * r, (h - 12) / 2);
 
@@ -155,8 +149,8 @@ public class SettingsScene extends Scene implements ISettingsScene {
 
     private TextureRegionDrawable createPanelDrawable(Color borderColor) {
         int w = 500;
-        int h = 600; 
-        int r = 20; 
+        int h = 600;
+        int r = 20;
         Pixmap p = new Pixmap(w, h, Pixmap.Format.RGBA8888);
 
         p.setColor(borderColor);
@@ -165,10 +159,9 @@ public class SettingsScene extends Scene implements ISettingsScene {
         p.setColor(new Color(0.02f, 0.1f, 0.25f, 0.95f));
         fillRoundedRect(p, 5, 5, w - 10, h - 10, r - 5);
 
-        // --- NEW SCI-FI SPACESHIP HEADER ---
-        p.setColor(new Color(0.08f, 0.18f, 0.38f, 1f)); 
-        fillRoundedRect(p, 5, 5, w - 10, 80, r - 5); 
-        p.fillRectangle(5, 25, w - 10, 60);          
+        p.setColor(new Color(0.08f, 0.18f, 0.38f, 1f));
+        fillRoundedRect(p, 5, 5, w - 10, 80, r - 5);
+        p.fillRectangle(5, 25, w - 10, 60);
 
         p.setColor(new Color(0.03f, 0.1f, 0.25f, 1f));
         for (int y = 15; y < 75; y += 12) {
@@ -176,13 +169,11 @@ public class SettingsScene extends Scene implements ISettingsScene {
         }
 
         p.setColor(new Color(0.0f, 0.8f, 1.0f, 0.8f));
-        p.fillCircle(25, 45, 6); 
-        p.fillCircle(w - 25, 45, 6); 
+        p.fillCircle(25, 45, 6);
+        p.fillCircle(w - 25, 45, 6);
 
         p.setColor(new Color(1f, 1f, 1f, 0.15f));
         p.fillRectangle(15, 8, w - 30, 5);
-        // --------------------------------------
-
         p.setColor(borderColor);
         p.fillRectangle(5, 85, w - 10, 4);
 
@@ -204,10 +195,10 @@ public class SettingsScene extends Scene implements ISettingsScene {
         this.previousSceneId = id;
         if (id.equals("MENU")) {
             btnBack.setText("RETURN TO MENU");
-            btnExitMenu.setVisible(false); 
+            btnExitMenu.setVisible(false);
         } else {
             btnBack.setText("RESUME MISSION");
-            btnExitMenu.setVisible(true); 
+            btnExitMenu.setVisible(true);
         }
     }
 
@@ -235,13 +226,14 @@ public class SettingsScene extends Scene implements ISettingsScene {
     public void show() {
         super.show();
         Gdx.input.setInputProcessor(stage);
-        updateButtonText(); 
+        //refresh audio button state when scene becomes active
+        updateButtonText();
     }
 
     @Override
     public void hide() { 
         super.hide();
-        Gdx.input.setInputProcessor(null); 
+        Gdx.input.setInputProcessor(null);
     }
 
     @Override

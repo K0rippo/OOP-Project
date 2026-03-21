@@ -5,15 +5,6 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
 
-/**
- * CsvQuestionProvider - loads questions from a CSV file.
- * 
- * CSV Format:
- * question,correct_answer,wrong_answer_1,wrong_answer_2,theme_color_r,theme_color_g,theme_color_b,time_limit
- * 
- * SRP: Responsible only for loading and parsing CSV data into Question objects.
- * DIP: Implements IQuestionProvider - GameScene doesn't care where questions come from.
- */
 public class CsvQuestionProvider implements IQuestionProvider {
     private Array<Question> questions;
     private static final String CSV_FILE = "questions.csv";
@@ -40,7 +31,7 @@ public class CsvQuestionProvider implements IQuestionProvider {
                 return;
             }
 
-            // Skip header line (line 0)
+            //skip csv header row
             for (int i = 1; i < lines.length; i++) {
                 String line = lines[i].trim();
                 if (line.isEmpty()) continue;
@@ -70,13 +61,9 @@ public class CsvQuestionProvider implements IQuestionProvider {
         }
     }
 
-    /**
-     * Parse a single CSV line into a Question object.
-     * Format: question,correct_answer,wrong_answer_1,wrong_answer_2,color_r,color_g,color_b,time_limit
-     */
     private Question parseQuestionFromCsvLine(String line) {
         try {
-            // Simple CSV parsing - handles quotes around fields with commas
+            //handle commas inside quoted fields
             String[] fields = parseCSVLine(line);
 
             if (fields.length < 8) {
@@ -94,7 +81,7 @@ public class CsvQuestionProvider implements IQuestionProvider {
             float colorB = Float.parseFloat(fields[6].trim());
             float timeLimit = Float.parseFloat(fields[7].trim());
 
-            // First element in array must be the correct answer
+            //first answer slot is treated as the correct answer
             String[] answers = { correctAnswer, wrongAnswer1, wrongAnswer2 };
             Color themeColor = new Color(colorR, colorG, colorB, 1f);
 
@@ -109,10 +96,6 @@ public class CsvQuestionProvider implements IQuestionProvider {
         }
     }
 
-    /**
-     * Simple CSV line parser that handles quoted fields containing commas.
-     * Splits on commas that are not inside quotes.
-     */
     private String[] parseCSVLine(String line) {
         Array<String> fields = new Array<>();
         StringBuilder currentField = new StringBuilder();
@@ -135,9 +118,6 @@ public class CsvQuestionProvider implements IQuestionProvider {
         return fields.toArray(String.class);
     }
 
-    /**
-     * Fallback to default questions if CSV loading fails.
-     */
     private void loadDefaultQuestions() {
         questions.clear();
         questions.add(new Question(
@@ -193,10 +173,6 @@ public class CsvQuestionProvider implements IQuestionProvider {
         return questions.size;
     }
 
-    /**
-     * Reshuffle questions for a new game.
-     * Call this when starting a new game to ensure different question order.
-     */
     @Override
     public void shuffleForNewGame() {
         questions.shuffle();

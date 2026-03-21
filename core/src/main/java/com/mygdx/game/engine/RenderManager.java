@@ -12,18 +12,18 @@ public class RenderManager {
     }
 
     public void render(SpriteBatch batch, List<Entity> entities) {
-        // Draw all sprites first
+        //draw sprite based visuals first
         for (Entity e : entities) {
             if (e.isActive()) {
                 e.render(batch);
             }
         }
 
+        //switch to shape renderer for geometry overlays
         batch.end();
         shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
 
-        // Draw geometric shapes
         for (Entity e : entities) {
             if (e.isActive()) {
                 e.renderShape(shapeRenderer);

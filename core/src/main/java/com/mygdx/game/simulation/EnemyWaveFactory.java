@@ -13,16 +13,14 @@ public class EnemyWaveFactory {
         EnemyWave wave = new EnemyWave(questionIndex);
 
         Array<EnemyShipSpec> specs = buildDefaultSpecs(scrollSpeed);
+        CircleBulletPattern pattern = new CircleBulletPattern(
+            15,
+            90f,
+            125f
+        );
 
         int nextId = firstShipId;
         for (EnemyShipSpec spec : specs) {
-
-            CircleBulletPattern pattern = new CircleBulletPattern(
-                    15,    // bullet count
-                    90f,  // bullet speed
-                    125f    // bullet spread
-            );
-
             EnemyShip ship = new EnemyShip(
                     nextId++,
                     new Vector2(sectionStartX + spec.getOffsetX(), worldHeight * spec.getYRatio()),
@@ -37,6 +35,7 @@ public class EnemyWaveFactory {
             wave.addShip(ship);
         }
 
+        //activate first wave immediately for initial pressure
         if (questionIndex == 0) {
             wave.activate();
         }

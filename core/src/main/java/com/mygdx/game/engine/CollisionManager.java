@@ -8,13 +8,11 @@ public class CollisionManager {
     private Quadtree quadtree;
     private HashSet<Long> processedPairs;
 
-    // Initializes the collision manager with dynamic world bounds
     public CollisionManager(float worldWidth, float worldHeight) {
         this.quadtree = new Quadtree(0, new Rectangle(0, 0, worldWidth, worldHeight)); 
         this.processedPairs = new HashSet<>();
     }
 
-    // Checks and processes collisions for a list of active entities
     public void checkCollisions(List<Entity> entities) {
         quadtree.clear();
         processedPairs.clear();
@@ -32,6 +30,7 @@ public class CollisionManager {
             if (!a.isActive() || a.getBounds() == null) continue;
 
             returnObjects.clear();
+            //limit checks to nearby candidates from quadtree
             quadtree.retrieve(returnObjects, a);
 
             for (int j = 0; j < returnObjects.size(); j++) {
@@ -45,6 +44,7 @@ public class CollisionManager {
                 long max = Math.max(idA, idB);
                 long pairId = (min << 32) | (max & 0xFFFFFFFFL);
 
+                //skip duplicate processing of the same pair
                 if (!processedPairs.add(pairId)) continue;
 
                 if (a.canCollideWith(b) || b.canCollideWith(a)) {

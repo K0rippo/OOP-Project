@@ -23,6 +23,7 @@ public class CircleBulletPattern implements BulletPattern {
         float spawnX = ship.getPosition().x + ship.getWidth() / 2f - 6f;
         float spawnY = ship.getPosition().y + ship.getHeight() / 2f - 6f;
 
+        //distribute bullets evenly around 360 degrees
         float angleStep = 360f / bulletCount;
 
         for (int i = 0; i < bulletCount; i++) {

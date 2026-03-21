@@ -5,9 +5,6 @@ import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.engine.Entity;
 import com.mygdx.game.engine.IGameEngine;
 
-/**
- * Owns combat-side spawning and shooting cadence.
- */
 class CombatDirector {
     private final IGameEngine engine;
     private final AudioManager audioManager;
@@ -42,6 +39,7 @@ class CombatDirector {
         int updatedPlayerBulletId = nextPlayerBulletId;
         int updatedEnemyBulletId = nextEnemyBulletId;
 
+        //spawn player bullet only when requested and cooldown is ready
         if (player != null && player.isShootRequested() && updatedCooldown <= 0f) {
             PlayerBullet bullet = new PlayerBullet(
                     updatedPlayerBulletId++,
@@ -59,6 +57,7 @@ class CombatDirector {
             }
         }
 
+        //let active enemy ships fire based on their internal timers
         for (Entity entity : engine.getEntitiesByLayer(enemyLayer)) {
             if (!(entity instanceof EnemyShip)) continue;
 
