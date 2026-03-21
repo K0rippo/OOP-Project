@@ -7,23 +7,34 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.mygdx.game.engine.Engine;
-import com.mygdx.game.engine.IGameEngine;
-import com.mygdx.game.engine.SceneManager;
+import com.mygdx.game.engine.*;
 
 public class GameMaster extends ApplicationAdapter {
 
-    private SpriteBatch batch;
+    private SpriteBatch  batch;
     private SceneManager sceneManager;
-    private IGameEngine gameEngine;
-    private Texture uiButtonTexture;
-    public static boolean isMuted = false;
+    private IGameEngine  gameEngine;
+    private Texture      uiButtonTexture;
+    private AudioManager audioManager;
+    
+    private static boolean muted = false;
+
+    public static boolean isMuted() { return muted; }
+    public static void setMuted(boolean value) { muted = value; }
 
     @Override
     public void create() {
-        batch = new SpriteBatch();
+        batch        = new SpriteBatch();
         sceneManager = new SceneManager();
-        gameEngine = new Engine();
+
+        //compose core managers before creating scenes
+        EntityManager entityManager = new EntityManager();
+        CollisionManager collisionManager = new CollisionManager(1280f, 720f);
+        IOManager ioManager = new IOManager();
+        MovementManager movementManager = new MovementManager();
+        RenderManager renderManager = new RenderManager();
+
+        gameEngine   = new Engine(entityManager, collisionManager, ioManager, movementManager, renderManager);
 
         Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
         pixmap.setColor(Color.WHITE);
@@ -31,10 +42,19 @@ public class GameMaster extends ApplicationAdapter {
         uiButtonTexture = new Texture(pixmap);
         pixmap.dispose();
 
-        sceneManager.addScene("MENU",     new MenuScene    ("MENU",     sceneManager, gameEngine, uiButtonTexture));
-        sceneManager.addScene("GAME",     new GameScene    ("GAME",     sceneManager, gameEngine, new DefaultQuestionProvider()));
-        sceneManager.addScene("SETTINGS", new SettingsScene("SETTINGS", sceneManager, gameEngine, uiButtonTexture));
-        sceneManager.addScene("RESULT",   new ResultScene  ("RESULT",   sceneManager, gameEngine, uiButtonTexture));
+        IQuestionProvider questionProvider = new CsvQuestionProvider();
+
+        audioManager = new AudioManager();
+        audioManager.loadAssets();
+
+        //inject engine only into gameplay scene
+        sceneManager.addScene("MENU",     new MenuScene    ("MENU",     sceneManager, uiButtonTexture));
+        sceneManager.addScene("INSTRUCTIONS", new InstructionsScene("INSTRUCTIONS", sceneManager, uiButtonTexture));
+
+        sceneManager.addScene("GAME",     new GameScene    ("GAME",     sceneManager, gameEngine, questionProvider, audioManager));
+
+        sceneManager.addScene("SETTINGS", new SettingsScene("SETTINGS", sceneManager, uiButtonTexture));
+        sceneManager.addScene("RESULT",   new ResultScene  ("RESULT",   sceneManager, uiButtonTexture));
 
         sceneManager.setActiveScene("MENU");
         resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -60,5 +80,9 @@ public class GameMaster extends ApplicationAdapter {
         batch.dispose();
         uiButtonTexture.dispose();
         gameEngine.dispose();
+
+        if (audioManager != null) {
+            audioManager.dispose();
+        }
     }
 }

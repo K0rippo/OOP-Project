@@ -1,6 +1,7 @@
 package com.mygdx.game.engine;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import java.util.List;
 
 public class Engine implements IGameEngine {
     private final EntityManager entityManager;
@@ -9,13 +10,13 @@ public class Engine implements IGameEngine {
     private final MovementManager movementManager;
     private final RenderManager renderManager;
 
-    public Engine() {
-        this.entityManager = new EntityManager();
-        this.collisionManager = new CollisionManager();
-        this.ioManager = new IOManager();
-        this.movementManager = new MovementManager();
-        this.renderManager = new RenderManager();
-        
+    public Engine(EntityManager entityManager, CollisionManager collisionManager, IOManager ioManager, MovementManager movementManager, RenderManager renderManager) {
+        this.entityManager = entityManager;
+        this.collisionManager = collisionManager;
+        this.ioManager = ioManager;
+        this.movementManager = movementManager;
+        this.renderManager = renderManager;
+
         this.entityManager.linkManagers(this.movementManager);
     }
 
@@ -27,18 +28,40 @@ public class Engine implements IGameEngine {
     }
 
     public void render(SpriteBatch batch) {
-        // Delegate rendering to the specialized manager
         renderManager.render(batch, entityManager.getEntities());
     }
 
-    public EntityManager getEntityManager() { return entityManager; }
-    public CollisionManager getCollisionManager() { return collisionManager; }
-    public IOManager getIOManager() { return ioManager; }
-    public MovementManager getMovementManager() { return movementManager; }
-    public RenderManager getRenderManager() { return renderManager; }
+    @Override
+    public void addEntity(Entity e) {
+        entityManager.addEntity(e);
+    }
+
+    @Override
+    public void removeEntity(Entity e) {
+        entityManager.removeEntity(e);
+    }
+
+    @Override
+    public List<Entity> getEntitiesByLayer(int layer) {
+        return entityManager.getEntitiesByLayer(layer);
+    }
+
+    @Override
+    public void bindKeyContinuous(int keycode, Runnable action) {
+        ioManager.bindKeyContinuous(keycode, action);
+    }
+
+    @Override
+    public void bindKeyJustPressed(int keycode, Runnable action) {
+        ioManager.bindKeyJustPressed(keycode, action);
+    }
+
+    @Override
+    public void setSpeedMultiplier(float multiplier) {
+        movementManager.setSpeedMultiplier(multiplier);
+    }
 
     public void dispose() {
-        entityManager.dispose();
         renderManager.dispose();
     }
 }

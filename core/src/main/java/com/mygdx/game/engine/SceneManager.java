@@ -26,7 +26,7 @@ public class SceneManager implements ISceneNavigator {
             if (activeScene != null) activeScene.hide();
             activeScene = scenes.get(id);
             activeScene.show();
-            // Force the new scene to instantly match the current window size
+            //resize immediately so new scene matches current window state
             activeScene.resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         } else {
             System.out.println("Scene " + id + " does not exist.");

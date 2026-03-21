@@ -1,0 +1,1210 @@
+[
+    {
+        "file":  "engine\\Circle.java",
+        "package":  "com.mygdx.game.engine",
+        "kind":  "class",
+        "name":  "Circle",
+        "extends":  "MovableEntity",
+        "implements":  [
+
+                       ],
+        "fields":  [
+                       "protected float radius",
+                       "protected Color color"
+                   ],
+        "methods":  [
+                        "public Circle(int id, String name, Vector2 position, float radius, Color color)",
+                        "public Rectangle getBounds()",
+                        "public void render(SpriteBatch batch)",
+                        "public float getRadius()"
+                    ]
+    },
+    {
+        "file":  "engine\\CollisionManager.java",
+        "package":  "com.mygdx.game.engine",
+        "kind":  "class",
+        "name":  "CollisionManager",
+        "extends":  "",
+        "implements":  [
+
+                       ],
+        "fields":  [
+                       "private Quadtree quadtree",
+                       "private HashSet\u003cLong\u003e processedPairs"
+                   ],
+        "methods":  [
+                        "public CollisionManager(float worldWidth, float worldHeight)",
+                        "public void checkCollisions(List\u003cEntity\u003e entities)"
+                    ]
+    },
+    {
+        "file":  "engine\\Engine.java",
+        "package":  "com.mygdx.game.engine",
+        "kind":  "class",
+        "name":  "Engine",
+        "extends":  "",
+        "implements":  [
+                           "IGameEngine"
+                       ],
+        "fields":  [
+                       "private final EntityManager entityManager",
+                       "private final CollisionManager collisionManager",
+                       "private final IOManager ioManager",
+                       "private final MovementManager movementManager",
+                       "private final RenderManager renderManager"
+                   ],
+        "methods":  [
+                        "public Engine(EntityManager entityManager, CollisionManager collisionManager, IOManager ioManager, MovementManager movementManager, RenderManager renderManager)",
+                        "public void update(float deltaTime)",
+                        "public void render(SpriteBatch batch)",
+                        "public void addEntity(Entity e)",
+                        "public void removeEntity(Entity e)",
+                        "public List\u003cEntity\u003e getEntitiesByLayer(int layer)",
+                        "public void bindKeyContinuous(int keycode, Runnable action)",
+                        "public void bindKeyJustPressed(int keycode, Runnable action)",
+                        "public void setSpeedMultiplier(float multiplier)",
+                        "public void dispose()"
+                    ]
+    },
+    {
+        "file":  "engine\\Entity.java",
+        "package":  "com.mygdx.game.engine",
+        "kind":  "class",
+        "name":  "Entity",
+        "extends":  "",
+        "implements":  [
+                           "ICollidable",
+                           "IRenderable"
+                       ],
+        "fields":  [
+                       "private int id",
+                       "private boolean isActive",
+                       "private String name",
+                       "private final Orientate orientate",
+                       "private int collisionLayer = 1",
+                       "private int collisionMask = -1"
+                   ],
+        "methods":  [
+                        "public Entity(int id, String name, Vector2 position)",
+                        "public abstract Rectangle getBounds()",
+                        "public abstract void onCollision(Entity other)",
+                        "public abstract void render(SpriteBatch batch)",
+                        "public boolean canCollideWith(Entity other)"
+                    ]
+    },
+    {
+        "file":  "engine\\EntityManager.java",
+        "package":  "com.mygdx.game.engine",
+        "kind":  "class",
+        "name":  "EntityManager",
+        "extends":  "",
+        "implements":  [
+
+                       ],
+        "fields":  [
+                       "private final List\u003cEntity\u003e entities",
+                       "private MovementManager movementManager"
+                   ],
+        "methods":  [
+                        "public EntityManager()",
+                        "public void linkManagers(MovementManager movementManager)",
+                        "public void addEntity(Entity e)",
+                        "public void removeEntity(Entity e)",
+                        "public List\u003cEntity\u003e getEntities()",
+                        "public List\u003cEntity\u003e getEntitiesByLayer(int layer)",
+                        "public void updateAll(float deltaTime)",
+                        "public void clear()"
+                    ]
+    },
+    {
+        "file":  "engine\\ICollidable.java",
+        "package":  "com.mygdx.game.engine",
+        "kind":  "interface",
+        "name":  "ICollidable",
+        "extends":  "",
+        "implements":  [
+
+                       ],
+        "fields":  [
+
+                   ],
+        "methods":  [
+
+                    ]
+    },
+    {
+        "file":  "engine\\ICollisionHandler.java",
+        "package":  "com.mygdx.game.engine",
+        "kind":  "interface",
+        "name":  "ICollisionHandler",
+        "extends":  "",
+        "implements":  [
+
+                       ],
+        "fields":  [
+
+                   ],
+        "methods":  [
+
+                    ]
+    },
+    {
+        "file":  "engine\\IGameEngine.java",
+        "package":  "com.mygdx.game.engine",
+        "kind":  "interface",
+        "name":  "IGameEngine",
+        "extends":  "",
+        "implements":  [
+
+                       ],
+        "fields":  [
+
+                   ],
+        "methods":  [
+
+                    ]
+    },
+    {
+        "file":  "engine\\iMovable.java",
+        "package":  "com.mygdx.game.engine",
+        "kind":  "interface",
+        "name":  "MovementLogic",
+        "extends":  "",
+        "implements":  [
+
+                       ],
+        "fields":  [
+
+                   ],
+        "methods":  [
+
+                    ]
+    },
+    {
+        "file":  "engine\\IOManager.java",
+        "package":  "com.mygdx.game.engine",
+        "kind":  "class",
+        "name":  "IOManager",
+        "extends":  "",
+        "implements":  [
+                           "InputProcessor"
+                       ],
+        "fields":  [
+                       "private Map\u003cInteger, Runnable\u003e justPressedBindings",
+                       "private Map\u003cInteger, Runnable\u003e continuousBindings"
+                   ],
+        "methods":  [
+                        "public IOManager()",
+                        "public void bindKeyJustPressed(int keyCode, Runnable command)",
+                        "public void bindKeyContinuous(int keyCode, Runnable command)",
+                        "public void handleInput()"
+                    ]
+    },
+    {
+        "file":  "engine\\IRenderable.java",
+        "package":  "com.mygdx.game.engine",
+        "kind":  "interface",
+        "name":  "IRenderable",
+        "extends":  "",
+        "implements":  [
+
+                       ],
+        "fields":  [
+
+                   ],
+        "methods":  [
+
+                    ]
+    },
+    {
+        "file":  "engine\\ISceneNavigator.java",
+        "package":  "com.mygdx.game.engine",
+        "kind":  "interface",
+        "name":  "ISceneNavigator",
+        "extends":  "",
+        "implements":  [
+
+                       ],
+        "fields":  [
+
+                   ],
+        "methods":  [
+
+                    ]
+    },
+    {
+        "file":  "engine\\MovableEntity.java",
+        "package":  "com.mygdx.game.engine",
+        "kind":  "class",
+        "name":  "MovableEntity",
+        "extends":  "Entity",
+        "implements":  [
+                           "iMovable"
+                       ],
+        "fields":  [
+
+                   ],
+        "methods":  [
+                        "private Vector2 velocity = new Vector2(0f, 0f)",
+                        "public MovableEntity(int id, String name, Vector2 position)",
+                        "public void setMovementLogic(MovementLogic logic)",
+                        "public void applyMovement(float deltaTime)"
+                    ]
+    },
+    {
+        "file":  "engine\\MovementManager.java",
+        "package":  "com.mygdx.game.engine",
+        "kind":  "class",
+        "name":  "MovementManager",
+        "extends":  "",
+        "implements":  [
+
+                       ],
+        "fields":  [
+                       "private float globalSpeedMultiplier = 1.0f"
+                   ],
+        "methods":  [
+                        "private final List\u003ciMovable\u003e movables = new ArrayList\u003c\u003e()",
+                        "public void registerMovable(iMovable m)",
+                        "public void unregisterMovable(iMovable m)",
+                        "public void update(float deltaTime)",
+                        "public void setSpeedMultiplier(float value)",
+                        "public float getSpeedMultiplier()"
+                    ]
+    },
+    {
+        "file":  "engine\\Orientate.java",
+        "package":  "com.mygdx.game.engine",
+        "kind":  "class",
+        "name":  "Orientate",
+        "extends":  "",
+        "implements":  [
+
+                       ],
+        "fields":  [
+                       "private Vector2 position",
+                       "private float rotationDegrees"
+                   ],
+        "methods":  [
+                        "public Orientate()",
+                        "public Vector2 getPosition()",
+                        "public void setPosition(Vector2 position)",
+                        "public float getRotationDegrees()",
+                        "public void setRotationDegrees(float rotationDegrees)"
+                    ]
+    },
+    {
+        "file":  "engine\\Quadtree.java",
+        "package":  "com.mygdx.game.engine",
+        "kind":  "class",
+        "name":  "Quadtree",
+        "extends":  "",
+        "implements":  [
+
+                       ],
+        "fields":  [
+                       "private final int MAX_OBJECTS = 5",
+                       "private final int MAX_LEVELS = 5",
+                       "private int level",
+                       "private List\u003cEntity\u003e objects",
+                       "private Rectangle bounds",
+                       "private Quadtree[] nodes"
+                   ],
+        "methods":  [
+                        "public Quadtree(int pLevel, Rectangle pBounds)",
+                        "public void clear()",
+                        "private void split()",
+                        "private int getIndex(Entity pEntity)",
+                        "public void insert(Entity pEntity)",
+                        "public List\u003cEntity\u003e retrieve(List\u003cEntity\u003e returnObjects, Entity pEntity)"
+                    ]
+    },
+    {
+        "file":  "engine\\Rectangle.java",
+        "package":  "com.mygdx.game.engine",
+        "kind":  "class",
+        "name":  "Rectangle",
+        "extends":  "",
+        "implements":  [
+
+                       ],
+        "fields":  [
+                       "private float x, y, width, height"
+                   ],
+        "methods":  [
+                        "public Rectangle(float x, float y, float width, float height)",
+                        "public boolean intersects(Rectangle other)"
+                    ]
+    },
+    {
+        "file":  "engine\\RectangleEntity.java",
+        "package":  "com.mygdx.game.engine",
+        "kind":  "class",
+        "name":  "RectangleEntity",
+        "extends":  "MovableEntity",
+        "implements":  [
+
+                       ],
+        "fields":  [
+                       "private float width",
+                       "private float height",
+                       "private Color color"
+                   ],
+        "methods":  [
+                        "public RectangleEntity(int id, String name, Vector2 position, float width, float height, Color color)",
+                        "public Rectangle getBounds()",
+                        "public void onCollision(Entity other)",
+                        "public void render(SpriteBatch batch)",
+                        "public void renderShape(ShapeRenderer shapeRenderer)",
+                        "public void update(float deltaTime)"
+                    ]
+    },
+    {
+        "file":  "engine\\RenderManager.java",
+        "package":  "com.mygdx.game.engine",
+        "kind":  "class",
+        "name":  "RenderManager",
+        "extends":  "",
+        "implements":  [
+
+                       ],
+        "fields":  [
+                       "private final ShapeRenderer shapeRenderer"
+                   ],
+        "methods":  [
+                        "public RenderManager()",
+                        "public void render(SpriteBatch batch, List\u003cEntity\u003e entities)",
+                        "public void dispose()"
+                    ]
+    },
+    {
+        "file":  "engine\\Scene.java",
+        "package":  "com.mygdx.game.engine",
+        "kind":  "class",
+        "name":  "Scene",
+        "extends":  "",
+        "implements":  [
+
+                       ],
+        "fields":  [
+                       "private final String id",
+                       "private boolean isActive"
+                   ],
+        "methods":  [
+                        "public Scene(String id)",
+                        "public abstract void update(float deltaTime)",
+                        "public abstract void render(SpriteBatch batch)",
+                        "public abstract void resize(int width, int height)"
+                    ]
+    },
+    {
+        "file":  "engine\\SceneManager.java",
+        "package":  "com.mygdx.game.engine",
+        "kind":  "class",
+        "name":  "SceneManager",
+        "extends":  "",
+        "implements":  [
+                           "ISceneNavigator"
+                       ],
+        "fields":  [
+                       "private Map\u003cString, Scene\u003e scenes",
+                       "private Scene activeScene"
+                   ],
+        "methods":  [
+                        "public SceneManager()",
+                        "public void addScene(String id, Scene scene)",
+                        "public Scene getScene(String id)",
+                        "public void setActiveScene(String id)",
+                        "public void goToScene(String sceneId)",
+                        "public void updateActiveScene(float deltaTime)",
+                        "public void renderActiveScene(SpriteBatch batch)",
+                        "public void resize(int width, int height)"
+                    ]
+    },
+    {
+        "file":  "simulation\\AudioManager.java",
+        "package":  "com.mygdx.game.simulation",
+        "kind":  "class",
+        "name":  "AudioManager",
+        "extends":  "",
+        "implements":  [
+
+                       ],
+        "fields":  [
+                       "private Music bgMusic",
+                       "private Sound laserSound",
+                       "private Sound breakSound"
+                   ],
+        "methods":  [
+                        "public void loadAssets()",
+                        "public void playMusic()",
+                        "public void pauseMusic()",
+                        "public void playLaserSound()",
+                        "public void playBreakSound()",
+                        "public void dispose()"
+                    ]
+    },
+    {
+        "file":  "simulation\\BreakableBarrier.java",
+        "package":  "com.mygdx.game.simulation",
+        "kind":  "class",
+        "name":  "BreakableBarrier",
+        "extends":  "RectangleEntity",
+        "implements":  [
+
+                       ],
+        "fields":  [
+                       "private static Texture fullWallTexture",
+                       "private static Texture semiWallTexture",
+                       "private static Texture badWallTexture",
+                       "private static boolean texturesLoaded = false",
+                       "private int           hitPoints",
+                       "private final boolean correctLane",
+                       "private boolean       broken = false",
+                       "private Runnable      onBreakCallback"
+                   ],
+        "methods":  [
+                        "private static final Color BARRIER_COLOR = new Color(0.45f, 0.55f, 0.75f, 1f)",
+                        "public void setOnBreakCallback(Runnable callback)",
+                        "public void onCollision(Entity other)",
+                        "public void render(SpriteBatch batch)",
+                        "public void renderShape(ShapeRenderer shapeRenderer)",
+                        "public static void disposeTextures()"
+                    ]
+    },
+    {
+        "file":  "simulation\\BulletPattern.java",
+        "package":  "com.mygdx.game.simulation",
+        "kind":  "interface",
+        "name":  "BulletPattern",
+        "extends":  "",
+        "implements":  [
+
+                       ],
+        "fields":  [
+
+                   ],
+        "methods":  [
+
+                    ]
+    },
+    {
+        "file":  "simulation\\BulletProjectile.java",
+        "package":  "com.mygdx.game.simulation",
+        "kind":  "class",
+        "name":  "BulletProjectile",
+        "extends":  "RectangleEntity",
+        "implements":  [
+
+                       ],
+        "fields":  [
+
+                   ],
+        "methods":  [
+                        "public BulletProjectile(int id, Vector2 position, float speedX)",
+                        "public void update(float deltaTime)",
+                        "public void onCollision(Entity other)"
+                    ]
+    },
+    {
+        "file":  "simulation\\CannonObstacle.java",
+        "package":  "com.mygdx.game.simulation",
+        "kind":  "class",
+        "name":  "CannonObstacle",
+        "extends":  "RectangleEntity",
+        "implements":  [
+
+                       ],
+        "fields":  [
+                       "private float shootTimer = 0f",
+                       "private final float shootInterval",
+                       "private final float bulletSpeed"
+                   ],
+        "methods":  [
+                        "public CannonObstacle(int id, Vector2 position, float shootInterval, float bulletSpeed)",
+                        "public void update(float deltaTime)",
+                        "public boolean shouldFire(float deltaTime)",
+                        "public BulletProjectile fire(int bulletId)",
+                        "public void onCollision(Entity other)",
+                        "public void renderShape(ShapeRenderer shapeRenderer)"
+                    ]
+    },
+    {
+        "file":  "simulation\\CircleBulletPattern.java",
+        "package":  "com.mygdx.game.simulation",
+        "kind":  "class",
+        "name":  "CircleBulletPattern",
+        "extends":  "",
+        "implements":  [
+                           "BulletPattern"
+                       ],
+        "fields":  [
+                       "private final int bulletCount",
+                       "private final float bulletSpeed",
+                       "private final float bulletSpread"
+                   ],
+        "methods":  [
+                        "public CircleBulletPattern(int bulletCount, float bulletSpeed, float bulletSpread)",
+                        "public Array\u003cEnemyBullet\u003e fire(EnemyShip ship, int firstBulletId, int bulletLayer, int bulletMask)"
+                    ]
+    },
+    {
+        "file":  "simulation\\ContinuousLevelSpawner.java",
+        "package":  "com.mygdx.game.simulation",
+        "kind":  "class",
+        "name":  "ContinuousLevelSpawner",
+        "extends":  "",
+        "implements":  [
+
+                       ],
+        "fields":  [
+                       "private final ISegmentSpawnDelegate delegate"
+                   ],
+        "methods":  [
+                        "private final Array\u003cLevelSegment\u003e segments = new Array\u003c\u003e()",
+                        "public void update(float cameraRightEdge)",
+                        "public Array\u003cLevelSegment\u003e getSegments()",
+                        "public boolean allSegmentsSpawned()",
+                        "private void buildSegments(IQuestionProvider provider, float firstStart)"
+                    ]
+    },
+    {
+        "file":  "simulation\\CsvQuestionProvider.java",
+        "package":  "com.mygdx.game.simulation",
+        "kind":  "class",
+        "name":  "CsvQuestionProvider",
+        "extends":  "",
+        "implements":  [
+                           "IQuestionProvider"
+                       ],
+        "fields":  [
+                       "private Array\u003cQuestion\u003e questions"
+                   ],
+        "methods":  [
+                        "public CsvQuestionProvider()",
+                        "private void loadQuestionsFromCsv()",
+                        "private Question parseQuestionFromCsvLine(String line)",
+                        "private String[] parseCSVLine(String line)",
+                        "private void loadDefaultQuestions()",
+                        "public Array\u003cQuestion\u003e getQuestions()",
+                        "public Question getQuestion(int index)",
+                        "public int getTotalQuestions()",
+                        "public void shuffleForNewGame()"
+                    ]
+    },
+    {
+        "file":  "simulation\\DefaultQuestionProvider.java",
+        "package":  "com.mygdx.game.simulation",
+        "kind":  "class",
+        "name":  "DefaultQuestionProvider",
+        "extends":  "",
+        "implements":  [
+                           "IQuestionProvider"
+                       ],
+        "fields":  [
+                       "private Array\u003cQuestion\u003e questions"
+                   ],
+        "methods":  [
+                        "public DefaultQuestionProvider()",
+                        "private void createQuestionBank()",
+                        "public Array\u003cQuestion\u003e getQuestions()",
+                        "public Question getQuestion(int index)",
+                        "public int getTotalQuestions()"
+                    ]
+    },
+    {
+        "file":  "simulation\\EnemyBullet.java",
+        "package":  "com.mygdx.game.simulation",
+        "kind":  "class",
+        "name":  "EnemyBullet",
+        "extends":  "RectangleEntity",
+        "implements":  [
+
+                       ],
+        "fields":  [
+                       "private float lifeTimer = 0f"
+                   ],
+        "methods":  [
+                        "public void update(float deltaTime)",
+                        "public void onCollision(Entity other)"
+                    ]
+    },
+    {
+        "file":  "simulation\\EnemyShip.java",
+        "package":  "com.mygdx.game.simulation",
+        "kind":  "class",
+        "name":  "EnemyShip",
+        "extends":  "RectangleEntity",
+        "implements":  [
+
+                       ],
+        "fields":  [
+                       "private final float baseY",
+                       "private final float bobAmplitude",
+                       "private final float bobSpeed",
+                       "private final float inactiveMoveSpeed",
+                       "private final float activeMoveSpeed",
+                       "private final float firstShotDelay",
+                       "private final float fireInterval",
+                       "private float fireTimer = 0f",
+                       "private final BulletPattern bulletPattern",
+                       "private final Texture texture",
+                       "private float bobTime = 0f",
+                       "private boolean waveActive = false",
+                       "private boolean hasEnteredScreen = false",
+                       "private int shotsFired = 0"
+                   ],
+        "methods":  [
+                        "public void setWaveActive(boolean active)",
+                        "public boolean isWaveActive()",
+                        "public void update(float deltaTime)",
+                        "public boolean shouldFire()",
+                        "public Array\u003cEnemyBullet\u003e fire(int firstBulletId, int bulletLayer, int bulletMask)",
+                        "public void onCollision(Entity other)",
+                        "public void render(SpriteBatch batch)",
+                        "public void renderShape(ShapeRenderer shapeRenderer)",
+                        "public void dispose()"
+                    ]
+    },
+    {
+        "file":  "simulation\\EnemyShipSpec.java",
+        "package":  "com.mygdx.game.simulation",
+        "kind":  "class",
+        "name":  "EnemyShipSpec",
+        "extends":  "",
+        "implements":  [
+
+                       ],
+        "fields":  [
+                       "private final float offsetX",
+                       "private final float yRatio",
+                       "private final float inactiveMoveSpeed",
+                       "private final float activeMoveSpeed",
+                       "private final float firstShotDelay",
+                       "private final float fireInterval",
+                       "private final float bobAmplitude"
+                   ],
+        "methods":  [
+                        "public float getOffsetX()",
+                        "public float getYRatio()",
+                        "public float getInactiveMoveSpeed()",
+                        "public float getActiveMoveSpeed()",
+                        "public float getFirstShotDelay()",
+                        "public float getFireInterval()",
+                        "public float getBobAmplitude()"
+                    ]
+    },
+    {
+        "file":  "simulation\\EnemyWave.java",
+        "package":  "com.mygdx.game.simulation",
+        "kind":  "class",
+        "name":  "EnemyWave",
+        "extends":  "",
+        "implements":  [
+
+                       ],
+        "fields":  [
+                       "private final int triggerQuestionIndex",
+                       "private final Array\u003cEnemyShip\u003e ships",
+                       "private boolean activated"
+                   ],
+        "methods":  [
+                        "public EnemyWave(int triggerQuestionIndex)",
+                        "public void addShip(EnemyShip ship)",
+                        "public Array\u003cEnemyShip\u003e getShips()",
+                        "public int getTriggerQuestionIndex()",
+                        "public boolean isActivated()",
+                        "public void activate()"
+                    ]
+    },
+    {
+        "file":  "simulation\\EnemyWaveFactory.java",
+        "package":  "com.mygdx.game.simulation",
+        "kind":  "class",
+        "name":  "EnemyWaveFactory",
+        "extends":  "",
+        "implements":  [
+
+                       ],
+        "fields":  [
+
+                   ],
+        "methods":  [
+                        "private Array\u003cEnemyShipSpec\u003e buildDefaultSpecs(float scrollSpeed)"
+                    ]
+    },
+    {
+        "file":  "simulation\\GameInputHandler.java",
+        "package":  "com.mygdx.game.simulation",
+        "kind":  "class",
+        "name":  "GameInputHandler",
+        "extends":  "",
+        "implements":  [
+
+                       ],
+        "fields":  [
+                       "private final IGameEngine engine",
+                       "private final ISceneNavigator sceneNavigator",
+                       "private PlayerCharacter player",
+                       "private final float worldHeight",
+                       "private final float worldWidth = 1280f"
+                   ],
+        "methods":  [
+                        "public GameInputHandler(IGameEngine engine, ISceneNavigator sceneNavigator, float worldHeight)",
+                        "public void setPlayer(PlayerCharacter player)",
+                        "public void initializeInput()"
+                    ]
+    },
+    {
+        "file":  "simulation\\GameMaster.java",
+        "package":  "com.mygdx.game.simulation",
+        "kind":  "class",
+        "name":  "GameMaster",
+        "extends":  "ApplicationAdapter",
+        "implements":  [
+
+                       ],
+        "fields":  [
+                       "private SpriteBatch  batch",
+                       "private SceneManager sceneManager",
+                       "private IGameEngine  gameEngine",
+                       "private Texture      uiButtonTexture",
+                       "private AudioManager audioManager",
+                       "private static boolean muted = false"
+                   ],
+        "methods":  [
+                        "public void create()",
+                        "public void render()",
+                        "public void resize(int width, int height)",
+                        "public void dispose()"
+                    ]
+    },
+    {
+        "file":  "simulation\\GameScene.java",
+        "package":  "com.mygdx.game.simulation",
+        "kind":  "class",
+        "name":  "GameScene",
+        "extends":  "Scene",
+        "implements":  [
+
+                       ],
+        "fields":  [
+                       "private final IGameEngine         engine",
+                       "private final ISceneNavigator     sceneNavigator",
+                       "private final ObstacleFactory     obstacleFactory",
+                       "private final GameStateManager    gameState",
+                       "private final GameUIManager       uiManager",
+                       "private final Stage               stage",
+                       "private final ScrollingBackground background",
+                       "private final IQuestionProvider   questionProvider",
+                       "private final EnemyWaveFactory    enemyWaveFactory",
+                       "private ContinuousLevelSpawner    levelSpawner",
+                       "private final GameInputHandler    inputHandler",
+                       "private final AudioManager        audioManager",
+                       "private PlayerCharacter player",
+                       "private Texture         heartTexture",
+                       "private int nextPlayerBulletId = 1000",
+                       "private int nextEnemyShipId    = 2000",
+                       "private int nextEnemyBulletId  = 3000",
+                       "private float shootCooldown    = 0f",
+                       "private float scrolledDistance = 0f",
+                       "private int   score            = 0",
+                       "private boolean paused         = false",
+                       "private boolean pendingRestart = true",
+                       "private final int                    questionIndex",
+                       "private final String[]               shuffledAnswers",
+                       "private boolean                      hudShown        = false",
+                       "private boolean                      passed          = false",
+                       "private boolean                      nextWaveTriggered = false"
+                   ],
+        "methods":  [
+                        "private final Array\u003cEnemyWave\u003e enemyWaves = new Array\u003c\u003e()",
+                        "private Color currentBGColor = new Color(0.08f, 0.10f, 0.18f, 1f)",
+                        "private final Array\u003cRectangleEntity\u003e walls           = new Array\u003c\u003e()",
+                        "private final Array\u003cWallGroup\u003e wallGroups = new Array\u003c\u003e()",
+                        "private void startLevel()",
+                        "public void requestRestart()",
+                        "public void show()",
+                        "public void hide()",
+                        "private void spawnSegment(LevelSegment segment)",
+                        "private void spawnEnemyWave(LevelSegment segment)",
+                        "private void spawnBarriers(float spawnX, float sectionHeight, int correctIndex, int segmentId)",
+                        "private void showQuestionOnHud(int questionIndex)",
+                        "private void updateHudForApproachingSegments()",
+                        "private void syncAnswerLabelsToUI()",
+                        "private void activateWaveForQuestion(int questionIndex)",
+                        "private void triggerUpcomingWavesFromPassedGroups()",
+                        "private boolean allSegmentsCompleted()",
+                        "private void prunePassedGroups()",
+                        "public void update(float deltaTime)",
+                        "private void updatePlayerShooting()",
+                        "private void updateEnemyShooting()",
+                        "public void render(SpriteBatch batch)",
+                        "private void renderUI(SpriteBatch batch)",
+                        "private void clearDynamicEntities()",
+                        "private void cleanupOffScreen()",
+                        "private void transitionToResult()",
+                        "public void resize(int width, int height)",
+                        "public void dispose()"
+                    ]
+    },
+    {
+        "file":  "simulation\\GameStateManager.java",
+        "package":  "com.mygdx.game.simulation",
+        "kind":  "class",
+        "name":  "GameStateManager",
+        "extends":  "",
+        "implements":  [
+
+                       ],
+        "fields":  [
+                       "private int currentQuestionIndex = 0",
+                       "private int lives = 3",
+                       "private final int initialLives = 3",
+                       "private IQuestionProvider questionProvider"
+                   ],
+        "methods":  [
+                        "public GameStateManager(IQuestionProvider questionProvider)",
+                        "public void advanceQuestion()",
+                        "public void loseLife()",
+                        "public void resetState()",
+                        "public boolean isGameOver()",
+                        "public boolean isLastQuestion()",
+                        "public int getCurrentQuestionIndex()",
+                        "public int getLives()",
+                        "public Question getCurrentQuestion()",
+                        "public int getTotalQuestions()"
+                    ]
+    },
+    {
+        "file":  "simulation\\GameUIManager.java",
+        "package":  "com.mygdx.game.simulation",
+        "kind":  "class",
+        "name":  "GameUIManager",
+        "extends":  "",
+        "implements":  [
+
+                       ],
+        "fields":  [
+                       "private final Stage      stage",
+                       "private final Label      questionLabel",
+                       "private final BitmapFont questionFont",
+                       "private final BitmapFont answerFont",
+                       "private final BitmapFont hpFont",
+                       "private final float      WORLD_HEIGHT",
+                       "private final Label[]    barrierHpLabels  = new Label[3]",
+                       "private final Label[]    answerLabelPool  = new Label[MAX_ANSWER_LABELS]"
+                   ],
+        "methods":  [
+                        "public GameUIManager(Stage stage, float worldHeight)",
+                        "public void updateQuestion(Question question)",
+                        "public void syncBarrierHp(Array\u003cBreakableBarrier\u003e barriers)",
+                        "public void dispose()"
+                    ]
+    },
+    {
+        "file":  "simulation\\InstructionsScene.java",
+        "package":  "com.mygdx.game.simulation",
+        "kind":  "class",
+        "name":  "InstructionsScene",
+        "extends":  "Scene",
+        "implements":  [
+
+                       ],
+        "fields":  [
+                       "private Stage stage"
+                   ],
+        "methods":  [
+                        "public InstructionsScene(String id, final ISceneNavigator sceneNavigator, Texture buttonTexture)",
+                        "public void clicked(InputEvent event, float x, float y)",
+                        "public void clicked(InputEvent event, float x, float y)",
+                        "private TextureRegionDrawable createPillButtonDrawable(Color coreColor, Color borderColor)",
+                        "private TextureRegionDrawable createPanelDrawable(Color borderColor)",
+                        "private void fillRoundedRect(Pixmap p, int x, int y, int width, int height, int radius)",
+                        "public void resize(int width, int height)",
+                        "public void show()",
+                        "public void hide()",
+                        "public void update(float deltaTime)",
+                        "public void render(SpriteBatch batch)"
+                    ]
+    },
+    {
+        "file":  "simulation\\IQuestionProvider.java",
+        "package":  "com.mygdx.game.simulation",
+        "kind":  "interface",
+        "name":  "IQuestionProvider",
+        "extends":  "",
+        "implements":  [
+
+                       ],
+        "fields":  [
+
+                   ],
+        "methods":  [
+
+                    ]
+    },
+    {
+        "file":  "simulation\\LevelSegment.java",
+        "package":  "com.mygdx.game.simulation",
+        "kind":  "class",
+        "name":  "LevelSegment",
+        "extends":  "",
+        "implements":  [
+
+                       ],
+        "fields":  [
+                       "private final int   questionIndex",
+                       "private final float startX",
+                       "private boolean     spawned = false"
+                   ],
+        "methods":  [
+                        "public LevelSegment(int questionIndex, float startX)"
+                    ]
+    },
+    {
+        "file":  "simulation\\MenuScene.java",
+        "package":  "com.mygdx.game.simulation",
+        "kind":  "class",
+        "name":  "MenuScene",
+        "extends":  "Scene",
+        "implements":  [
+
+                       ],
+        "fields":  [
+                       "private Stage stage"
+                   ],
+        "methods":  [
+                        "public MenuScene(String id, final ISceneNavigator sceneNavigator, Texture buttonTexture)",
+                        "public void clicked(InputEvent event, float x, float y)",
+                        "public void clicked(InputEvent event, float x, float y)",
+                        "public void clicked(InputEvent event, float x, float y)",
+                        "private TextureRegionDrawable createPillButtonDrawable(Color coreColor, Color borderColor)",
+                        "private TextureRegionDrawable createPanelDrawable(Color borderColor)",
+                        "private void fillRoundedRect(Pixmap p, int x, int y, int width, int height, int radius)",
+                        "public void resize(int width, int height)",
+                        "public void show()",
+                        "public void hide()",
+                        "public void update(float deltaTime)",
+                        "public void render(SpriteBatch batch)"
+                    ]
+    },
+    {
+        "file":  "simulation\\ObstacleFactory.java",
+        "package":  "com.mygdx.game.simulation",
+        "kind":  "class",
+        "name":  "ObstacleFactory",
+        "extends":  "",
+        "implements":  [
+
+                       ],
+        "fields":  [
+
+                   ],
+        "methods":  [
+                        "public RectangleEntity createWall(WallType type, int id, float x, float y, float width, float height)",
+                        "public RectangleEntity createCorrectWall(int id, float x, float y, float width, float height)",
+                        "public RectangleEntity createWrongWall(int id, float x, float y, float width, float height)"
+                    ]
+    },
+    {
+        "file":  "simulation\\PlayerBullet.java",
+        "package":  "com.mygdx.game.simulation",
+        "kind":  "class",
+        "name":  "PlayerBullet",
+        "extends":  "RectangleEntity",
+        "implements":  [
+
+                       ],
+        "fields":  [
+
+                   ],
+        "methods":  [
+                        "public PlayerBullet(int id, Vector2 position)",
+                        "public void update(float deltaTime)",
+                        "public void onCollision(Entity other)"
+                    ]
+    },
+    {
+        "file":  "simulation\\PlayerCharacter.java",
+        "package":  "com.mygdx.game.simulation",
+        "kind":  "class",
+        "name":  "PlayerCharacter",
+        "extends":  "Circle",
+        "implements":  [
+
+                       ],
+        "fields":  [
+                       "private final Texture texture",
+                       "private float invulnerabilityTimer = 0f",
+                       "private float gateCooldown         = 0f",
+                       "private boolean tookDamage     = false",
+                       "private boolean reachedGate    = false",
+                       "private boolean shootRequested = false"
+                   ],
+        "methods":  [
+                        "public PlayerCharacter(int id, Vector2 position, float radius)",
+                        "public void update(float deltaTime)",
+                        "public void render(SpriteBatch batch)",
+                        "public void onCollision(Entity other)",
+                        "public boolean hasTakenDamage()",
+                        "public boolean hasReachedGate()",
+                        "public boolean isShootRequested()",
+                        "public void consumeDamage()",
+                        "public void consumeGoal()",
+                        "public void consumeShoot()",
+                        "public void requestShoot()",
+                        "private boolean isPlayerCentreInsideWall(Entity other)",
+                        "private void applyDamage()",
+                        "public void dispose()"
+                    ]
+    },
+    {
+        "file":  "simulation\\Question.java",
+        "package":  "com.mygdx.game.simulation",
+        "kind":  "class",
+        "name":  "Question",
+        "extends":  "",
+        "implements":  [
+
+                       ],
+        "fields":  [
+                       "private String text",
+                       "private String[] answers",
+                       "private Color themeColor",
+                       "private float timeToReach"
+                   ],
+        "methods":  [
+                        "public Question(String text, String[] answers, Color themeColor, float timeToReach)",
+                        "public String getText()",
+                        "public Color getThemeColor()",
+                        "public void setThemeColor(Color themeColor)",
+                        "public String[] getAnswers()",
+                        "public void setAnswers(String[] answers)",
+                        "public float getTimeToReach()",
+                        "public void setTimeToReach(float timeToReach)"
+                    ]
+    },
+    {
+        "file":  "simulation\\ResultScene.java",
+        "package":  "com.mygdx.game.simulation",
+        "kind":  "class",
+        "name":  "ResultScene",
+        "extends":  "Scene",
+        "implements":  [
+
+                       ],
+        "fields":  [
+                       "private Stage stage",
+                       "private Label scoreLabel"
+                   ],
+        "methods":  [
+                        "public ResultScene(String id, final ISceneNavigator sceneNavigator, Texture buttonTexture)",
+                        "public void clicked(InputEvent event, float x, float y)",
+                        "public void clicked(InputEvent event, float x, float y)",
+                        "private TextureRegionDrawable createPillButtonDrawable(Color coreColor, Color borderColor)",
+                        "private TextureRegionDrawable createPanelDrawable(Color borderColor)",
+                        "private void fillRoundedRect(Pixmap p, int x, int y, int width, int height, int radius)",
+                        "public void setScore(int current, int max)",
+                        "public void resize(int width, int height)",
+                        "public void show()",
+                        "public void hide()",
+                        "public void update(float deltaTime)",
+                        "public void render(SpriteBatch batch)"
+                    ]
+    },
+    {
+        "file":  "simulation\\ScrollingBackground.java",
+        "package":  "com.mygdx.game.simulation",
+        "kind":  "class",
+        "name":  "ScrollingBackground",
+        "extends":  "",
+        "implements":  [
+
+                       ],
+        "fields":  [
+                       "private final float worldWidth",
+                       "private final float worldHeight",
+                       "private final Texture pixel",
+                       "private float totalDistance = 0f"
+                   ],
+        "methods":  [
+                        "private final Array\u003cVector2\u003e stars = new Array\u003c\u003e()",
+                        "public ScrollingBackground(float width, float height)",
+                        "public void update(float delta, float scrollSpeed)",
+                        "public void render(SpriteBatch batch, Color skyColor)"
+                    ]
+    },
+    {
+        "file":  "simulation\\SettingsScene.java",
+        "package":  "com.mygdx.game.simulation",
+        "kind":  "class",
+        "name":  "SettingsScene",
+        "extends":  "Scene",
+        "implements":  [
+
+                       ],
+        "fields":  [
+                       "private Stage stage",
+                       "private TextButton btnMute",
+                       "private TextButton btnBack",
+                       "private TextButton btnExitMenu",
+                       "private String previousSceneId = \"MENU\"",
+                       "private TextButton.TextButtonStyle audioActiveStyle",
+                       "private TextButton.TextButtonStyle audioMutedStyle"
+                   ],
+        "methods":  [
+                        "public SettingsScene(String id, final ISceneNavigator sceneNavigator, Texture buttonTexture)",
+                        "public void clicked(InputEvent event, float x, float y)",
+                        "public void clicked(InputEvent event, float x, float y)",
+                        "public void clicked(InputEvent event, float x, float y)",
+                        "private TextureRegionDrawable createPillButtonDrawable(Color coreColor, Color borderColor)",
+                        "private TextureRegionDrawable createPanelDrawable(Color borderColor)",
+                        "private void fillRoundedRect(Pixmap p, int x, int y, int width, int height, int radius)",
+                        "public void setPreviousScene(String id)",
+                        "private void toggleMute()",
+                        "private void updateButtonText()",
+                        "public void resize(int width, int height)",
+                        "public void show()",
+                        "public void hide()",
+                        "public void update(float deltaTime)",
+                        "public void render(SpriteBatch batch)"
+                    ]
+    },
+    {
+        "file":  "simulation\\WallAnswerData.java",
+        "package":  "com.mygdx.game.simulation",
+        "kind":  "class",
+        "name":  "WallAnswerData",
+        "extends":  "",
+        "implements":  [
+
+                       ],
+        "fields":  [
+                       "public final String  answerText",
+                       "public final float   wallX",
+                       "public final float   wallY",
+                       "public final float   wallHeight"
+                   ],
+        "methods":  [
+                        "public WallAnswerData(String text, float x, float y, float height)"
+                    ]
+    },
+    {
+        "file":  "simulation\\WallType.java",
+        "package":  "com.mygdx.game.simulation",
+        "kind":  "enum",
+        "name":  "WallType",
+        "extends":  "",
+        "implements":  [
+
+                       ],
+        "fields":  [
+                       "public final String name",
+                       "public final Color  color"
+                   ],
+        "methods":  [
+
+                    ]
+    }
+]

@@ -3,9 +3,10 @@ package com.mygdx.game.engine;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class EntityManager {
-    
+
     private final List<Entity> entities;
     private MovementManager movementManager;
 
@@ -38,11 +39,20 @@ public class EntityManager {
         return Collections.unmodifiableList(entities);
     }
 
+    public List<Entity> getEntitiesByLayer(int layer) {
+        return entities.stream()
+            .filter(e -> e.getCollisionLayer() == layer)
+            .collect(Collectors.toList());
+    }
+
     public void updateAll(float deltaTime) {
-        for (int i = 0; i < entities.size(); i++) {    
+        //iterate backwards so inactive removals are safe
+        for (int i = entities.size() - 1; i >= 0; i--) {    
             Entity e = entities.get(i);
             if (e.isActive()) {
                 e.update(deltaTime);
+            } else {
+                removeEntity(e); 
             }
         }
     }
@@ -54,9 +64,5 @@ public class EntityManager {
             }
         }
         entities.clear();
-    }
-    
-    public void dispose() {
-        // Resources moved to RenderManager
     }
 }

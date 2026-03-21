@@ -19,6 +19,7 @@ public class MovementManager {
     }
 
     public void update(float deltaTime) {
+        //apply global time scaling to all movables
         float scaledDelta = deltaTime * globalSpeedMultiplier;
 
         for (iMovable m : movables) {
@@ -28,9 +29,5 @@ public class MovementManager {
 
     public void setSpeedMultiplier(float value) {
         globalSpeedMultiplier = Math.max(0f, value);
-    }
-
-    public float getSpeedMultiplier() {
-        return globalSpeedMultiplier;
     }
 }

@@ -1,11 +1,5 @@
 package com.mygdx.game.simulation;
 
-import com.badlogic.gdx.utils.Array;
-
-/**
- * Manages game state and level progression.
- * Extracted from GameScene to support single responsibility principle.
- */
 public class GameStateManager {
     private int currentQuestionIndex = 0;
     private int lives = 3;
@@ -33,26 +27,12 @@ public class GameStateManager {
         return lives <= 0;
     }
 
-    public boolean isLastQuestion() {
-        return currentQuestionIndex >= questionProvider.getTotalQuestions();
-    }
-
-    public int getCurrentQuestionIndex() {
-        return currentQuestionIndex;
-    }
-
     public int getLives() {
         return lives;
-    }
-
-    public Question getCurrentQuestion() {
-        return questionProvider.getQuestion(currentQuestionIndex);
     }
 
     public int getTotalQuestions() {
         return questionProvider.getTotalQuestions();
     }
-    
-    
-    
+
 }

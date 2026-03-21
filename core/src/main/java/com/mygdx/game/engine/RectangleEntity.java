@@ -29,18 +29,18 @@ public class RectangleEntity extends MovableEntity {
     @Override
     public void render(SpriteBatch batch) {
     }
-    
+
     @Override
     public void renderShape(ShapeRenderer shapeRenderer) {
         shapeRenderer.setColor(color);
         shapeRenderer.rect(getPosition().x, getPosition().y, width, height);
     }
-    
+
     @Override
     public void update(float deltaTime) {
-        super.update(deltaTime); 
+        super.update(deltaTime);
     }
-    
+
     public float getWidth() { return width; }
     public float getHeight() { return height; }
 }
