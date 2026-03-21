@@ -311,6 +311,14 @@ public class SettingsScene extends Scene implements ISettingsScene {
     public void show() {
         super.show();
         Gdx.input.setInputProcessor(stage);
+        
+        if (audioManager != null) {
+            if ("MENU".equals(previousSceneId)) {
+                audioManager.playMenuMusic();
+            } else {
+                audioManager.playGameMusic();
+            }
+        }
     }
 
     @Override

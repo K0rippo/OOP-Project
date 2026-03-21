@@ -23,9 +23,11 @@ import com.mygdx.game.engine.Scene;
 public class MenuScene extends Scene {
 
     private Stage stage;
+    private AudioManager audioManager;
 
     public MenuScene(String id, final ISceneNavigator sceneNavigator, Texture buttonTexture, final AudioManager audioManager) {
         super(id);
+        this.audioManager = audioManager;
         this.stage = new Stage(new StretchViewport(1280, 720));
 
         BitmapFont buttonFont = new BitmapFont();
@@ -129,13 +131,10 @@ public class MenuScene extends Scene {
 
         p.setColor(borderColor);
         fillRoundedRect(p, 0, 0, w, h, r);
-
         p.setColor(new Color(0.02f, 0.1f, 0.25f, 1f));
         fillRoundedRect(p, 3, 3, w - 6, h - 6, r - 3);
-
         p.setColor(coreColor);
         fillRoundedRect(p, 6, 6, w - 12, h - 12, r - 6);
-
         p.setColor(new Color(1f, 1f, 1f, 0.15f));
         p.fillRectangle(r, 6, w - 2 * r, (h - 12) / 2);
 
@@ -152,26 +151,20 @@ public class MenuScene extends Scene {
 
         p.setColor(borderColor);
         fillRoundedRect(p, 0, 0, w, h, r);
-
         p.setColor(new Color(0.02f, 0.1f, 0.25f, 0.95f));
         fillRoundedRect(p, 5, 5, w - 10, h - 10, r - 5);
-
         p.setColor(new Color(0.08f, 0.18f, 0.38f, 1f));
         fillRoundedRect(p, 5, 5, w - 10, 80, r - 5);
         p.fillRectangle(5, 25, w - 10, 60);
-
         p.setColor(new Color(0.03f, 0.1f, 0.25f, 1f));
         for (int y = 15; y < 75; y += 12) {
             p.fillRectangle(15, y, w - 30, 4);
         }
-
         p.setColor(new Color(0.0f, 0.8f, 1.0f, 0.8f));
         p.fillCircle(25, 45, 6);
         p.fillCircle(w - 25, 45, 6);
-
         p.setColor(new Color(1f, 1f, 1f, 0.15f));
         p.fillRectangle(15, 8, w - 30, 5);
-
         p.setColor(borderColor);
         p.fillRectangle(5, 85, w - 10, 4);
 
@@ -198,6 +191,9 @@ public class MenuScene extends Scene {
     public void show() { 
         super.show();
         Gdx.input.setInputProcessor(stage);
+        if (audioManager != null) {
+            audioManager.playMenuMusic();
+        }
     }
 
     @Override

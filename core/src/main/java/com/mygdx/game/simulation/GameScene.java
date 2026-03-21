@@ -118,12 +118,10 @@ public class GameScene extends Scene {
         if (player == null) {
             player = new PlayerCharacter(1, new Vector2(PLAYER_X, WORLD_HEIGHT / 2f), 25f);
             
-            // --- NEW: Attach the sound callbacks! ---
             player.setSoundCallbacks(
                 () -> { if (audioManager != null) audioManager.playShipDamageSound(); },
                 () -> { if (audioManager != null) audioManager.playCorrectGateSound(); }
             );
-            // ----------------------------------------
             
             engine.addEntity(player);
         } else {
@@ -156,7 +154,7 @@ public class GameScene extends Scene {
         engine.setSpeedMultiplier(1f);
 
         if (audioManager != null) {
-            audioManager.playMusic();
+            audioManager.playGameMusic();
         }
 
         if (pendingRestart) {
@@ -172,7 +170,7 @@ public class GameScene extends Scene {
         engine.setSpeedMultiplier(0f);
 
         if (audioManager != null) {
-            audioManager.pauseMusic();
+            audioManager.pauseGameMusic();
         }
     }
 
@@ -281,9 +279,11 @@ public class GameScene extends Scene {
     }
 
     private void transitionToResult() {
-        resultTransitionService.transition(score, gameState.getTotalQuestions());
+        boolean isSuccess = gameState.getLives() > 0;
+        resultTransitionService.transition(score, gameState.getTotalQuestions(), isSuccess);
         pendingRestart = true;
     }
+    // ----------------------------------------------------------------
 
     @Override
     public void resize(int width, int height) {

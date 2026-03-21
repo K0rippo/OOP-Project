@@ -9,10 +9,11 @@ class ResultTransitionService {
         this.sceneNavigator = sceneNavigator;
     }
 
-    void transition(int score, int totalQuestions) {
+    void transition(int score, int totalQuestions, boolean isSuccess) {
         ResultScene result = (ResultScene) sceneNavigator.getScene("RESULT");
         if (result != null) {
             result.setScore(score, totalQuestions);
+            result.setMissionStatus(isSuccess); // Update the visual status
         }
         sceneNavigator.goToScene("RESULT");
     }

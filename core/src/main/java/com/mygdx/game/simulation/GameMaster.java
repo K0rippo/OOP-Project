@@ -17,9 +17,8 @@ public class GameMaster extends ApplicationAdapter {
     private Texture      uiButtonTexture;
     private AudioManager audioManager;
     
-    // --- GLOBAL SETTINGS (Updated to start at 100% volume) ---
-    private static float musicVolume = 1.0f;
-    private static float sfxVolume = 1.0f;
+    private static float musicVolume = 0.5f;
+    private static float sfxVolume = 0.5f;
     private static boolean useWASD = false;
 
     public static float getMusicVolume() { return musicVolume; }

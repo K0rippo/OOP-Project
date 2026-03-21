@@ -120,7 +120,6 @@ public class EnemyShip extends RectangleEntity {
     public void onCollision(Entity other) {
         if (!isActive()) return;
 
-        // --- NEW: Take damage from player bullets ---
         if (other instanceof PlayerBullet && other.isActive()) {
             hitPoints--;
             other.setActive(false); // Consume the bullet so it doesn't pierce through
