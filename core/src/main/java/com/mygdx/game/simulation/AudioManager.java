@@ -13,6 +13,7 @@ public class AudioManager {
     private Sound damageSound;
     private Sound clickSound;
     private Sound correctSound;
+    private Sound healSound;
 
     public void loadAssets() {
         try {
@@ -34,6 +35,8 @@ public class AudioManager {
         try { damageSound = Gdx.audio.newSound(Gdx.files.internal("damage.mp3")); } catch (Exception e) {}
         try { clickSound = Gdx.audio.newSound(Gdx.files.internal("click.mp3")); } catch (Exception e) {}
         try { correctSound = Gdx.audio.newSound(Gdx.files.internal("correct.mp3")); } catch (Exception e) {}
+        // --- NEW: Load heal sound ---
+        try { healSound = Gdx.audio.newSound(Gdx.files.internal("heal.mp3")); } catch (Exception e) {}
     }
 
     // --- MUSIC CONTROLS ---
@@ -88,6 +91,10 @@ public class AudioManager {
         if (GameMaster.getSfxVolume() > 0f && clickSound != null) clickSound.play(GameMaster.getSfxVolume()); 
     }
 
+    public void playHealSound() {
+        if (GameMaster.getSfxVolume() > 0f && healSound != null) healSound.play(GameMaster.getSfxVolume());
+    }
+
     public void dispose() {
         if (bgMusic != null) bgMusic.dispose();
         if (menuMusic != null) menuMusic.dispose();
@@ -96,5 +103,6 @@ public class AudioManager {
         if (damageSound != null) damageSound.dispose();
         if (clickSound != null) clickSound.dispose();
         if (correctSound != null) correctSound.dispose();
+        if (healSound != null) healSound.dispose();
     }
 }

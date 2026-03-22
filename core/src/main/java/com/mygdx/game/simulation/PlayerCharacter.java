@@ -28,6 +28,8 @@ public class PlayerCharacter extends Circle {
     private boolean tookDamage     = false;
     private boolean reachedGate    = false;
     private boolean shootRequested = false;
+    
+    private boolean pickedUpHealth = false;
 
     private Runnable onDamageCallback;
     private Runnable onGateCallback;
@@ -83,6 +85,11 @@ public class PlayerCharacter extends Circle {
 
     @Override
     public void onCollision(Entity other) {
+        if (other instanceof HealthOrb) {
+            pickedUpHealth = true;
+            return;
+        }
+
         if (other instanceof AnswerGate) {
             AnswerGate gate = (AnswerGate) other;
             if (!reachedGate && gateCooldown <= 0f) {
@@ -100,7 +107,6 @@ public class PlayerCharacter extends Circle {
 
         if (other instanceof BreakableBarrier) {
             if (reachedGate) return; 
-            // -------------------------------------------------------------------------
 
             if (!isPlayerCentreInsideWall(other)) return;
             applyWallBounce((RectangleEntity) other);
@@ -108,42 +114,22 @@ public class PlayerCharacter extends Circle {
             return;
         }
 
-        if (other instanceof EnemyBullet || other instanceof EnemyShip || other instanceof BulletProjectile) {
+        if (other instanceof EnemyBullet || other instanceof EnemyShip || other instanceof BulletProjectile || other instanceof EliteBullet || other instanceof EliteEnemyShip) {
             applyDamage();
         }
     }
 
-    public boolean hasTakenDamage() {
-        return tookDamage;
-    }
+    public boolean hasTakenDamage() { return tookDamage; }
+    public boolean hasReachedGate() { return reachedGate; }
+    public boolean isShootRequested() { return shootRequested; }
+    public boolean isControlsLocked() { return controlLockTimer > 0f; }
+    public boolean hasPickedUpHealth() { return pickedUpHealth; }
 
-    public boolean hasReachedGate() {
-        return reachedGate;
-    }
-
-    public boolean isShootRequested() {
-        return shootRequested;
-    }
-
-    public boolean isControlsLocked() {
-        return controlLockTimer > 0f;
-    }
-
-    public void consumeDamage() {
-        tookDamage = false;
-    }
-
-    public void consumeGoal() {
-        reachedGate = false;
-    }
-
-    public void consumeShoot() {
-        shootRequested = false;
-    }
-
-    public void requestShoot() {
-        shootRequested = true;
-    }
+    public void consumeDamage() { tookDamage = false; }
+    public void consumeGoal() { reachedGate = false; }
+    public void consumeShoot() { shootRequested = false; }
+    public void requestShoot() { shootRequested = true; }
+    public void consumeHealthPickup() { pickedUpHealth = false; }
 
     private boolean isPlayerCentreInsideWall(Entity other) {
         if (!(other instanceof RectangleEntity)) return true;
@@ -161,7 +147,7 @@ public class PlayerCharacter extends Circle {
             tookDamage           = true;
             invulnerabilityTimer = INVULNERABILITY_TIME;
             applyKnockback();
-            if (onDamageCallback != null) onDamageCallback.run(); // Play damage sound!
+            if (onDamageCallback != null) onDamageCallback.run();
         }
     }
 
@@ -170,7 +156,6 @@ public class PlayerCharacter extends Circle {
         if (getX() > maxAllowedX) {
             setX(maxAllowedX);
         }
-
         applyKnockback();
     }
 

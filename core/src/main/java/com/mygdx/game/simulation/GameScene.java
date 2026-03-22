@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Array;
@@ -17,6 +18,7 @@ public class GameScene extends Scene {
     public static final int LAYER_GATE         = 2;
     public static final int LAYER_ENEMY        = 4;
     public static final int LAYER_ENEMY_BULLET = 8;
+    public static final int LAYER_POWERUP      = 16; 
 
     private static final float WORLD_WIDTH         = 1280f;
     private static final float WORLD_HEIGHT        = 720f;
@@ -52,6 +54,7 @@ public class GameScene extends Scene {
 
     private int nextPlayerBulletId = 1000;
     private int nextEnemyBulletId  = 3000;
+    private int nextEliteEnemyId   = 5000;
 
     private float shootCooldown    = 0f;
     private float scrolledDistance = 0f;
@@ -79,8 +82,10 @@ public class GameScene extends Scene {
         EnemyWaveFactory enemyWaveFactory = new EnemyWaveFactory();
         this.combatDirector   = new CombatDirector(engine, audioManager, SHOOT_INTERVAL,
             LAYER_PLAYER, LAYER_GATE, LAYER_ENEMY, LAYER_ENEMY_BULLET);
+        
         this.cullingService   = new EntityCullingService(engine, WORLD_WIDTH,
-            LAYER_PLAYER, LAYER_GATE, LAYER_ENEMY, LAYER_ENEMY_BULLET);
+            LAYER_PLAYER, LAYER_GATE, LAYER_ENEMY, LAYER_ENEMY_BULLET); 
+            
         this.resultTransitionService = new ResultTransitionService(sceneNavigator);
         this.wallHudCoordinator = new WallHudCoordinator();
         this.segmentSpawnService = new SegmentSpawnService(
@@ -115,6 +120,7 @@ public class GameScene extends Scene {
 
         nextPlayerBulletId = 1000;
         nextEnemyBulletId  = 3000;
+        nextEliteEnemyId   = 5000;
         segmentSpawnService.reset();
 
         questionProvider.shuffleForNewGame();
@@ -134,6 +140,7 @@ public class GameScene extends Scene {
             player.consumeDamage();
             player.consumeGoal();
             player.consumeShoot();
+            player.consumeHealthPickup();
         }
 
         configurePlayerCollision();
@@ -144,7 +151,7 @@ public class GameScene extends Scene {
 
     private void configurePlayerCollision() {
         player.setCollisionLayer(LAYER_PLAYER);
-        player.setCollisionMask(LAYER_GATE | LAYER_ENEMY_BULLET | LAYER_ENEMY);
+        player.setCollisionMask(LAYER_GATE | LAYER_ENEMY_BULLET | LAYER_ENEMY | LAYER_POWERUP);
     }
 
     public void requestRestart() {
@@ -211,6 +218,21 @@ public class GameScene extends Scene {
         nextPlayerBulletId = combatState.getNextPlayerBulletId();
         nextEnemyBulletId = combatState.getNextEnemyBulletId();
 
+        for (Entity e : engine.getEntitiesByLayer(LAYER_ENEMY)) {
+            if (e instanceof EliteEnemyShip && e.isActive()) {
+                EliteEnemyShip elite = (EliteEnemyShip) e;
+                if (elite.shouldFire()) {
+                    float spawnX = elite.getX() - 10f;
+                    float spawnY = elite.getY() + elite.getHeight() / 2f;
+                    
+                    EliteBullet missile = new EliteBullet(nextEnemyBulletId++, new Vector2(spawnX, spawnY), player);
+                    missile.setCollisionLayer(LAYER_ENEMY_BULLET);
+                    missile.setCollisionMask(LAYER_PLAYER);
+                    engine.addEntity(missile);
+                }
+            }
+        }
+
         int oldScore = score;
         
         GameProgressionService.ProgressionResult progressionResult =
@@ -220,18 +242,47 @@ public class GameScene extends Scene {
             transitionToResult();
             return;
         }
+        
+        if (player.hasPickedUpHealth()) {
+            player.consumeHealthPickup();
+            if (audioManager != null) {
+                audioManager.playHealSound();
+            }
+            if (gameState.getLives() < gameState.getMaxLives()) {
+                gameState.setLives(gameState.getLives() + 1);
+            }
+        }
+        // --------------------------------------------------------------
 
-        // --- FIXED: Properly casting the entity to set its Y position in the physics engine ---
         if (score > oldScore) {
             for (Entity e : engine.getEntitiesByLayer(LAYER_GATE)) {
                 if (e.getPosition().x < player.getPosition().x + 600f) {
                     if (e instanceof RectangleEntity) {
-                        ((RectangleEntity) e).setY(-2000f); // Drops it instantly off the bottom of the screen!
+                        ((RectangleEntity) e).setY(-2000f); 
                     }
                 }
             }
+            
+            float randomY = MathUtils.random(100f, WORLD_HEIGHT - 100f);
+            EliteEnemyShip eliteShip = new EliteEnemyShip(nextEliteEnemyId++, new Vector2(WORLD_WIDTH + 100f, randomY), player);
+            eliteShip.setCollisionLayer(LAYER_ENEMY);
+            eliteShip.setCollisionMask(LAYER_PLAYER);
+            
+            eliteShip.setOnDamageCallback(() -> {
+                if (audioManager != null) audioManager.playShipDamageSound();
+            });
+            
+            eliteShip.setOnDeathCallback(() -> {
+                if (audioManager != null) audioManager.playBreakSound();
+                
+                HealthOrb orb = new HealthOrb(nextEliteEnemyId++, new Vector2(eliteShip.getX(), eliteShip.getY() + 20f));
+                orb.setCollisionLayer(LAYER_POWERUP);
+                orb.setCollisionMask(LAYER_PLAYER);
+                engine.addEntity(orb);
+            });
+            
+            engine.addEntity(eliteShip);
         }
-        // --------------------------------------------------------------------------------------
 
         engine.update(deltaTime);
         cleanupOffScreen();
@@ -284,10 +335,16 @@ public class GameScene extends Scene {
 
     private void clearDynamicEntities() {
         cullingService.clearDynamicEntities(player);
+        for (Entity entity : engine.getEntitiesByLayer(LAYER_POWERUP)) {
+            engine.removeEntity(entity);
+        }
     }
 
     private void cleanupOffScreen() {
         cullingService.cleanupOffScreen(player);
+        for (Entity entity : engine.getEntitiesByLayer(LAYER_POWERUP)) {
+            if (entity.getX() < -200f) engine.removeEntity(entity);
+        }
     }
 
     private void transitionToResult() {

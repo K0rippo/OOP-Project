@@ -30,11 +30,14 @@ public class GameStateManager {
     public int getLives() {
         return lives;
     }
+    
+    public void setLives(int newLives) {
+        this.lives = newLives;
+    }
 
     public int getMaxLives() {
         return initialLives;
     }
-    // ---------------------------------------------------------
 
     public int getTotalQuestions() {
         return questionProvider.getTotalQuestions();
