@@ -1,5 +1,5 @@
 package com.mygdx.game.simulation;
-
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.engine.IGameEngine;
@@ -111,8 +111,11 @@ class SegmentSpawnService {
                                   WallHudCoordinator.WallGroup group) {
         for (int i = 0; i < 3; i++) {
             WallType type = (correctIndex == i) ? WallType.CORRECT : WallType.WRONG;
+            Color slotColor = LaneStyle.getSlotColor(i);
+
             RectangleEntity wall = obstacleFactory.createWall(
                     type,
+                    slotColor,
                     segmentId * 10 + i,
                     spawnX,
                     sectionHeight * (2 - i),
