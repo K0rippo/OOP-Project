@@ -7,7 +7,7 @@ import com.mygdx.game.engine.RectangleEntity;
 
 public class EliteBullet extends RectangleEntity {
 
-    private static final float SPEED = 250f;
+    private static final float SPEED = 200f;
     private static final float LIFETIME = 3.0f;
     
     private final PlayerCharacter target;
