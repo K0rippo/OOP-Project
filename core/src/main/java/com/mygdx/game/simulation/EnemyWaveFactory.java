@@ -1,5 +1,6 @@
 package com.mygdx.game.simulation;
 
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
@@ -46,9 +47,17 @@ public class EnemyWaveFactory {
     private Array<EnemyShipSpec> buildDefaultSpecs(float scrollSpeed) {
         Array<EnemyShipSpec> specs = new Array<EnemyShipSpec>();
 
+        float y1 = MathUtils.random(0.15f, 0.85f);
+        float y2;
+        
+        do {
+            y2 = MathUtils.random(0.15f, 0.85f);
+        } while (Math.abs(y1 - y2) < 0.25f);
+        // ----------------------------------------------------------
+
         specs.add(new EnemyShipSpec(
                 -120f,
-                0.70f,
+                y1,
                 scrollSpeed,
                 scrollSpeed + 35f,
                 0.25f,
@@ -58,7 +67,7 @@ public class EnemyWaveFactory {
 
         specs.add(new EnemyShipSpec(
                 40f,
-                0.30f,
+                y2,
                 scrollSpeed,
                 scrollSpeed + 28f,
                 0.25f,

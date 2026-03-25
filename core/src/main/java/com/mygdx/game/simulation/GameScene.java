@@ -252,7 +252,6 @@ public class GameScene extends Scene {
                 gameState.setLives(gameState.getLives() + 1);
             }
         }
-        // --------------------------------------------------------------
 
         if (score > oldScore) {
             for (Entity e : engine.getEntitiesByLayer(LAYER_GATE)) {
@@ -263,25 +262,28 @@ public class GameScene extends Scene {
                 }
             }
             
-            float randomY = MathUtils.random(100f, WORLD_HEIGHT - 100f);
-            EliteEnemyShip eliteShip = new EliteEnemyShip(nextEliteEnemyId++, new Vector2(WORLD_WIDTH + 100f, randomY), player);
-            eliteShip.setCollisionLayer(LAYER_ENEMY);
-            eliteShip.setCollisionMask(LAYER_PLAYER);
-            
-            eliteShip.setOnDamageCallback(() -> {
-                if (audioManager != null) audioManager.playShipDamageSound();
-            });
-            
-            eliteShip.setOnDeathCallback(() -> {
-                if (audioManager != null) audioManager.playBreakSound();
+            if (score < gameState.getTotalQuestions()) {
+                float randomY = MathUtils.random(100f, WORLD_HEIGHT - 100f);
+                EliteEnemyShip eliteShip = new EliteEnemyShip(nextEliteEnemyId++, new Vector2(WORLD_WIDTH + 100f, randomY), player);
+                eliteShip.setCollisionLayer(LAYER_ENEMY);
+                eliteShip.setCollisionMask(LAYER_PLAYER);
                 
-                HealthOrb orb = new HealthOrb(nextEliteEnemyId++, new Vector2(eliteShip.getX(), eliteShip.getY() + 20f));
-                orb.setCollisionLayer(LAYER_POWERUP);
-                orb.setCollisionMask(LAYER_PLAYER);
-                engine.addEntity(orb);
-            });
-            
-            engine.addEntity(eliteShip);
+                eliteShip.setOnDamageCallback(() -> {
+                    if (audioManager != null) audioManager.playShipDamageSound();
+                });
+                
+                eliteShip.setOnDeathCallback(() -> {
+                    if (audioManager != null) audioManager.playBreakSound();
+                    
+                    HealthOrb orb = new HealthOrb(nextEliteEnemyId++, new Vector2(eliteShip.getX(), eliteShip.getY() + 20f));
+                    orb.setCollisionLayer(LAYER_POWERUP);
+                    orb.setCollisionMask(LAYER_PLAYER);
+                    engine.addEntity(orb);
+                });
+                
+                engine.addEntity(eliteShip);
+            }
+            // -----------------------------------------------------------------------
         }
 
         engine.update(deltaTime);
