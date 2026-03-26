@@ -72,7 +72,7 @@ public class MenuScene extends Scene {
         TextureRegionDrawable panelBackground = createPanelDrawable(cyanBorder);
 
         Label.LabelStyle titleStyle = new Label.LabelStyle(titleFont, Color.WHITE);
-        Label titleLabel = new Label("SPACE SHOOTERS", titleStyle);
+        Label titleLabel = new Label("SPACE LEARNING", titleStyle);
         titleLabel.setAlignment(Align.center);
 
         TextButton btnPlay = new TextButton("PLAY", cyanStyle);
