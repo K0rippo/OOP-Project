@@ -18,7 +18,7 @@ public class CsvQuestionProvider implements IQuestionProvider {
         try {
             FileHandle fileHandle = Gdx.files.internal(CSV_FILE);
             if (!fileHandle.exists()) {
-                System.err.println("⚠️ questions.csv not found! Using default questions.");
+                System.err.println("questions.csv not found! Using default questions.");
                 loadDefaultQuestions();
                 return;
             }
@@ -26,7 +26,7 @@ public class CsvQuestionProvider implements IQuestionProvider {
             String[] lines = fileHandle.readString().split("\n");
             
             if (lines.length < 2) {
-                System.err.println("⚠️ questions.csv is empty! Using default questions.");
+                System.err.println("questions.csv is empty! Using default questions.");
                 loadDefaultQuestions();
                 return;
             }
@@ -42,17 +42,17 @@ public class CsvQuestionProvider implements IQuestionProvider {
                         questions.add(q);
                     }
                 } catch (Exception e) {
-                    System.err.println("⚠️ Error parsing line " + (i + 1) + ": " + e.getMessage());
+                    System.err.println("Error parsing line " + (i + 1) + ": " + e.getMessage());
                 }
             }
 
             if (questions.size == 0) {
-                System.err.println("⚠️ No valid questions loaded from CSV! Using default questions.");
+                System.err.println("No valid questions loaded from CSV! Using default questions.");
                 loadDefaultQuestions();
                 return;
             }
 
-            System.out.println("✓ Loaded " + questions.size + " questions from " + CSV_FILE);
+            System.out.println("Loaded " + questions.size + " questions from " + CSV_FILE);
             questions.shuffle();
 
         } catch (Exception e) {
@@ -66,8 +66,8 @@ public class CsvQuestionProvider implements IQuestionProvider {
             //handle commas inside quoted fields
             String[] fields = parseCSVLine(line);
 
-            if (fields.length < 8) {
-                System.err.println("✗ Insufficient fields in line: " + line);
+            if (fields.length < 7) {
+                System.err.println("Insufficient fields in line: " + line);
                 return null;
             }
 
@@ -79,13 +79,12 @@ public class CsvQuestionProvider implements IQuestionProvider {
             float colorR = Float.parseFloat(fields[4].trim());
             float colorG = Float.parseFloat(fields[5].trim());
             float colorB = Float.parseFloat(fields[6].trim());
-            float timeLimit = Float.parseFloat(fields[7].trim());
 
             //first answer slot is treated as the correct answer
             String[] answers = { correctAnswer, wrongAnswer1, wrongAnswer2 };
             Color themeColor = new Color(colorR, colorG, colorB, 1f);
 
-            return new Question(questionText, answers, themeColor, timeLimit);
+            return new Question(questionText, answers, themeColor);
 
         } catch (NumberFormatException e) {
             System.err.println("✗ Number parsing error: " + e.getMessage());
@@ -123,32 +122,27 @@ public class CsvQuestionProvider implements IQuestionProvider {
         questions.add(new Question(
             "What is the probability of flipping tails on a fair coin?",
             new String[]{"1/2", "1/3", "1/4"},
-            new Color(0.1f, 0.1f, 0.2f, 1f),
-            5f
+            new Color(0.1f, 0.1f, 0.2f, 1f)
         ));
         questions.add(new Question(
             "What is the probability of rolling a 4 on a 6-sided die?",
             new String[]{"1/6", "1/2", "1/4"},
-            new Color(0.1f, 0.2f, 0.1f, 1f),
-            5f
+            new Color(0.1f, 0.2f, 0.1f, 1f)
         ));
         questions.add(new Question(
             "What is the probability of drawing an Ace from a standard deck?",
             new String[]{"1/13", "1/4", "1/52"},
-            new Color(0.2f, 0.1f, 0.1f, 1f),
-            4f
+            new Color(0.2f, 0.1f, 0.1f, 1f)
         ));
         questions.add(new Question(
             "What is the probability of flipping two heads in a row?",
             new String[]{"1/4", "1/2", "3/4"},
-            new Color(0.2f, 0.2f, 0.1f, 1f),
-            4f
+            new Color(0.2f, 0.2f, 0.1f, 1f)
         ));
         questions.add(new Question(
             "What is the probability of rolling a sum of 7 with two dice?",
             new String[]{"1/6", "1/12", "1/36"},
-            new Color(0.1f, 0.1f, 0.1f, 1f),
-            3.5f
+            new Color(0.1f, 0.1f, 0.1f, 1f)
         ));
 
         System.out.println("✓ Using " + questions.size + " default questions");
