@@ -37,7 +37,7 @@ public class EliteEnemyShip extends RectangleEntity {
         
         // Moves left faster than normal enemies
         setVelocityX(-150f); 
-    }
+    } 
 
     public void setOnDeathCallback(Runnable callback) { this.onDeathCallback = callback; }
     public void setOnDamageCallback(Runnable callback) { this.onDamageCallback = callback; }
