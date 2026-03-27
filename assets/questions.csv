@@ -1,6 +1,6 @@
-question,correct_answer,wrong_answer_1,wrong_answer_2,theme_color_r,theme_color_g,theme_color_b,time_limit
-Which keyword is used to inherit a class in Java?,extends,implements,inherits,0.1,0.1,0.3,5
-Which concept intentionally hides internal object details?,Encapsulation,Inheritance,Polymorphism,0.2,0.1,0.1,5
-Does Java support multiple inheritance for classes?,No,Sometimes,Yes,0.2,0.2,0.1,5
-Which modifier completely hides a variable from other classes?,private,public,protected,0.1,0.3,0.1,5
-Which keyword is used to access a parent class's constructor or methods?,super,this,parent,0.2,0.3,0.2,5
+question,correct_answer,wrong_answer_1,wrong_answer_2,theme_color_r,theme_color_g,theme_color_b
+Which keyword is used to inherit a class in Java?,extends,implements,inherits,0.1,0.1,0.3
+Which concept intentionally hides internal object details?,Encapsulation,Inheritance,Polymorphism,0.2,0.1,0.1
+Does Java support multiple inheritance for classes?,No,Sometimes,Yes,0.2,0.2,0.1
+Which modifier completely hides a variable from other classes?,private,public,protected,0.1,0.3,0.1
+Which keyword is used to access a parent class's constructor or methods?,super,this,parent,0.2,0.3,0.2

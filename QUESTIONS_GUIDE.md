@@ -13,7 +13,7 @@ Questions are now loaded from a CSV file (`assets/questions.csv`) instead of bei
 
 ### Header Row
 ```
-question,correct_answer,wrong_answer_1,wrong_answer_2,theme_color_r,theme_color_g,theme_color_b,time_limit
+question,correct_answer,wrong_answer_1,wrong_answer_2,theme_color_r,theme_color_g,theme_color_b
 ```
 
 ### Field Descriptions
@@ -27,11 +27,10 @@ question,correct_answer,wrong_answer_1,wrong_answer_2,theme_color_r,theme_color_
 | `theme_color_r` | Float | Red component (0.0-1.0) | "0.2" |
 | `theme_color_g` | Float | Green component (0.0-1.0) | "0.1" |
 | `theme_color_b` | Float | Blue component (0.0-1.0) | "0.15" |
-| `time_limit` | Float | Time to reach wall in seconds | "5" |
 
 ## Example CSV Entry
 ```csv
-What is the capital of France?,Paris,London,Berlin,0.25,0.15,0.15,5
+What is the capital of France?,Paris,London,Berlin,0.25,0.15,0.15
 ```
 
 This creates a question:
@@ -69,7 +68,7 @@ Purple:     0.5, 0.0, 0.5
 
 ### Fallback Behavior
 If `questions.csv` is not found or cannot be parsed:
-- Console prints warning: `⚠️ questions.csv not found! Using default questions.`
+- Console prints warning: `questions.csv not found! Using default questions.`
 - Game uses 5 built-in questions as backup
 - Game continues normally
 

@@ -7,13 +7,11 @@ public class Question {
     //index 0 is always the correct answer
     private String[] answers;
     private Color themeColor;
-    private float timeToReach;
 
-    public Question(String text, String[] answers, Color themeColor, float timeToReach) {
+    public Question(String text, String[] answers, Color themeColor) {
         this.text = text;
         this.answers = answers;
         this.themeColor = themeColor;
-        this.timeToReach = timeToReach;
     }
 
     public String getText() {
